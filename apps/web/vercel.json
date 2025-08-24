@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd ../.. && yarn workspace web build",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && yarn install",
+  "functions": {
+    "apps/web/.next/server/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
