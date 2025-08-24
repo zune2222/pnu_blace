@@ -543,7 +543,7 @@ export class SchoolApiService {
         // 각 item에서 필드 추출
         const extractFromItem = (tagName: string): string => {
           const regex = new RegExp(
-            `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]*)\\]\\]>\\s*</${tagName}>`,
+            `<${tagName}>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tagName}>`,
             'i',
           );
           const match = itemXml.match(regex);

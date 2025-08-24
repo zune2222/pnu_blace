@@ -127,6 +127,11 @@ export class ApiClient {
     return this.get("/health");
   }
 
+  // 열람실 목록 조회
+  async getRooms() {
+    return this.get("/api/v1/rooms");
+  }
+
   // 토큰 관리 메서드
   setAuthToken(token: string) {
     TokenManager.setToken(token);
