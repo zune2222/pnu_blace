@@ -6,7 +6,7 @@ import { Button } from "@/shared/ui";
 
 export const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
   const [themeMode, setThemeMode] = useState<"system" | "light" | "dark">(
     "system"
   );
@@ -26,18 +26,7 @@ export const Header: React.FC = () => {
         | null;
       const currentMode: "system" | "light" | "dark" = saved || "system";
 
-      let shouldBeDark = false;
-      if (currentMode === "dark") {
-        shouldBeDark = true;
-      } else if (currentMode === "light") {
-        shouldBeDark = false;
-      } else {
-        // system 모드일 때는 현재 시스템 설정 확인
-        shouldBeDark = mediaQuery.matches;
-      }
-
       setThemeMode(currentMode);
-      setIsDarkMode(shouldBeDark);
     };
 
     // 초기 상태 동기화
@@ -48,7 +37,6 @@ export const Header: React.FC = () => {
       const saved = localStorage.getItem("theme");
       // system 모드일 때만 시스템 설정을 따름
       if (!saved || saved === "system") {
-        setIsDarkMode(e.matches);
         if (e.matches) {
           html.classList.add("dark");
         } else {
@@ -83,7 +71,6 @@ export const Header: React.FC = () => {
     }
 
     setThemeMode(newMode);
-    setIsDarkMode(newDarkMode);
 
     // DOM 클래스와 colorScheme 업데이트
     if (newDarkMode) {
@@ -110,32 +97,6 @@ export const Header: React.FC = () => {
           </div>
 
           {/* 데스크톱 네비게이션 */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
-            >
-              홈
-            </Link>
-            <Link
-              href="/features"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-            >
-              기능
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-            >
-              소개
-            </Link>
-            <Link
-              href="/contact"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-            >
-              문의
-            </Link>
-          </nav>
 
           {/* 데스크톱 액션 버튼 */}
           <div className="hidden md:flex items-center space-x-3">
@@ -194,9 +155,6 @@ export const Header: React.FC = () => {
             <Button variant="outline" size="sm" asChild>
               <Link href="/login">로그인</Link>
             </Button>
-            <Button size="sm" asChild>
-              <Link href="/register">회원가입</Link>
-            </Button>
           </div>
 
           {/* 모바일 메뉴 및 로그인 버튼 */}
@@ -245,59 +203,10 @@ export const Header: React.FC = () => {
           }`}
         >
           <div className="px-2 pt-2 pb-3 space-y-1 bg-background/80 backdrop-blur-sm border-t border-border/40">
-            <div
-              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "100ms" }}
-            >
-              <Link
-                href="/"
-                className="block px-3 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                홈
-              </Link>
-            </div>
-            <div
-              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "150ms" }}
-            >
-              <Link
-                href="/features"
-                className="block px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                기능
-              </Link>
-            </div>
-            <div
-              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "200ms" }}
-            >
-              <Link
-                href="/about"
-                className="block px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                소개
-              </Link>
-            </div>
-            <div
-              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "250ms" }}
-            >
-              <Link
-                href="/contact"
-                className="block px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                문의
-              </Link>
-            </div>
-
             {/* 모바일 테마 토글 */}
             <div
               className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "300ms" }}
+              style={{ transitionDelay: "100ms" }}
             >
               <button
                 onClick={toggleDarkMode}
@@ -362,19 +271,11 @@ export const Header: React.FC = () => {
             {/* 모바일 액션 버튼 */}
             <div
               className={`pt-4 space-y-3 transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "350ms" }}
+              style={{ transitionDelay: "200ms" }}
             >
               <Button variant="outline" className="w-full" asChild>
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                   로그인
-                </Link>
-              </Button>
-              <Button className="w-full" asChild>
-                <Link
-                  href="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  회원가입
                 </Link>
               </Button>
             </div>
