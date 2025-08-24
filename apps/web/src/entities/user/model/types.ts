@@ -1,6 +1,8 @@
-import { UserProfileDto } from "@packages/types";
-
-export type UserProfile = UserProfileDto;
+export interface UserProfile {
+  studentId: string;
+  name?: string;
+  major?: string;
+}
 
 export interface UserState {
   profile: UserProfile | null;

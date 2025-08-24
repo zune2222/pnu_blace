@@ -21,10 +21,13 @@ export const LoginForm: React.FC = () => {
             label="학번"
             type="text"
             name="studentId"
-            placeholder="2021000000"
+            placeholder="202100000"
             value={formData.studentId}
             onChange={handleChange}
             error={errors.studentId}
+            maxLength={9}
+            pattern="[0-9]*"
+            inputMode="numeric"
             required
           />
 

@@ -1,4 +1,13 @@
-import { LoginRequestDto, LoginResponse, JwtPayload } from "@packages/types";
+// 프론트엔드용 타입 정의 (백엔드 의존성 없음)
+export interface LoginResponse {
+  accessToken: string;
+}
+
+export interface JwtPayload {
+  sub: string; // studentId
+  iat: number;
+  exp: number;
+}
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -11,12 +20,13 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-export type LoginCredentials = LoginRequestDto;
-
-export interface AuthContextType extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => void;
-  refreshToken: () => Promise<void>;
+export interface LoginCredentials {
+  studentId: string;
+  password: string;
 }
 
-export type { LoginResponse, JwtPayload };
+export interface AuthContextType extends AuthState {
+  login: (credentials: LoginCredentials) => Promise<LoginResponse>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<string>;
+}

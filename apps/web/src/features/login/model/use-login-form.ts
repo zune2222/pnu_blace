@@ -36,19 +36,30 @@ export const useLoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // 클라이언트 사이드 유효성 검사
     if (!validateForm()) {
       return;
     }
+
+    // 일반 에러 메시지 초기화
+    setErrors((prev) => ({ ...prev, general: undefined }));
 
     try {
       await login({
         studentId: formData.studentId,
         password: formData.password,
       });
-      // Login successful - redirect will be handled by auth context or parent component
+      // 로그인 성공 - useAuth에서 리다이렉트 처리
     } catch (error) {
       console.error("Login failed:", error);
-      setErrors({ general: "로그인에 실패했습니다. 다시 시도해주세요." });
+
+      // 에러 메시지 설정
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "로그인에 실패했습니다. 다시 시도해주세요.";
+
+      setErrors({ general: errorMessage });
     }
   };
 

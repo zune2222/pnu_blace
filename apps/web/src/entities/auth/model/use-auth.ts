@@ -1,93 +1,74 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { AuthState, LoginCredentials, AuthContextType } from "./types";
+import { useEffect } from "react";
+import { AuthContextType, LoginCredentials } from "./types";
+import { useAuthState } from "./use-auth-state";
+import { useAuthActions } from "./use-auth-actions";
+import { useAuthRouter } from "./use-auth-router";
 import { authApi } from "../api/auth-api";
 
-const STORAGE_KEY = "auth_token";
-
+// 작은 hook들을 조합하는 컴포지션 hook
 export const useAuth = (): AuthContextType => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
-    token: null,
-    isLoading: true,
-  });
+  const {
+    authState,
+    setAuthenticated,
+    setUnauthenticated,
+    setLoading,
+    updateToken,
+  } = useAuthState();
+  const { redirectToHome, redirectToLogin } = useAuthRouter();
 
-  // Initialize auth state from localStorage
+  const {
+    login: loginAction,
+    logout: logoutAction,
+    refreshToken: refreshTokenAction,
+  } = useAuthActions(
+    setAuthenticated,
+    setUnauthenticated,
+    setLoading,
+    updateToken
+  );
+
+  // 초기화만 담당 (한 번만 실행)
   useEffect(() => {
-    const token = localStorage.getItem(STORAGE_KEY);
-    if (token) {
+    const initializeAuth = async () => {
       try {
-        // TODO: Validate token and get user info
-        // For now, just set as authenticated
-        setAuthState((prev) => ({
-          ...prev,
-          isAuthenticated: true,
-          token,
-          isLoading: false,
-        }));
+        const token = authApi.getCurrentToken();
+        if (!token) {
+          setUnauthenticated();
+          return;
+        }
+
+        const isValid = await authApi.checkAuth();
+        if (isValid) {
+          setAuthenticated(null, token);
+        } else {
+          setUnauthenticated();
+        }
       } catch (error) {
-        localStorage.removeItem(STORAGE_KEY);
-        setAuthState((prev) => ({ ...prev, isLoading: false }));
+        console.error("Auth initialization failed:", error);
+        setUnauthenticated();
       }
-    } else {
-      setAuthState((prev) => ({ ...prev, isLoading: false }));
-    }
-  }, []);
+    };
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    try {
-      setAuthState((prev) => ({ ...prev, isLoading: true }));
+    initializeAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 의도적으로 한 번만 실행
 
-      const response = await authApi.login(credentials);
+  // 라우팅이 포함된 액션들
+  const login = async (credentials: LoginCredentials) => {
+    const response = await loginAction(credentials);
+    redirectToHome();
+    return response;
+  };
 
-      // Store token
-      localStorage.setItem(STORAGE_KEY, response.accessToken);
+  const logout = async () => {
+    await logoutAction();
+    redirectToLogin();
+  };
 
-      // TODO: Decode JWT to get user info
-      const user = {
-        studentId: credentials.studentId,
-        // name and major should come from JWT or separate API call
-      };
-
-      setAuthState({
-        isAuthenticated: true,
-        user,
-        token: response.accessToken,
-        isLoading: false,
-      });
-    } catch (error) {
-      setAuthState((prev) => ({ ...prev, isLoading: false }));
-      throw error;
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-      token: null,
-      isLoading: false,
-    });
-  }, []);
-
-  const refreshToken = useCallback(async () => {
-    if (!authState.token) return;
-
-    try {
-      const response = await authApi.refreshToken(authState.token);
-      localStorage.setItem(STORAGE_KEY, response.accessToken);
-
-      setAuthState((prev) => ({
-        ...prev,
-        token: response.accessToken,
-      }));
-    } catch (error) {
-      logout();
-      throw error;
-    }
-  }, [authState.token, logout]);
+  const refreshToken = async () => {
+    return await refreshTokenAction();
+  };
 
   return {
     ...authState,

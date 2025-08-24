@@ -6,8 +6,8 @@ export const validateLoginForm = (formData: LoginFormData): LoginFormErrors => {
   // 학번 유효성 검사
   if (!formData.studentId) {
     errors.studentId = "학번을 입력해주세요";
-  } else if (!/^\d{10}$/.test(formData.studentId)) {
-    errors.studentId = "올바른 학번 형식을 입력해주세요 (10자리 숫자)";
+  } else if (!/^\d{9}$/.test(formData.studentId)) {
+    errors.studentId = "올바른 학번 형식을 입력해주세요 (9자리 숫자)";
   }
 
   // 비밀번호 유효성 검사
