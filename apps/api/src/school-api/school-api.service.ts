@@ -262,7 +262,7 @@ export class SchoolApiService {
       }
 
       const response: AxiosResponse = await this.httpClient.get(
-        `/seatMap.do?roomNo=${roomNo}`,
+        `/seatMap.do?roomNo=${roomNo}&searchGB=S&campGB=(null)&deviceGB=I`,
         {
           headers,
         },
@@ -276,6 +276,49 @@ export class SchoolApiService {
     } catch (error: any) {
       this.logger.error(`Get seat map error: ${error.message}`);
       return [];
+    }
+  }
+
+  /**
+   * 특정 방의 정보 조회 (HTML에서 추출)
+   */
+  async getRoomInfo(
+    roomNo: string,
+    sessionID?: string,
+  ): Promise<{ roomNo: string; roomName: string } | null> {
+    try {
+      const headers: any = {};
+      if (sessionID) {
+        headers.Cookie = `JSESSIONID=${sessionID}`;
+      }
+
+      const response: AxiosResponse = await this.httpClient.get(
+        `/seatMap.do?roomNo=${roomNo}&searchGB=S&campGB=(null)&deviceGB=I`,
+        {
+          headers,
+        },
+      );
+
+      if (response.status === 200 && response.data) {
+        const html = response.data as string;
+
+        // 방 번호와 방 이름 추출
+        const roomNoMatch = html.match(/roomNo\s*=\s*"(\d+)";/);
+        const roomNameMatch = html.match(/roomName\s*=\s*"([^"]+)";/);
+
+        const extractedRoomNo = roomNoMatch ? roomNoMatch[1] : roomNo;
+        const roomName = roomNameMatch ? roomNameMatch[1] : `열람실 ${roomNo}`;
+
+        return {
+          roomNo: extractedRoomNo,
+          roomName: roomName,
+        };
+      }
+
+      return null;
+    } catch (error: any) {
+      this.logger.error(`Get room info error: ${error.message}`);
+      return null;
     }
   }
 
@@ -346,7 +389,7 @@ export class SchoolApiService {
       });
     }
 
-    // 고장난/사용불가 좌석 배열 추출
+    // 고장난/사용불가 좌석 배열 추출 (seatFix 변수)
     const seatFixMatch = html.match(/seatFix\s*=\s*"([^"]+)";/);
     const unavailableSeatNumbers = new Set<string>();
 
@@ -370,6 +413,15 @@ export class SchoolApiService {
       }
     }
 
+    // 방 번호와 방 이름 추출
+    const roomNoMatch = html.match(/roomNo\s*=\s*"(\d+)";/);
+    const roomNameMatch = html.match(/roomName\s*=\s*"([^"]+)";/);
+
+    const roomNo = roomNoMatch ? roomNoMatch[1] : '';
+    const roomName = roomNameMatch ? roomNameMatch[1] : '';
+
+    this.logger.debug(`Parsing seats for room: ${roomNo} (${roomName})`);
+
     // td 태그에서 좌석 정보 추출 (id가 숫자인 것들)
     $('td[id]').each((index, element) => {
       const $seat = $(element);
@@ -390,6 +442,9 @@ export class SchoolApiService {
         seats.push({ setNo, status });
       }
     });
+
+    // 좌석 번호로 정렬
+    seats.sort((a, b) => parseInt(a.setNo) - parseInt(b.setNo));
 
     this.logger.debug(`Parsed ${seats.length} seats from HTML`);
     this.logger.debug(
@@ -491,7 +546,10 @@ export class SchoolApiService {
    */
   async getRoomStatus(): Promise<RoomInfo[]> {
     try {
-      const response = await this.httpClient.post('/seatStatusListNew.do', 'libGB=S');
+      const response = await this.httpClient.post(
+        '/seatStatusListNew.do',
+        'libGB=S',
+      );
 
       this.logger.log(`Room status response status: ${response.status}`);
       this.logger.log(
@@ -583,5 +641,40 @@ export class SchoolApiService {
       return error.message;
     }
     return String(error);
+  }
+
+  /**
+   * 방 번호에 따른 배경 이미지 URL 반환
+   */
+  getBackgroundImageUrl(roomNo: string): string {
+    const backgroundMap: Record<string, string> = {
+      // 1층
+      '1': '/PUSAN_MOBILE/images/1f_reading_zone.jpg', // READING-ZONE-1F
+      '2': '/PUSAN_MOBILE/images/1f_dvd_zone.jpg', // DVD-ZONE-1F
+
+      // 2층
+      '3': '/PUSAN_MOBILE/images/2f_reading_A.jpg', // READING-A-2F
+      '4': '/PUSAN_MOBILE/images/2f_reading_B.jpg', // READING-B-2F
+      '5': '/PUSAN_MOBILE/images/2f_notebook_reading.jpg', // NOTEBOOK-READING-2F
+      '29': '/PUSAN_MOBILE/images/2F_dawn_A.jpg', // DAWN-A-2F
+      '30': '/PUSAN_MOBILE/images/2F_dawn_B.jpg', // DAWN-B-2F
+
+      // 3층
+      '6': '/PUSAN_MOBILE/images/3f_2_reading_A.jpg', // READING2-A-3F
+      '7': '/PUSAN_MOBILE/images/3f_2_reading_B.jpg', // READING2-B-3F
+      '8': '/PUSAN_MOBILE/images/3f_2_reading_C.jpg', // READING2-C-3F
+      '9': '/PUSAN_MOBILE/images/3f_2_reading_D.jpg', // READING2-D-3F
+
+      // 4층
+      '10': '/PUSAN_MOBILE/images/4f_3_reading_A.jpg', // READING3-A-4F
+      '11': '/PUSAN_MOBILE/images/4f_3_reading_B.jpg', // READING3-B-4F
+      '12': '/PUSAN_MOBILE/images/4f_3_reading_C.jpg', // READING3-C-4F
+      '13': '/PUSAN_MOBILE/images/4f_3_reading_D.jpg', // READING3-D-4F
+      '14': '/PUSAN_MOBILE/images/4f_2_notebook_A.jpg', // NOTEBOOK2-A-4F
+      '15': '/PUSAN_MOBILE/images/4f_2_notebook_B.jpg', // NOTEBOOK2-B-4F
+      '16': '/PUSAN_MOBILE/images/4f_carel.jpg', // CARREL-4F
+    };
+
+    return backgroundMap[roomNo] || '/PUSAN_MOBILE/images/1f_reading_zone.jpg';
   }
 }

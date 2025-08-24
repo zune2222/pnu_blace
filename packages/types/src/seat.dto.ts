@@ -6,6 +6,18 @@ export class SeatStatusDto {
 	status: "AVAILABLE" | "OCCUPIED" | "UNAVAILABLE";
 }
 
+// GET /seats/:roomNo/detail
+export class SeatDetailDto {
+	roomNo: string;
+	roomName: string;
+	totalSeats: number;
+	occupiedSeats: string[];
+	unavailableSeats: string[];
+	availableSeats: string[];
+	seats: SeatStatusDto[];
+	backgroundImageUrl?: string;
+}
+
 // GET /seats/my-seat
 export class MySeatDto {
 	roomNo: string;
