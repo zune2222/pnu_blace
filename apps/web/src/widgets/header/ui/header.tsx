@@ -103,11 +103,17 @@ export const Header: React.FC = () => {
           {/* 데스크톱 네비게이션 */}
           {isAuthenticated && (
             <div className="hidden md:flex items-center space-x-8">
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className="text-muted-foreground hover:text-foreground transition-colors font-medium"
               >
                 대시보드
+              </Link>
+              <Link
+                href="/seats"
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              >
+                좌석 찾기
               </Link>
             </div>
           )}
@@ -166,7 +172,7 @@ export const Header: React.FC = () => {
               )}
             </button>
 
-{isAuthenticated ? (
+            {isAuthenticated ? (
               <Button variant="outline" size="sm" onClick={logout}>
                 로그아웃
               </Button>
@@ -242,6 +248,13 @@ export const Header: React.FC = () => {
                 >
                   대시보드
                 </Link>
+                <Link
+                  href="/seats"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                >
+                  좌석 찾기
+                </Link>
               </div>
             )}
 
@@ -315,10 +328,10 @@ export const Header: React.FC = () => {
               className={`pt-4 space-y-3 transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
               style={{ transitionDelay: "200ms" }}
             >
-{isAuthenticated ? (
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
+              {isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
@@ -328,7 +341,10 @@ export const Header: React.FC = () => {
                 </Button>
               ) : (
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     로그인
                   </Link>
                 </Button>
