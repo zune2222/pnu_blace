@@ -12,9 +12,9 @@ export const HomePage: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <HeroSection />
+      <CtaSection />
       <FeaturesSection />
       <StatsSection />
-      <CtaSection />
       <Footer />
     </div>
   );

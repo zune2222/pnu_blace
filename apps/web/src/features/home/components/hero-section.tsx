@@ -8,7 +8,9 @@ export const HeroSection: React.FC = () => {
           PNU Blace
         </h1>
         <p className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light leading-tight max-w-5xl mx-auto variable-weight-hover cursor-default">
-          부산대학교 도서관 좌석 예약의 새로운 경험
+          부산대학교 도서관
+          <br />
+          좌석 시스템의 새로운 경험
         </p>
       </div>
     </section>

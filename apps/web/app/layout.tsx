@@ -63,10 +63,9 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PNU Blace - 부산대학교 도서관 좌석 예약 시스템",
-  description:
-    "부산대학교 도서관 좌석을 실시간으로 모니터링하고 자동 예약하는 서비스",
-  keywords: ["부산대학교", "도서관", "좌석예약", "자동예약", "PNU"],
+  title: "PNU Blace",
+  description: "부산대학교 도서관을 더욱 편리하게",
+  keywords: ["부산대학교", "도서관", "좌석예약", "자동예약", "PNU", "Blace"],
 };
 
 // 다크 모드 초기화 스크립트 (번쩍임 방지)

@@ -6,23 +6,30 @@ export const CtaSection: React.FC = () => {
   return (
     <section className="py-32 px-6">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-5xl md:text-6xl lg:text-7xl font-light text-foreground variable-weight-hover mb-12 cursor-default">
-          지금 시작하세요
-        </h2>
-        <div className="space-y-6">
-          <Button size="lg" className="text-lg px-8 py-4" asChild>
-            <Link href="/register">시작하기</Link>
+        <div className="flex justify-center">
+          <Button
+            size="lg"
+            className="group relative text-xl font-semibold px-8 py-4 border-0 bg-transparent hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            asChild
+          >
+            <Link href="/login" className="flex items-center gap-3">
+              <span>시작하기</span>
+              <svg
+                className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </Link>
           </Button>
-          <div>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-lg px-8 py-4"
-              asChild
-            >
-              <Link href="/login">로그인</Link>
-            </Button>
-          </div>
         </div>
       </div>
     </section>
