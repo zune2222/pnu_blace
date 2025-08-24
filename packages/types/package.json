@@ -1,30 +1,37 @@
 {
-	"name": "@repo/ui",
+	"name": "@pnu-blace/types",
 	"version": "0.0.0",
 	"private": true,
+	"main": "./src/index.ts",
 	"exports": {
-		"./*": "./src/*.tsx"
+		".": "./src/index.ts",
+		"./user": "./src/user.dto.ts",
+		"./seat": "./src/seat.dto.ts",
+		"./notification": "./src/notification.dto.ts",
+		"./stats": "./src/stats.dto.ts"
 	},
 	"scripts": {
 		"build": "tsc",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
 		"format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
-		"lint": "eslint . --max-warnings 0",
-		"generate:component": "turbo gen react-component",
+		"lint": "eslint .",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"@repo/eslint-config": "*",
 		"@repo/typescript-config": "*",
-		"@types/node": "^22.15.3",
-		"@types/react": "19.1.0",
-		"@types/react-dom": "19.1.1",
 		"eslint": "^9.33.0",
+		"prettier": "^3.2.5",
 		"typescript": "^5.9.2"
 	},
 	"dependencies": {
-		"react": "^19.1.0",
-		"react-dom": "^19.1.0"
+		"class-validator": "^0.14.1",
+		"class-transformer": "^0.5.1"
+	},
+	"eslintConfig": {
+		"extends": [
+			"@repo/eslint-config/base"
+		]
 	},
 	"prettier": {
 		"printWidth": 80,
