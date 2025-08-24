@@ -20,6 +20,7 @@ import {
   SeatActionResponseDto,
   ExtendSeatResponseDto,
   SeatDetailDto,
+  SeatVacancyPredictionDto,
 } from '@pnu-blace/types';
 
 @Controller('api/v1/seats')
@@ -124,6 +125,20 @@ export class SeatsController {
   }
 
   /**
+   * 빈자리 예약 (현재 사용 중인 좌석이 비워지면 자동 예약)
+   */
+  @Post('reserve-empty')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async reserveEmptySeat(
+    @Request() req,
+    @Body() reserveSeatDto: ReserveSeatRequestDto,
+  ): Promise<SeatActionResponseDto> {
+    const user = req.user;
+    return this.seatsService.reserveEmptySeat(user.studentId, reserveSeatDto);
+  }
+
+  /**
    * 좌석 반납
    */
   @Post('return')
@@ -143,5 +158,16 @@ export class SeatsController {
   async extendSeat(@Request() req): Promise<ExtendSeatResponseDto> {
     const user = req.user;
     return this.seatsService.extendSeat(user.studentId);
+  }
+
+  /**
+   * 좌석 반납 예측 시간 조회
+   */
+  @Get(':roomNo/:setNo/prediction')
+  async getSeatPrediction(
+    @Param('roomNo') roomNo: string,
+    @Param('setNo') setNo: string,
+  ): Promise<SeatVacancyPredictionDto> {
+    return this.seatsService.getSeatPrediction(roomNo, setNo);
   }
 }

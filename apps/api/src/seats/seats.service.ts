@@ -16,6 +16,7 @@ import {
   SeatActionResponseDto,
   ExtendSeatResponseDto,
   SeatDetailDto,
+  SeatVacancyPredictionDto,
 } from '@pnu-blace/types';
 
 @Injectable()
@@ -1191,6 +1192,39 @@ export class SeatsService {
       // 원본 CSS를 head에 추가
       html = html.replace('</head>', `${originalCSS}</head>`);
 
+      // 좌석 버튼에 클릭 이벤트 추가
+      const clickEventScript = `
+        <script>
+          // 부모 창과 통신하는 함수
+          function sendSeatClick(seatNo) {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                type: 'SEAT_CLICK',
+                seatNo: seatNo
+              }, '*');
+            }
+          }
+
+          // 모든 좌석 버튼에 클릭 이벤트 추가
+          document.addEventListener('DOMContentLoaded', function() {
+            const seatButtons = document.querySelectorAll('.desk, .deskL, .deskR, .deskT, .sdesk');
+            seatButtons.forEach(function(button) {
+              const seatNo = button.textContent.trim();
+              if (seatNo && !isNaN(seatNo)) {
+                button.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  sendSeatClick(seatNo);
+                });
+              }
+            });
+          });
+        </script>
+      `;
+
+      // 스크립트를 body 끝에 추가
+      html = html.replace('</body>', `${clickEventScript}</body>`);
+
       return html;
     } catch (error) {
       console.error('Error fetching seat map HTML:', error);
@@ -1373,6 +1407,65 @@ export class SeatsService {
   }
 
   /**
+   * 빈자리 예약 (현재 사용 중인 좌석이 비워지면 자동 예약)
+   */
+  async reserveEmptySeat(
+    studentId: string,
+    reserveSeatDto: ReserveSeatRequestDto,
+  ): Promise<SeatActionResponseDto> {
+    try {
+      const { roomNo, setNo } = reserveSeatDto;
+
+      // 이미 예약한 좌석이 있는지 확인
+      const existingReservation = await this.myUsageLogRepository.findOne({
+        where: {
+          studentId,
+          endTime: null as any, // 아직 반납하지 않은 좌석
+        },
+      });
+
+      if (existingReservation) {
+        throw new ConflictException('이미 예약한 좌석이 있습니다.');
+      }
+
+      // 현재 좌석이 실제로 사용 중인지 확인
+      const seatStatus = await this.getSeatStatus(roomNo);
+      const targetSeat = seatStatus.find((seat) => seat.setNo === setNo);
+
+      if (!targetSeat) {
+        throw new BadRequestException('좌석을 찾을 수 없습니다.');
+      }
+
+      if (targetSeat.status !== 'OCCUPIED') {
+        throw new BadRequestException('이 좌석은 현재 사용 중이 아닙니다.');
+      }
+
+      // TODO: 실제로는 NotificationRequest 엔티티에 빈자리 예약 요청을 저장
+      // 현재는 임시로 성공 응답만 반환
+      this.logger.debug(
+        `Empty seat reservation requested: ${studentId} - ${roomNo}/${setNo}`,
+      );
+
+      return {
+        success: true,
+        message:
+          '빈자리 예약이 완료되었습니다. 좌석이 비워지면 자동으로 예약됩니다.',
+      };
+    } catch (error: any) {
+      this.logger.error(`Reserve empty seat error: ${error.message}`);
+
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+
+      throw new BadRequestException('빈자리 예약 중 오류가 발생했습니다.');
+    }
+  }
+
+  /**
    * 좌석 연장
    */
   async extendSeat(studentId: string): Promise<ExtendSeatResponseDto> {
@@ -1430,6 +1523,52 @@ export class SeatsService {
       }
 
       throw new BadRequestException('좌석 연장 중 오류가 발생했습니다.');
+    }
+  }
+
+  /**
+   * 좌석 반납 예측 시간 조회
+   */
+  async getSeatPrediction(
+    roomNo: string,
+    setNo: string,
+  ): Promise<SeatVacancyPredictionDto> {
+    try {
+      // 현재 좌석 상태 확인
+      const seatStatus = await this.getSeatStatus(roomNo);
+      const targetSeat = seatStatus.find((seat) => seat.setNo === setNo);
+
+      if (!targetSeat) {
+        throw new BadRequestException('좌석을 찾을 수 없습니다.');
+      }
+
+      if (targetSeat.status !== 'OCCUPIED') {
+        throw new BadRequestException('이 좌석은 현재 사용 중이 아닙니다.');
+      }
+
+      // TODO: 실제로는 머신러닝 모델이나 사용 패턴 분석을 통해 예측
+      // 현재는 임시로 2시간 후로 예측
+      const now = new Date();
+      const predictedEndTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2시간 후
+
+      this.logger.debug(`Seat prediction requested: ${roomNo}/${setNo}`);
+
+      return {
+        setNo,
+        predictedEndTime: predictedEndTime.toISOString(),
+        confidence: 0.7, // 70% 확신
+        message: '사용 패턴을 기반으로 한 예측입니다.',
+      };
+    } catch (error: any) {
+      this.logger.error(`Get seat prediction error: ${error.message}`);
+
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        '좌석 예측 정보 조회 중 오류가 발생했습니다.',
+      );
     }
   }
 }

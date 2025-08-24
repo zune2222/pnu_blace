@@ -48,3 +48,11 @@ export class ExtendSeatResponseDto {
 	endTime: string;
 	message: string;
 }
+
+// GET /seats/:roomNo/:setNo/prediction
+export class SeatVacancyPredictionDto {
+	setNo: string;
+	predictedEndTime: string;
+	confidence: number; // 0-1 사이의 값
+	message: string;
+}
