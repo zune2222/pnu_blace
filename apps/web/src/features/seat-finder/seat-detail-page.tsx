@@ -240,9 +240,27 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 group"
+                  style={{
+                    backgroundColor:
+                      document.documentElement.classList.contains("dark")
+                        ? "transparent"
+                        : "transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (document.documentElement.classList.contains("dark")) {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(31, 41, 55, 0.8)";
+                    } else {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(243, 244, 246, 0.8)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
                 >
-                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                  <ArrowLeft className="w-5 h-5 text-foreground transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                 </button>
                 <div>
                   <h1 className="text-2xl font-light text-foreground">
