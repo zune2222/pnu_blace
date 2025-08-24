@@ -5,8 +5,8 @@ import {
 	ManyToOne,
 	JoinColumn,
 	CreateDateColumn,
+	Relation,
 } from "typeorm";
-import { User } from "./user.entity";
 
 @Entity()
 export class NotificationRequest {
@@ -35,7 +35,7 @@ export class NotificationRequest {
 	@CreateDateColumn()
 	createdAt!: Date;
 
-	@ManyToOne(() => User, (user) => user.notificationRequests)
+	@ManyToOne("User", "notificationRequests")
 	@JoinColumn({ name: "studentId" })
-	user!: User;
+	user!: Relation<any>;
 }

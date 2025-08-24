@@ -4,8 +4,8 @@ import {
 	Column,
 	ManyToOne,
 	JoinColumn,
+	Relation,
 } from "typeorm";
-import { User } from "./user.entity";
 
 @Entity()
 export class MyUsageLog {
@@ -27,7 +27,7 @@ export class MyUsageLog {
 	@Column()
 	studentId!: string;
 
-	@ManyToOne(() => User, (user) => user.usageLogs)
+	@ManyToOne("User", "usageLogs")
 	@JoinColumn({ name: "studentId" })
-	user!: User;
+	user!: Relation<any>;
 }

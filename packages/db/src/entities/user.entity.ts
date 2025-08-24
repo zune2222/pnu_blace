@@ -1,6 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
-import { MyUsageLog } from "./my-usage-log.entity";
-import { NotificationRequest } from "./notification-request.entity";
+import { Entity, PrimaryColumn, Column, OneToMany, Relation } from "typeorm";
 
 @Entity()
 export class User {
@@ -16,9 +14,9 @@ export class User {
 	@Column({ type: "timestamp", nullable: true })
 	lastLoginAt?: Date;
 
-	@OneToMany(() => MyUsageLog, (log) => log.user)
-	usageLogs!: MyUsageLog[];
+	@OneToMany("MyUsageLog", "user")
+	usageLogs!: Relation<any[]>;
 
-	@OneToMany(() => NotificationRequest, (request) => request.user)
-	notificationRequests!: NotificationRequest[];
+	@OneToMany("NotificationRequest", "user")
+	notificationRequests!: Relation<any[]>;
 }

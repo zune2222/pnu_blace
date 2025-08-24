@@ -2,13 +2,15 @@
 	"name": "@pnu-blace/types",
 	"version": "0.0.0",
 	"private": true,
-	"main": "./src/index.ts",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
-		".": "./src/index.ts",
-		"./user": "./src/user.dto.ts",
-		"./seat": "./src/seat.dto.ts",
-		"./notification": "./src/notification.dto.ts",
-		"./stats": "./src/stats.dto.ts"
+		".": "./dist/index.js",
+		"./user": "./dist/user.dto.js",
+		"./seat": "./dist/seat.dto.js",
+		"./notification": "./dist/notification.dto.js",
+		"./stats": "./dist/stats.dto.js"
 	},
 	"scripts": {
 		"build": "tsc",
