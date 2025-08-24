@@ -41,3 +41,9 @@ export class CalendarActionResponseDto {
 	success: boolean;
 	message: string;
 }
+
+// 사용 패턴 분석용 인터페이스
+export interface UsagePattern {
+	durationHours: number;
+	count: number;
+}
