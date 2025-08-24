@@ -1,5 +1,5 @@
 import React from "react";
-import { HeroSection, FeaturesSection, StatsSection, CtaSection } from "./ui";
+import { HeroSection, FeaturesSection, CtaSection } from "./ui";
 
 export const HomePage: React.FC = () => {
   return (
@@ -7,7 +7,6 @@ export const HomePage: React.FC = () => {
       <HeroSection />
       <CtaSection />
       <FeaturesSection />
-      <StatsSection />
     </>
   );
 };

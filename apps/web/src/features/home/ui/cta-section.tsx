@@ -1,35 +1,46 @@
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/shared/ui";
 
 export const CtaSection: React.FC = () => {
   return (
-    <section className="py-32 px-6">
+    <section className="py-16 md:py-24 px-6">
       <div className="max-w-4xl mx-auto text-center">
-        <div className="flex justify-center">
-          <Button
-            size="lg"
-            className="group relative text-xl font-semibold px-8 py-4 border-0 bg-transparent hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-            asChild
-          >
-            <Link href="/login" className="flex items-center gap-3">
-              <span>시작하기</span>
+        <div className="space-y-8 md:space-y-12">
+          {/* 메인 메시지 */}
+          <div className="space-y-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground leading-tight">
+              지금 시작해보세요
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
+              부산대학교 학번으로 로그인하고
+              <br className="hidden sm:block" />더 스마트한 도서관 경험을
+              만나보세요
+            </p>
+          </div>
+
+          {/* CTA 버튼 */}
+          <div className="pt-4">
+            <Link
+              href="/login"
+              className="group inline-flex items-center justify-center space-x-3 text-xl md:text-2xl font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
+            >
+              <span>로그인하기</span>
+              <div className="w-8 h-px bg-foreground group-hover:w-12 group-hover:bg-muted-foreground transition-all duration-300"></div>
               <svg
                 className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M13 7l5 5m0 0l-5 5m5-5H6"
                 />
               </svg>
             </Link>
-          </Button>
+          </div>
         </div>
       </div>
     </section>
