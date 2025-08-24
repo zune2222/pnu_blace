@@ -5,7 +5,7 @@ class AuthApi {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const response = await apiClient.post<LoginResponse>(
-        "/auth/login",
+        "/api/v1/auth/login",
         credentials
       );
 
@@ -40,7 +40,7 @@ class AuthApi {
   async logout(): Promise<void> {
     try {
       // 서버에 로그아웃 요청 (선택사항)
-      await apiClient.post("/auth/logout");
+      await apiClient.post("/api/v1/auth/logout");
     } catch (error) {
       // 로그아웃 실패해도 로컬 토큰은 제거
       console.warn("로그아웃 API 호출 실패:", error);
@@ -52,7 +52,7 @@ class AuthApi {
 
   async refreshToken(): Promise<LoginResponse> {
     try {
-      const response = await apiClient.post<LoginResponse>("/auth/refresh");
+      const response = await apiClient.post<LoginResponse>("/api/v1/auth/refresh");
 
       // 새 토큰 저장
       if (response.accessToken) {
@@ -77,7 +77,7 @@ class AuthApi {
       if (!token) return false;
 
       // 토큰 유효성 검사 (선택사항)
-      await apiClient.get("/auth/me");
+      await apiClient.get("/api/v1/users/me");
       return true;
     } catch (error) {
       // 인증 실패시 토큰 제거

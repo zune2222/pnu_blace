@@ -4,58 +4,58 @@ import "./globals.css";
 import { Header, Footer } from "@/widgets";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "../public/GeistVF.woff",
   variable: "--font-geist-sans",
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "../public/GeistMonoVF.woff",
   variable: "--font-geist-mono",
 });
 
 const pretendard = localFont({
   src: [
     {
-      path: "./fonts/Pretendard-Thin.woff2",
+      path: "../public/Pretendard-Thin.woff2",
       weight: "100",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-ExtraLight.woff2",
+      path: "../public/Pretendard-ExtraLight.woff2",
       weight: "200",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-Light.woff2",
+      path: "../public/Pretendard-Light.woff2",
       weight: "300",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-Regular.woff2",
+      path: "../public/Pretendard-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-Medium.woff2",
+      path: "../public/Pretendard-Medium.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-SemiBold.woff2",
+      path: "../public/Pretendard-SemiBold.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-Bold.woff2",
+      path: "../public/Pretendard-Bold.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-ExtraBold.woff2",
+      path: "../public/Pretendard-ExtraBold.woff2",
       weight: "800",
       style: "normal",
     },
     {
-      path: "./fonts/Pretendard-Black.woff2",
+      path: "../public/Pretendard-Black.woff2",
       weight: "900",
       style: "normal",
     },

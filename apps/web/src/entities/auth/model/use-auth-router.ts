@@ -7,7 +7,7 @@ export const useAuthRouter = () => {
   const router = useRouter();
 
   const redirectToHome = useCallback(() => {
-    router.push("/");
+    router.push("/dashboard");
   }, [router]);
 
   const redirectToLogin = useCallback(() => {

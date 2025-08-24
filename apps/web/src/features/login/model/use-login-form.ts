@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import { useAuth } from "@/entities/auth";
+import { useLogin } from "@/features/auth";
 import { validateLoginForm, isValidForm } from "../lib/validation";
 import type { LoginFormData, LoginFormErrors } from "./types";
 
 export const useLoginForm = () => {
-  const { login, isLoading: authLoading } = useAuth();
+  const { login, isLoading: authLoading } = useLogin();
 
   const [formData, setFormData] = useState<LoginFormData>({
     studentId: "",
