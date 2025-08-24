@@ -13,6 +13,7 @@ import {
   LoginResult,
   SeatInfo,
   MySeatInfo,
+  RoomInfo,
 } from '@pnu-blace/types';
 
 @Injectable()
@@ -108,7 +109,7 @@ export class SchoolApiService {
       // 로그인 결과 검증
       if (
         loginResponse.status === 200 &&
-        (loginResponse.data as any)?.success !== false
+        loginResponse.data?.success !== false
       ) {
         return {
           success: true,
@@ -152,9 +153,7 @@ export class SchoolApiService {
         },
       );
 
-      return (
-        response.status === 200 && (response.data as any)?.success !== false
-      );
+      return response.status === 200 && response.data?.success !== false;
     } catch (error: any) {
       this.logger.error(`Reserve seat error: ${error.message}`);
       return false;
@@ -181,9 +180,7 @@ export class SchoolApiService {
         },
       );
 
-      return (
-        response.status === 200 && (response.data as any)?.success !== false
-      );
+      return response.status === 200 && response.data?.success !== false;
     } catch (error: any) {
       this.logger.error(`Return seat error: ${error.message}`);
       return false;
@@ -210,9 +207,7 @@ export class SchoolApiService {
         },
       );
 
-      return (
-        response.status === 200 && (response.data as any)?.success !== false
-      );
+      return response.status === 200 && response.data?.success !== false;
     } catch (error: any) {
       this.logger.error(`Extend seat error: ${error.message}`);
       return false;
@@ -238,7 +233,7 @@ export class SchoolApiService {
       );
 
       if (response.status === 200 && response.data) {
-        const data = response.data as any;
+        const data = response.data;
         if (data.roomNo && data.setNo) {
           return {
             roomNo: data.roomNo,
@@ -489,6 +484,95 @@ export class SchoolApiService {
     }
 
     return this.login(systemUserId, systemPassword);
+  }
+
+  /**
+   * 열람실 현황 조회
+   */
+  async getRoomStatus(): Promise<RoomInfo[]> {
+    try {
+      const response = await this.httpClient.post('/seatStatusListNew.do', 'libGB=S');
+
+      this.logger.log(`Room status response status: ${response.status}`);
+      this.logger.log(
+        `Room status response data: ${JSON.stringify(response.data)}`,
+      );
+
+      if (response.status === 200 && response.data) {
+        return this.parseRoomStatusXml(response.data as string);
+      }
+
+      return [];
+    } catch (error: any) {
+      this.logger.error(`Get room status error: ${error.message}`);
+      return [];
+    }
+  }
+
+  /**
+   * 열람실 현황 XML 파싱
+   */
+  private parseRoomStatusXml(xmlData: string): RoomInfo[] {
+    try {
+      const rooms: RoomInfo[] = [];
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      // resultCode 확인
+      const resultCode = extractCDATA('resultCode');
+      if (resultCode !== '0') {
+        this.logger.warn(`Room status request failed with code: ${resultCode}`);
+        return [];
+      }
+
+      // 모든 item 태그 추출
+      const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+      let match;
+
+      while ((match = itemRegex.exec(xmlData)) !== null) {
+        const itemXml = match[1];
+
+        // 각 item에서 필드 추출
+        const extractFromItem = (tagName: string): string => {
+          const regex = new RegExp(
+            `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]*)\\]\\]>\\s*</${tagName}>`,
+            'i',
+          );
+          const match = itemXml.match(regex);
+          return match ? match[1].trim() : '';
+        };
+
+        const room: RoomInfo = {
+          roomNo: extractFromItem('roomNo'),
+          roomName: extractFromItem('roomName'),
+          useYN: extractFromItem('useYN'),
+          timeStart: extractFromItem('timeStart'),
+          timeEnd: extractFromItem('timeEnd'),
+          totalSeat: parseInt(extractFromItem('totalSeat')) || 0,
+          useSeat: parseInt(extractFromItem('useSeat')) || 0,
+          remainSeat: parseInt(extractFromItem('remainSeat')) || 0,
+          useRate: parseInt(extractFromItem('useRate')) || 0,
+        };
+
+        rooms.push(room);
+      }
+
+      this.logger.debug(`Parsed ${rooms.length} rooms from XML`);
+      return rooms;
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse room status XML: ${this.getErrorMessage(error)}`,
+      );
+      return [];
+    }
   }
 
   /**

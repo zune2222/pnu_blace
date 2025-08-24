@@ -18,6 +18,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { StatsModule } from './stats/stats.module';
 import { SchoolApiModule } from './school-api/school-api.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { SchoolApiModule } from './school-api/school-api.module';
     AuthModule,
     UsersModule,
     SeatsModule,
+    RoomsModule,
     NotificationsModule,
     SchedulerModule,
     StatsModule,

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root> 
+    <resultCode>
+        <\![CDATA[0]]>
+    </resultCode> 
+    <resultMsg>
+        <\![CDATA[정상]]>
+    </resultMsg> 
+    <item> 
+        <roomNo>
+            <\![CDATA[2]]>
+        </roomNo> 
+        <roomName>
+            <\![CDATA[1F 미디어 ZONE]]>
+        </roomName> 
+        <useYN>
+            <\![CDATA[]]>
+        </useYN> 
+        <timeStart>
+            <\![CDATA[06:00]]>
+        </timeStart> 
+        <timeEnd>
+            <\![CDATA[23:00]]>
+        </timeEnd> 
+        <totalSeat>
+            <\![CDATA[5]]>
+        </totalSeat> 
+        <useSeat>
+            <\![CDATA[0]]>
+        </useSeat> 
+        <remainSeat>
+            <\![CDATA[5]]>
+        </remainSeat> 
+        <useRate>
+            <\![CDATA[0]]>
+        </useRate> 
+    </item> 
+</root>

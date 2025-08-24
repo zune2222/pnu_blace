@@ -195,7 +195,7 @@ export class SeatAutoReservorService {
 
       const seatMap = await this.schoolApiService.getSeatMap(
         roomNo,
-        loginResult.sessionID!,
+        loginResult.sessionID,
       );
 
       const targetSeat = seatMap.find((seat) => seat.setNo === setNo);

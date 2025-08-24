@@ -13,6 +13,8 @@
   "dependencies": {
     "@pnu-blace/types": "*",
     "@repo/ui": "*",
+    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query-devtools": "^5.85.5",
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

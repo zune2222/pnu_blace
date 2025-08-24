@@ -48,7 +48,7 @@ export class SeatScannerService {
       // 각 열람실별로 좌석 상태 수집
       for (const roomNo of Object.keys(this.MONITORED_ROOMS)) {
         try {
-          const snapshot = await this.scanRoom(roomNo, loginResult.sessionID!);
+          const snapshot = await this.scanRoom(roomNo, loginResult.sessionID);
           results.set(roomNo, snapshot);
           this.logger.debug(
             `Scanned room ${roomNo} (${this.MONITORED_ROOMS[roomNo]}): ${snapshot.length} seats`,

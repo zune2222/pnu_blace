@@ -1,37 +1,86 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { CurrentSeat } from "@/entities/dashboard";
 
-interface CurrentSeatData {
-  isReserved: boolean;
-  roomName?: string;
-  seatNumber?: string;
-  timeRemaining?: string;
-  lastUsedRoom?: string;
+// 남은 시간을 포맷하는 유틸 함수
+const formatRemainingTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const secs = 0; // API에서 초 단위는 제공되지 않으므로 0으로 설정
+  return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+// 좌석 상태 배지 (현재 좌석이 있으면 ACTIVE)
+const getStatusBadge = () => {
+  return {
+    color: 'green',
+    text: 'ACTIVE',
+    bgClass: 'bg-green-500/10 text-green-600 dark:bg-green-400/10 dark:text-green-400'
+  };
+};
+
+interface CurrentSeatWidgetProps {
+  currentSeat: CurrentSeat | null;
+  isLoading: boolean;
+  error: string | null;
+  cancelReservation: (reservationId: string) => Promise<void>;
 }
 
-export const CurrentSeatWidget: React.FC = () => {
-  // TODO: 실제 데이터는 API나 상태 관리에서 가져와야 함
-  const seatData: CurrentSeatData = {
-    isReserved: true,
-    roomName: "2F 새벽별당-A",
-    seatNumber: "78번",
-    timeRemaining: "3:15:20",
-    lastUsedRoom: "4F 제3열람실-A"
+export const CurrentSeatWidget: React.FC<CurrentSeatWidgetProps> = ({
+  currentSeat,
+  isLoading,
+  error,
+  cancelReservation: cancelReservationProp
+}) => {
+  // 좌석 취소 핸들러
+  const handleCancelReservation = async () => {
+    if (!currentSeat?.reservationId) return;
+    
+    try {
+      await cancelReservationProp(currentSeat.reservationId);
+    } catch (err) {
+      console.error('예약 취소 실패:', err);
+    }
   };
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <section className="py-20 md:py-32">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="text-2xl text-muted-foreground font-light">좌석 정보를 불러오는 중...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <section className="py-20 md:py-32">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="text-xl text-red-600 font-light">{error}</div>
+        </div>
+      </section>
+    );
+  }
+
+  const isReserved = currentSeat !== null;
+  const statusBadge = isReserved ? getStatusBadge() : null;
 
   return (
     <section className="py-20 md:py-32">
       <div className="max-w-4xl mx-auto">
-        {seatData.isReserved ? (
+        {isReserved ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             {/* 왼쪽: 좌석 정보 */}
             <div className="space-y-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs px-2 py-1 bg-green-500/10 text-green-600 dark:bg-green-400/10 dark:text-green-400 rounded-full font-medium tracking-wide">
-                    ACTIVE
+                  <div className={`w-2 h-2 bg-${statusBadge?.color}-500 rounded-full animate-pulse`}></div>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium tracking-wide ${statusBadge?.bgClass}`}>
+                    {statusBadge?.text}
                   </span>
                 </div>
                 
@@ -43,10 +92,10 @@ export const CurrentSeatWidget: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-3xl md:text-4xl font-extralight text-foreground mb-2">
-                    {seatData.roomName}
+                    {currentSeat?.roomName}
                   </h2>
                   <p className="text-xl text-muted-foreground/70 font-light">
-                    {seatData.seatNumber}
+                    {currentSeat?.seatDisplayName}
                   </p>
                 </div>
               </div>
@@ -62,12 +111,12 @@ export const CurrentSeatWidget: React.FC = () => {
                   </svg>
                 </Link>
                 
-                <Link
-                  href="#"
+                <button
+                  onClick={handleCancelReservation}
                   className="text-base text-muted-foreground/50 font-light hover:text-muted-foreground transition-colors duration-300"
                 >
                   반납
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -78,7 +127,7 @@ export const CurrentSeatWidget: React.FC = () => {
                   Time Remaining
                 </p>
                 <div className="font-mono text-6xl md:text-7xl font-extralight text-foreground leading-none">
-                  {seatData.timeRemaining}
+                  {currentSeat?.remainingMinutes ? formatRemainingTime(currentSeat.remainingMinutes) : '0:00:00'}
                 </div>
               </div>
             </div>
@@ -105,7 +154,7 @@ export const CurrentSeatWidget: React.FC = () => {
                 href="#"
                 className="group inline-flex items-center space-x-4 text-xl font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
               >
-                <span>{seatData.lastUsedRoom ? `${seatData.lastUsedRoom}로 이동` : "좌석 찾기"}</span>
+                <span>좌석 찾기</span>
                 <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
