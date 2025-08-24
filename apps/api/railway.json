@@ -5,7 +5,7 @@
     "buildCommand": "cd ../../ && yarn install && yarn workspace api build"
   },
   "deploy": {
-    "startCommand": "yarn start:prod",
+    "startCommand": "yarn workspace api start:prod",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
