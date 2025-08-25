@@ -26,6 +26,7 @@ export class AppController {
   @Get('debug/seat/:roomNo')
   async debugSeatMap(@Param('roomNo') roomNo: string) {
     try {
+      // 디버깅용으로는 시스템 계정 사용 (개발/운영 중 문제 진단용)
       const loginResult = await this.schoolApiService.loginAsSystem();
       if (!loginResult.success) {
         return { error: 'Login failed', message: loginResult.errorMessage };
@@ -52,6 +53,7 @@ export class AppController {
   @Get('debug/userinfo')
   async debugUserInfo() {
     try {
+      // 디버깅용으로는 시스템 계정 사용 (개발/운영 중 문제 진단용)
       const loginResult = await this.schoolApiService.loginAsSystem();
       if (!loginResult.success) {
         return { error: 'Login failed', message: loginResult.errorMessage };

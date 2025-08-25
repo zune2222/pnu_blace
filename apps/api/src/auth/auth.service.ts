@@ -71,7 +71,14 @@ export class AuthService {
         }
       }
 
-      // 3. JWT 토큰 생성
+      // 3. 학교 API 세션 정보 저장
+      user.schoolSessionId = loginResult.sessionID;
+      user.schoolSessionExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30분 후 만료
+
+      await this.userRepository.save(user);
+      this.logger.debug(`School API session saved for: ${studentId}`);
+
+      // 4. JWT 토큰 생성
       const payload = { sub: user.studentId };
       const accessToken = this.jwtService.sign(payload);
 

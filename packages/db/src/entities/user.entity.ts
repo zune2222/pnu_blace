@@ -14,6 +14,13 @@ export class User {
 	@Column({ type: "timestamp", nullable: true })
 	lastLoginAt?: Date;
 
+	// 학교 API 세션 정보
+	@Column({ nullable: true })
+	schoolSessionId?: string;
+
+	@Column({ type: "timestamp", nullable: true })
+	schoolSessionExpiresAt?: Date;
+
 	@OneToMany("MyUsageLog", "user")
 	usageLogs!: Relation<any[]>;
 

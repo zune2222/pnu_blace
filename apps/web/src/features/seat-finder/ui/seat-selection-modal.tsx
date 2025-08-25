@@ -97,8 +97,12 @@ export const SeatSelectionModal = ({
       }
 
       onClose();
-    } catch (error) {
-      console.error("Action failed:", error);
+    } catch (error: any) {
+      // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
+      // 예상치 못한 에러만 콘솔에 출력
+      if (error.status !== 409 && error.status !== 400) {
+        console.error("Unexpected action error:", error);
+      }
     } finally {
       setIsLoading(false);
       setActionType(null);
@@ -392,7 +396,7 @@ export const SeatSelectionModal = ({
                 }`}
               >
                 {isLoading && actionType === "reserve"
-                  ? "예약 중..."
+                  ? "발권 중..."
                   : "좌석 발권하기"}
               </button>
             )}
@@ -450,10 +454,10 @@ export const SeatSelectionModal = ({
                     : "#6b7280",
                 }}
               >
-                <p>• 좌석 발권: 즉시 사용 가능한 좌석을 예약합니다.</p>
+                <p>• 좌석 발권: 즉시 사용 가능한 좌석을 발권합니다.</p>
                 <p>
                   • 빈자리 발권 예약: 현재 사용 중인 좌석이 비워지면 자동으로
-                  예약됩니다.
+                  발권됩니다.
                 </p>
               </div>
             </div>

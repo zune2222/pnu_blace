@@ -91,18 +91,21 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSelectedSeat(null);
 
         // 성공 메시지 표시 (실제로는 토스트나 알림 사용)
-        alert("좌석이 성공적으로 예약되었습니다!");
+        alert("좌석이 성공적으로 발권되었습니다!");
       }
     } catch (err: any) {
-      console.error("Reservation error:", err);
-      let errorMessage = "좌석 예약에 실패했습니다.";
+      // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
+      let errorMessage = "좌석 발권에 실패했습니다.";
 
       if (err.status === 409) {
-        errorMessage = "이미 예약된 좌석입니다.";
+        // 백엔드에서 제공하는 상세한 메시지 사용
+        errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "예약 정보가 올바르지 않습니다.";
+        errorMessage = "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
+        // 예상치 못한 에러만 콘솔에 출력
+        console.error("Unexpected reservation error:", err);
       }
 
       setError(errorMessage);
@@ -138,19 +141,22 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
 
         // 성공 메시지 표시
         alert(
-          "빈자리 예약이 완료되었습니다. 좌석이 비워지면 자동으로 예약됩니다."
+          "빈자리 발권 예약이 완료되었습니다. 좌석이 비워지면 자동으로 발권됩니다."
         );
       }
     } catch (err: any) {
-      console.error("Empty seat reservation error:", err);
-      let errorMessage = "빈자리 예약에 실패했습니다.";
+      // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
+      let errorMessage = "빈자리 발권 예약에 실패했습니다.";
 
       if (err.status === 409) {
-        errorMessage = "이미 예약된 좌석입니다.";
+        // 백엔드에서 제공하는 상세한 메시지 사용
+        errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "예약 정보가 올바르지 않습니다.";
+        errorMessage = "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
+        // 예상치 못한 에러만 콘솔에 출력
+        console.error("Unexpected empty seat reservation error:", err);
       }
 
       setError(errorMessage);

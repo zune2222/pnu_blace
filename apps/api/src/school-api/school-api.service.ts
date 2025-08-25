@@ -134,7 +134,7 @@ export class SchoolApiService {
   }
 
   /**
-   * 좌석 예약
+   * 좌석 발급
    */
   async reserveSeat(
     userID: string,
@@ -234,13 +234,24 @@ export class SchoolApiService {
 
       if (response.status === 200 && response.data) {
         const data = response.data;
-        if (data.roomNo && data.setNo) {
-          return {
-            roomNo: data.roomNo,
-            setNo: data.setNo,
-            startTime: data.startTime || '',
-            endTime: data.endTime || '',
-          };
+
+        // XML 응답에서 library 섹션 확인
+        if (data.item && data.item.library) {
+          const library = data.item.library;
+
+          // libDataEmpty가 'N'이면 데이터가 있음
+          if (
+            library.libDataEmpty === 'N' &&
+            library.roomNo &&
+            library.seatNo
+          ) {
+            return {
+              roomNo: library.roomNo,
+              setNo: library.seatNo,
+              startTime: library.startTm || '',
+              endTime: library.endTm || '',
+            };
+          }
         }
       }
 

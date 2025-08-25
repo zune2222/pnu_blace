@@ -63,8 +63,13 @@ export class SeatsController {
    * 특정 열람실의 상세 좌석 정보 조회
    */
   @Get(':roomNo/detail')
-  async getSeatDetail(@Param('roomNo') roomNo: string): Promise<SeatDetailDto> {
-    return this.seatsService.getSeatDetail(roomNo);
+  @UseGuards(JwtAuthGuard)
+  async getSeatDetail(
+    @Param('roomNo') roomNo: string,
+    @Request() req,
+  ): Promise<SeatDetailDto> {
+    const user = req.user;
+    return this.seatsService.getSeatDetail(roomNo, user.studentId);
   }
 
   /**
@@ -104,10 +109,13 @@ export class SeatsController {
    * 특정 열람실의 전체 좌석 상태 조회
    */
   @Get(':roomNo')
+  @UseGuards(JwtAuthGuard)
   async getSeatStatus(
     @Param('roomNo') roomNo: string,
+    @Request() req,
   ): Promise<SeatStatusDto[]> {
-    return this.seatsService.getSeatStatus(roomNo);
+    const user = req.user;
+    return this.seatsService.getSeatStatus(roomNo, user.studentId);
   }
 
   /**
