@@ -250,39 +250,129 @@ export class SchoolApiService {
         // 응답 데이터 디버깅 로그 추가
         this.logger.debug(`getMySeat response for ${userID}: ${JSON.stringify(data)}`);
 
-        // XML 응답에서 library 섹션 확인
-        if (data.item && data.item.library) {
-          const library = data.item.library;
-          
-          // 라이브러리 섹션 디버깅 로그 추가
-          this.logger.debug(`Library data: ${JSON.stringify(library)}`);
-
-          // libDataEmpty가 'N'이면 데이터가 있음
-          if (
-            library.libDataEmpty === 'N' &&
-            library.roomNo &&
-            library.seatNo
-          ) {
-            const seatInfo = {
-              roomNo: library.roomNo,
-              setNo: library.seatNo,
-              startTime: library.startTm || '',
-              endTime: library.endTm || '',
-            };
-            
-            this.logger.debug(`Parsed seat info: ${JSON.stringify(seatInfo)}`);
-            return seatInfo;
-          } else {
-            this.logger.debug(`Seat data validation failed - libDataEmpty: ${library.libDataEmpty}, roomNo: ${library.roomNo}, seatNo: ${library.seatNo}`);
-          }
+        // XML 형식 응답인지 확인
+        if (typeof data === 'string') {
+          // XML 파싱 사용
+          return this.parseMySeatXml(data);
         } else {
-          this.logger.debug('No library section found in response data');
+          // JSON 형식 응답 처리 (기존 로직)
+          if (data.item && data.item.library) {
+            const library = data.item.library;
+            
+            // 라이브러리 섹션 디버깅 로그 추가
+            this.logger.debug(`Library data: ${JSON.stringify(library)}`);
+
+            // libDataEmpty가 'N'이면 데이터가 있음
+            if (
+              library.libDataEmpty === 'N' &&
+              library.roomNo &&
+              library.seatNo
+            ) {
+              const seatInfo = {
+                roomNo: library.roomNo,
+                setNo: library.seatNo,
+                startTime: library.startTm || '',
+                endTime: library.endTm || '',
+              };
+              
+              this.logger.debug(`Parsed seat info: ${JSON.stringify(seatInfo)}`);
+              return seatInfo;
+            } else {
+              this.logger.debug(`Seat data validation failed - libDataEmpty: ${library.libDataEmpty}, roomNo: ${library.roomNo}, seatNo: ${library.seatNo}`);
+            }
+          } else {
+            this.logger.debug('No library section found in response data');
+          }
         }
       }
 
       return null;
     } catch (error: any) {
       this.logger.error(`Get my seat error: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * 내 좌석 정보 XML 파싱
+   */
+  private parseMySeatXml(xmlData: string): MySeatInfo | null {
+    try {
+      this.logger.debug(`Raw XML data for parsing: ${xmlData}`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      // resultCode 확인
+      const resultCode = extractCDATA('resultCode');
+      this.logger.debug(`ResultCode: ${resultCode}`);
+      
+      if (resultCode !== '0') {
+        this.logger.warn(`My seat request failed with code: ${resultCode}`);
+        return null;
+      }
+
+      // library 섹션 찾기
+      const libraryMatch = xmlData.match(/<library>([\s\S]*?)<\/library>/i);
+      if (!libraryMatch) {
+        this.logger.debug('No library section found in XML');
+        return null;
+      }
+
+      const libraryXml = libraryMatch[1];
+      this.logger.debug(`Library XML section: ${libraryXml}`);
+
+      // library 섹션 내에서 값 추출
+      const extractFromLibrary = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = libraryXml.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const libDataEmpty = extractFromLibrary('libDataEmpty');
+      
+      this.logger.debug(`libDataEmpty value: ${libDataEmpty}`);
+
+      if (libDataEmpty === 'N') {
+        const roomNo = extractFromLibrary('roomNo');
+        const seatNo = extractFromLibrary('seatNo');
+        const startTm = extractFromLibrary('startTm');
+        const endTm = extractFromLibrary('endTm');
+
+        this.logger.debug(`Extracted values - roomNo: ${roomNo}, seatNo: ${seatNo}, startTm: ${startTm}, endTm: ${endTm}`);
+
+        if (roomNo && seatNo) {
+          const seatInfo = {
+            roomNo: roomNo,
+            setNo: seatNo,
+            startTime: startTm || '',
+            endTime: endTm || '',
+          };
+          
+          this.logger.debug(`Successfully parsed seat info from XML: ${JSON.stringify(seatInfo)}`);
+          return seatInfo;
+        } else {
+          this.logger.debug(`Missing seat data - roomNo: ${roomNo}, seatNo: ${seatNo}`);
+        }
+      } else {
+        this.logger.debug(`No seat data available - libDataEmpty: ${libDataEmpty}`);
+      }
+
+      return null;
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse my seat XML: ${this.getErrorMessage(error)}`,
+      );
       return null;
     }
   }
@@ -459,7 +549,7 @@ export class SchoolApiService {
     this.logger.debug(`Parsing seats for room: ${roomNo} (${roomName})`);
 
     // td 태그에서 좌석 정보 추출 (id가 숫자인 것들)
-    $('td[id]').each((index, element) => {
+    $('td[id]').each((_index, element) => {
       const $seat = $(element);
       const seatId = $seat.attr('id');
       const className = $seat.attr('class');
@@ -629,7 +719,7 @@ export class SchoolApiService {
 
       // 모든 item 태그 추출
       const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-      let match;
+      let match: RegExpExecArray | null;
 
       while ((match = itemRegex.exec(xmlData)) !== null) {
         const itemXml = match[1];
