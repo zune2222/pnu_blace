@@ -143,6 +143,8 @@ export class SchoolApiService {
     setNo: string,
   ): Promise<boolean> {
     try {
+      this.logger.debug(`Attempting to reserve seat: ${userID} - ${roomNo}/${setNo}`);
+      
       const response = await this.httpClient.post(
         '/assignSeat.do',
         `userID=${userID}&roomNo=${roomNo}&setNo=${setNo}`,
@@ -153,9 +155,19 @@ export class SchoolApiService {
         },
       );
 
-      return response.status === 200 && response.data?.success !== false;
+      this.logger.debug(`Reserve seat response status: ${response.status}`);
+      this.logger.debug(`Reserve seat response data: ${JSON.stringify(response.data)}`);
+
+      const isSuccess = response.status === 200 && response.data?.success !== false;
+      this.logger.debug(`Reserve seat result: ${isSuccess}`);
+      
+      return isSuccess;
     } catch (error: any) {
       this.logger.error(`Reserve seat error: ${error.message}`);
+      if (error.response) {
+        this.logger.error(`Error response status: ${error.response.status}`);
+        this.logger.error(`Error response data: ${JSON.stringify(error.response.data)}`);
+      }
       return false;
     }
   }
@@ -234,10 +246,16 @@ export class SchoolApiService {
 
       if (response.status === 200 && response.data) {
         const data = response.data;
+        
+        // 응답 데이터 디버깅 로그 추가
+        this.logger.debug(`getMySeat response for ${userID}: ${JSON.stringify(data)}`);
 
         // XML 응답에서 library 섹션 확인
         if (data.item && data.item.library) {
           const library = data.item.library;
+          
+          // 라이브러리 섹션 디버깅 로그 추가
+          this.logger.debug(`Library data: ${JSON.stringify(library)}`);
 
           // libDataEmpty가 'N'이면 데이터가 있음
           if (
@@ -245,13 +263,20 @@ export class SchoolApiService {
             library.roomNo &&
             library.seatNo
           ) {
-            return {
+            const seatInfo = {
               roomNo: library.roomNo,
               setNo: library.seatNo,
               startTime: library.startTm || '',
               endTime: library.endTm || '',
             };
+            
+            this.logger.debug(`Parsed seat info: ${JSON.stringify(seatInfo)}`);
+            return seatInfo;
+          } else {
+            this.logger.debug(`Seat data validation failed - libDataEmpty: ${library.libDataEmpty}, roomNo: ${library.roomNo}, seatNo: ${library.seatNo}`);
           }
+        } else {
+          this.logger.debug('No library section found in response data');
         }
       }
 

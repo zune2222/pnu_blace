@@ -24,7 +24,12 @@ class DashboardApi {
   // 현재 내 좌석 조회
   async getCurrentSeat(): Promise<CurrentSeat | null> {
     try {
-      const mySeat = await apiClient.get<MySeatDto>("/api/v1/seats/my-seat");
+      const mySeat = await apiClient.get<MySeatDto | null>("/api/v1/seats/my-seat");
+
+      // mySeat이 null이면 예약된 좌석이 없음
+      if (!mySeat) {
+        return null;
+      }
 
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       const roomInfo = READING_ROOMS[mySeat.roomNo];
@@ -36,15 +41,23 @@ class DashboardApi {
         Math.floor((endTime.getTime() - now.getTime()) / (1000 * 60))
       );
 
+      // setNo 값 검증 로깅
+      console.log('MySeat data:', {
+        roomNo: mySeat.roomNo,
+        setNo: mySeat.setNo,
+        setNoType: typeof mySeat.setNo,
+        setNoValue: JSON.stringify(mySeat.setNo)
+      });
+
       return {
         ...mySeat,
         roomName: roomInfo?.name || `열람실 ${mySeat.roomNo}`,
-        seatDisplayName: `${mySeat.setNo}번`,
+        seatDisplayName: `${mySeat.setNo || '?'}번`,
         remainingMinutes,
       };
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) {
-        return null; // 예약된 좌석이 없음
+        return null; // 예약된 좌석이 없음 (하위호환성)
       }
       throw new Error("현재 좌석 정보를 불러올 수 없습니다");
     }
