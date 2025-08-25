@@ -24,6 +24,7 @@ export class MySeatDto {
 	setNo: string;
 	startTime: string;
 	endTime: string;
+	remainingTime?: string;
 }
 
 // POST /seats/reserve

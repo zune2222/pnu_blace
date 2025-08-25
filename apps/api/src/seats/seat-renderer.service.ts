@@ -1092,11 +1092,11 @@ export class SeatRendererService {
             const seatButtons = document.querySelectorAll('.desk, .deskL, .deskR, .deskT, .sdesk');
             seatButtons.forEach(function(button) {
               const seatNo = button.textContent.trim();
-              if (seatNo && !isNaN(seatNo)) {
+              if (seatNo && seatNo !== '' && !isNaN(parseInt(seatNo)) && parseInt(seatNo) > 0) {
                 button.addEventListener('click', function(e) {
                   e.preventDefault();
                   e.stopPropagation();
-                  sendSeatClick(seatNo);
+                  sendSeatClick(parseInt(seatNo).toString());
                 });
               }
             });

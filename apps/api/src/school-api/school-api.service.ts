@@ -273,6 +273,7 @@ export class SchoolApiService {
                 setNo: library.seatNo,
                 startTime: library.startTm || '',
                 endTime: library.endTm || '',
+                remainingTime: library.remTm || '',
               };
               
               this.logger.debug(`Parsed seat info: ${JSON.stringify(seatInfo)}`);
@@ -349,14 +350,18 @@ export class SchoolApiService {
         const startTm = extractFromLibrary('startTm');
         const endTm = extractFromLibrary('endTm');
 
-        this.logger.debug(`Extracted values - roomNo: ${roomNo}, seatNo: ${seatNo}, startTm: ${startTm}, endTm: ${endTm}`);
+        const remTm = extractFromLibrary('remTm');
+        
+        this.logger.debug(`Extracted values - roomNo: ${roomNo}, seatNo: ${seatNo}, startTm: ${startTm}, endTm: ${endTm}, remTm: ${remTm}`);
 
         if (roomNo && seatNo) {
+          
           const seatInfo = {
             roomNo: roomNo,
             setNo: seatNo,
             startTime: startTm || '',
             endTime: endTm || '',
+            remainingTime: remTm || '',
           };
           
           this.logger.debug(`Successfully parsed seat info from XML: ${JSON.stringify(seatInfo)}`);
