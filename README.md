@@ -1,135 +1,147 @@
-# Turborepo starter
+# PNU Blace
 
-This Turborepo starter is maintained by the Turborepo core team.
+부산대학교 도서관 좌석 예약 시스템
 
-## Using this example
+## 🎯 개요
 
-Run the following command:
+PNU Blace는 부산대학교 도서관의 좌석 예약을 더욱 편리하게 만들어주는 웹 애플리케이션입니다. 실시간 좌석 현황 확인, 자동 예약, 빈자리 알림 등의 기능을 제공합니다.
 
-```sh
-npx create-turbo@latest
+## ✨ 주요 기능
+
+- **실시간 좌석 현황**: 도서관 각 열람실의 실시간 좌석 상태 확인
+- **자동 좌석 예약**: 원하는 좌석이 비워지면 자동으로 예약
+- **좌석 예약/반납**: 간편한 좌석 예약 및 반납 기능
+- **좌석 연장**: 현재 사용 중인 좌석 이용 시간 연장
+- **빈자리 예측**: AI 기반 좌석 반납 시간 예측
+- **즐겨찾기**: 자주 이용하는 열람실 즐겨찾기 기능
+- **알림 서비스**: 좌석 상태 변경 알림
+
+## 🏗️ 기술 스택
+
+### Frontend
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **State Management**: React Query (TanStack Query)
+- **Language**: TypeScript
+- **Fonts**: Pretendard, Geist
+
+### Backend
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PostgreSQL (추정)
+- **Authentication**: JWT
+- **Scheduler**: Bull Queue (추정)
+
+### Development Tools
+- **Monorepo**: Turborepo
+- **Package Manager**: Yarn
+- **Linting**: ESLint
+- **Formatting**: Prettier
+
+## 🚀 시작하기
+
+### 필수 요구사항
+- Node.js >= 20
+- Yarn 1.22.22
+
+### 설치 및 실행
+
+```bash
+# 저장소 클론
+git clone <repository-url>
+cd pnu_blace
+
+# 의존성 설치
+yarn install
+
+# 개발 서버 실행 (모든 앱)
+yarn dev
+
+# 특정 앱만 실행
+yarn dev --filter=web    # 웹 앱만
+yarn dev --filter=api    # API 서버만
 ```
 
-## What's inside?
+### 빌드
 
-This Turborepo includes the following packages/apps:
+```bash
+# 전체 빌드
+yarn build
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# 특정 앱 빌드
+yarn build:web    # 웹 앱 빌드
+yarn build:api    # API 서버 빌드
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## 📁 프로젝트 구조
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+pnu_blace/
+├── apps/
+│   ├── web/                # Next.js 웹 애플리케이션
+│   │   ├── app/           # App Router 페이지
+│   │   └── src/           # 소스 코드
+│   │       ├── entities/  # 도메인 엔티티
+│   │       ├── features/  # 기능별 모듈
+│   │       ├── shared/    # 공통 컴포넌트
+│   │       └── widgets/   # 위젯 컴포넌트
+│   ├── api/               # NestJS API 서버
+│   │   └── src/
+│   │       ├── auth/      # 인증 모듈
+│   │       ├── seats/     # 좌석 관리 모듈
+│   │       ├── scheduler/ # 스케줄러 모듈
+│   │       └── users/     # 사용자 모듈
+│   └── docs/              # 문서 사이트
+└── packages/              # 공유 패키지
 ```
 
-### Develop
+## 🔧 개발 명령어
 
-To develop all apps and packages, run the following command:
+```bash
+# 개발 서버 실행
+yarn dev
 
-```
-cd my-turborepo
+# 코드 린팅
+yarn lint
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+# 타입 체크
+yarn type-check
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+# 코드 포매팅
+yarn format
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# 프로덕션 시작
+yarn start
 ```
 
-### Remote Caching
+## 📱 주요 페이지
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- `/` - 홈페이지 (서비스 소개)
+- `/login` - 로그인
+- `/dashboard` - 대시보드 (현재 좌석, 즐겨찾기 등)
+- `/seats` - 좌석 찾기 (전체 열람실 목록)
+- `/seats/[roomNo]` - 특정 열람실 좌석 현황
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🌐 배포
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+### Vercel (Web)
+웹 애플리케이션은 Vercel을 통해 자동 배포됩니다.
 
-```
-cd my-turborepo
+### Railway (API)
+API 서버는 Railway에 배포됩니다.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+## 🤝 기여하기
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 📄 라이선스
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+이 프로젝트는 MIT 라이선스 하에 있습니다.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+## 📞 문의
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+프로젝트 관련 문의사항이 있으시면 이슈를 등록해 주세요.
