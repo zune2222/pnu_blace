@@ -1,20 +1,16 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd ../../ && yarn install --frozen-lockfile --ignore-scripts && yarn build:api"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "yarn start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "NODE_ENV": "production",
-    "NODE_VERSION": "20",
-    "YARN_VERSION": "1.22.22",
-    "NIXPACKS_BUILD_CMD": "cd ../../ && yarn install --frozen-lockfile --ignore-scripts && yarn build:api"
+    "NODE_ENV": "production"
   }
 }
