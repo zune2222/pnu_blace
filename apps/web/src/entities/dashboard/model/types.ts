@@ -14,6 +14,7 @@ export interface CurrentSeat extends MySeatDto {
   roomName?: string; // 열람실 이름 (별도 매핑 필요)
   seatDisplayName?: string; // 좌석 표시명 (seatNo 기반)
   remainingMinutes?: number; // 남은 시간 (분)
+  isActive?: boolean; // 좌석 활성 상태
 }
 
 // 열람실 정보 (좌석 상태 조회용)
