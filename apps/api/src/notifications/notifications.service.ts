@@ -33,7 +33,7 @@ export class NotificationsService {
     createDto: CreateNotificationRequestDto,
   ): Promise<NotificationActionResponseDto> {
     try {
-      const { roomNo, setNo, autoReserve } = createDto;
+      const { roomNo, seatNo, autoReserve } = createDto;
 
       // 사용자 존재 확인
       const user = await this.userRepository.findOne({
@@ -49,7 +49,7 @@ export class NotificationsService {
         where: {
           user: { studentId },
           roomNo,
-          setNo,
+          seatNo,
           status: 'PENDING',
         },
       });
@@ -64,7 +64,7 @@ export class NotificationsService {
       const notification = this.notificationRepository.create({
         user,
         roomNo,
-        setNo,
+        seatNo,
         autoReserve,
         status: 'PENDING',
       });
@@ -72,7 +72,7 @@ export class NotificationsService {
       await this.notificationRepository.save(notification);
 
       this.logger.debug(
-        `Notification created: ${studentId} - ${roomNo}/${setNo}`,
+        `Notification created: ${studentId} - ${roomNo}/${seatNo}`,
       );
 
       return {
@@ -113,7 +113,7 @@ export class NotificationsService {
       return notifications.map((notification) => ({
         id: notification.requestId,
         roomNo: notification.roomNo,
-        setNo: notification.setNo,
+        seatNo: notification.seatNo,
         autoReserve: notification.autoReserve,
         createdAt: notification.createdAt,
         isActive: notification.status === 'PENDING',
@@ -149,7 +149,7 @@ export class NotificationsService {
       await this.notificationRepository.save(notification);
 
       this.logger.debug(
-        `Notification cancelled: ${studentId} - ${notification.roomNo}/${notification.setNo}`,
+        `Notification cancelled: ${studentId} - ${notification.roomNo}/${notification.seatNo}`,
       );
 
       return {
@@ -172,12 +172,12 @@ export class NotificationsService {
    */
   async getActiveNotificationsForSeat(
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<NotificationRequest[]> {
     return this.notificationRepository.find({
       where: {
         roomNo,
-        setNo,
+        seatNo,
         status: 'PENDING',
       },
       relations: ['user'],

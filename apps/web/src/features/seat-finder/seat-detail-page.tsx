@@ -74,7 +74,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
 
       const reserveRequest: ReserveSeatRequestDto = {
         roomNo,
-        setNo: seatNo,
+        seatNo: seatNo,
       };
 
       const response = await apiClient.post<SeatActionResponseDto>(
@@ -123,7 +123,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       // 빈자리 예약 API 호출 (실제로는 별도 엔드포인트 필요)
       const reserveRequest: ReserveSeatRequestDto = {
         roomNo,
-        setNo: seatNo,
+        seatNo: seatNo,
       };
 
       const response = await apiClient.post<SeatActionResponseDto>(

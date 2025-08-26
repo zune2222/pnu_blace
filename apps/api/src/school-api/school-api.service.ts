@@ -138,35 +138,45 @@ export class SchoolApiService {
    */
   async reserveSeat(
     userID: string,
-    sessionID: string,
+    sessionID: string | null,
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<boolean> {
     try {
-      this.logger.debug(`Attempting to reserve seat: ${userID} - ${roomNo}/${setNo}`);
-      
+      const currentSessionID =
+        sessionID || (await this.loginAsSystem()).sessionID;
+
+      this.logger.debug(
+        `Attempting to reserve seat: ${userID} - ${roomNo}/${seatNo}`,
+      );
+
       const response = await this.httpClient.post(
         '/assignSeat.do',
-        `userID=${userID}&roomNo=${roomNo}&setNo=${setNo}`,
+        `userID=${userID}&roomNo=${roomNo}&seatNo=${seatNo}`,
         {
           headers: {
-            Cookie: `JSESSIONID=${sessionID}`,
+            Cookie: `JSESSIONID=${currentSessionID}`,
           },
         },
       );
 
       this.logger.debug(`Reserve seat response status: ${response.status}`);
-      this.logger.debug(`Reserve seat response data: ${JSON.stringify(response.data)}`);
+      this.logger.debug(
+        `Reserve seat response data: ${JSON.stringify(response.data)}`,
+      );
 
-      const isSuccess = response.status === 200 && response.data?.success !== false;
+      const isSuccess =
+        response.status === 200 && response.data?.success !== false;
       this.logger.debug(`Reserve seat result: ${isSuccess}`);
-      
+
       return isSuccess;
     } catch (error: any) {
       this.logger.error(`Reserve seat error: ${error.message}`);
       if (error.response) {
         this.logger.error(`Error response status: ${error.response.status}`);
-        this.logger.error(`Error response data: ${JSON.stringify(error.response.data)}`);
+        this.logger.error(
+          `Error response data: ${JSON.stringify(error.response.data)}`,
+        );
       }
       return false;
     }
@@ -177,17 +187,24 @@ export class SchoolApiService {
    */
   async returnSeat(
     userID: string,
-    sessionID: string,
+    sessionID: string | null,
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<boolean> {
     try {
+      const currentSessionID =
+        sessionID || (await this.loginAsSystem()).sessionID;
+
+      this.logger.debug(
+        `Attempting to return seat: ${userID} - ${roomNo}/${seatNo}`,
+      );
+
       const response = await this.httpClient.post(
         '/returnSeat.do',
-        `userID=${userID}&roomNo=${roomNo}&setNo=${setNo}`,
+        `userID=${userID}&roomNo=${roomNo}&seatNo=${seatNo}`,
         {
           headers: {
-            Cookie: `JSESSIONID=${sessionID}`,
+            Cookie: `JSESSIONID=${currentSessionID}`,
           },
         },
       );
@@ -204,17 +221,24 @@ export class SchoolApiService {
    */
   async extendSeat(
     userID: string,
-    sessionID: string,
+    sessionID: string | null,
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<boolean> {
     try {
+      const currentSessionID =
+        sessionID || (await this.loginAsSystem()).sessionID;
+
+      this.logger.debug(
+        `Attempting to extend seat: ${userID} - ${roomNo}/${seatNo}`,
+      );
+
       const response = await this.httpClient.post(
         '/contSeat.do',
-        `userID=${userID}&roomNo=${roomNo}&setNo=${setNo}`,
+        `userID=${userID}&roomNo=${roomNo}&seatNo=${seatNo}`,
         {
           headers: {
-            Cookie: `JSESSIONID=${sessionID}`,
+            Cookie: `JSESSIONID=${currentSessionID}`,
           },
         },
       );
@@ -246,9 +270,11 @@ export class SchoolApiService {
 
       if (response.status === 200 && response.data) {
         const data = response.data;
-        
+
         // 응답 데이터 디버깅 로그 추가
-        this.logger.debug(`getMySeat response for ${userID}: ${JSON.stringify(data)}`);
+        this.logger.debug(
+          `getMySeat response for ${userID}: ${JSON.stringify(data)}`,
+        );
 
         // XML 형식 응답인지 확인
         if (typeof data === 'string') {
@@ -258,7 +284,7 @@ export class SchoolApiService {
           // JSON 형식 응답 처리 (기존 로직)
           if (data.item && data.item.library) {
             const library = data.item.library;
-            
+
             // 라이브러리 섹션 디버깅 로그 추가
             this.logger.debug(`Library data: ${JSON.stringify(library)}`);
 
@@ -270,16 +296,20 @@ export class SchoolApiService {
             ) {
               const seatInfo = {
                 roomNo: library.roomNo,
-                setNo: library.seatNo,
+                seatNo: library.seatNo,
                 startTime: library.startTm || '',
                 endTime: library.endTm || '',
                 remainingTime: library.remTm || '',
               };
-              
-              this.logger.debug(`Parsed seat info: ${JSON.stringify(seatInfo)}`);
+
+              this.logger.debug(
+                `Parsed seat info: ${JSON.stringify(seatInfo)}`,
+              );
               return seatInfo;
             } else {
-              this.logger.debug(`Seat data validation failed - libDataEmpty: ${library.libDataEmpty}, roomNo: ${library.roomNo}, seatNo: ${library.seatNo}`);
+              this.logger.debug(
+                `Seat data validation failed - libDataEmpty: ${library.libDataEmpty}, roomNo: ${library.roomNo}, seatNo: ${library.seatNo}`,
+              );
             }
           } else {
             this.logger.debug('No library section found in response data');
@@ -314,7 +344,7 @@ export class SchoolApiService {
       // resultCode 확인
       const resultCode = extractCDATA('resultCode');
       this.logger.debug(`ResultCode: ${resultCode}`);
-      
+
       if (resultCode !== '0') {
         this.logger.warn(`My seat request failed with code: ${resultCode}`);
         return null;
@@ -341,7 +371,7 @@ export class SchoolApiService {
       };
 
       const libDataEmpty = extractFromLibrary('libDataEmpty');
-      
+
       this.logger.debug(`libDataEmpty value: ${libDataEmpty}`);
 
       if (libDataEmpty === 'N') {
@@ -351,26 +381,33 @@ export class SchoolApiService {
         const endTm = extractFromLibrary('endTm');
 
         const remTm = extractFromLibrary('remTm');
-        
-        this.logger.debug(`Extracted values - roomNo: ${roomNo}, seatNo: ${seatNo}, startTm: ${startTm}, endTm: ${endTm}, remTm: ${remTm}`);
+
+        this.logger.debug(
+          `Extracted values - roomNo: ${roomNo}, seatNo: ${seatNo}, startTm: ${startTm}, endTm: ${endTm}, remTm: ${remTm}`,
+        );
 
         if (roomNo && seatNo) {
-          
           const seatInfo = {
             roomNo: roomNo,
-            setNo: seatNo,
+            seatNo: seatNo,
             startTime: startTm || '',
             endTime: endTm || '',
             remainingTime: remTm || '',
           };
-          
-          this.logger.debug(`Successfully parsed seat info from XML: ${JSON.stringify(seatInfo)}`);
+
+          this.logger.debug(
+            `Successfully parsed seat info from XML: ${JSON.stringify(seatInfo)}`,
+          );
           return seatInfo;
         } else {
-          this.logger.debug(`Missing seat data - roomNo: ${roomNo}, seatNo: ${seatNo}`);
+          this.logger.debug(
+            `Missing seat data - roomNo: ${roomNo}, seatNo: ${seatNo}`,
+          );
         }
       } else {
-        this.logger.debug(`No seat data available - libDataEmpty: ${libDataEmpty}`);
+        this.logger.debug(
+          `No seat data available - libDataEmpty: ${libDataEmpty}`,
+        );
       }
 
       return null;
@@ -561,21 +598,21 @@ export class SchoolApiService {
 
       // id가 숫자인 경우만 좌석으로 간주
       if (seatId && /^\d+$/.test(seatId) && className === 'desk') {
-        const setNo = seatId;
+        const seatNo = seatId;
         let status: 'OCCUPIED' | 'AVAILABLE' | 'UNAVAILABLE' = 'AVAILABLE';
 
-        if (unavailableSeatNumbers.has(setNo)) {
+        if (unavailableSeatNumbers.has(seatNo)) {
           status = 'UNAVAILABLE';
-        } else if (occupiedSeatNumbers.has(setNo)) {
+        } else if (occupiedSeatNumbers.has(seatNo)) {
           status = 'OCCUPIED';
         }
 
-        seats.push({ setNo, status });
+        seats.push({ seatNo, status });
       }
     });
 
     // 좌석 번호로 정렬
-    seats.sort((a, b) => parseInt(a.setNo) - parseInt(b.setNo));
+    seats.sort((a, b) => parseInt(a.seatNo) - parseInt(b.seatNo));
 
     this.logger.debug(`Parsed ${seats.length} seats from HTML`);
     this.logger.debug(

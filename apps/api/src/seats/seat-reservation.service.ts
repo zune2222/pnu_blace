@@ -81,7 +81,7 @@ export class SeatReservationService {
     reserveSeatDto: ReserveSeatRequestDto,
   ): Promise<SeatActionResponseDto> {
     try {
-      const { roomNo, setNo } = reserveSeatDto;
+      const { roomNo, seatNo } = reserveSeatDto;
 
       const user = await this.getUserWithValidSession(studentId);
 
@@ -90,7 +90,7 @@ export class SeatReservationService {
         const mySeat = await this.getMySeat(studentId);
         if (mySeat) {
           throw new ConflictException(
-            `이미 ${mySeat.roomNo} ${mySeat.setNo}번 좌석을 발권하고 있습니다. 다른 좌석을 발권하려면 먼저 현재 좌석을 반납해주세요.`,
+            `이미 ${mySeat.roomNo} ${mySeat.seatNo}번 좌석을 발권하고 있습니다. 다른 좌석을 발권하려면 먼저 현재 좌석을 반납해주세요.`,
           );
         }
       } catch (error: any) {
@@ -103,7 +103,7 @@ export class SeatReservationService {
         studentId,
         user.schoolSessionId!,
         roomNo,
-        setNo,
+        seatNo,
       );
 
       if (!reserveSuccess) {
@@ -113,13 +113,13 @@ export class SeatReservationService {
       const usageLog = this.myUsageLogRepository.create({
         studentId,
         roomNo,
-        setNo,
+        seatNo,
         startTime: new Date(),
       });
 
       await this.myUsageLogRepository.save(usageLog);
 
-      this.logger.debug(`Seat reserved: ${studentId} - ${roomNo}/${setNo}`);
+      this.logger.debug(`Seat reserved: ${studentId} - ${roomNo}/${seatNo}`);
 
       return {
         success: true,
@@ -165,7 +165,7 @@ export class SeatReservationService {
         studentId,
         loginResult.sessionID!,
         currentUsage.roomNo,
-        currentUsage.setNo,
+        currentUsage.seatNo,
       );
 
       if (!returnSuccess) {
@@ -176,7 +176,7 @@ export class SeatReservationService {
       await this.myUsageLogRepository.save(currentUsage);
 
       this.logger.debug(
-        `Seat returned: ${studentId} - ${currentUsage.roomNo}/${currentUsage.setNo}`,
+        `Seat returned: ${studentId} - ${currentUsage.roomNo}/${currentUsage.seatNo}`,
       );
 
       return {
@@ -205,7 +205,7 @@ export class SeatReservationService {
     reserveSeatDto: ReserveSeatRequestDto,
   ): Promise<SeatActionResponseDto> {
     try {
-      const { roomNo, setNo } = reserveSeatDto;
+      const { roomNo, seatNo } = reserveSeatDto;
 
       const existingReservation = await this.myUsageLogRepository.findOne({
         where: {
@@ -220,8 +220,11 @@ export class SeatReservationService {
 
       // 현재 좌석이 실제로 사용 중인지 확인하기 위해 직접 좌석 정보를 가져옴
       const user = await this.getUserWithValidSession(studentId);
-      const seats = await this.schoolApiService.getSeatMap(roomNo, user.schoolSessionId!);
-      const targetSeat = seats.find((seat) => seat.setNo === setNo);
+      const seats = await this.schoolApiService.getSeatMap(
+        roomNo,
+        user.schoolSessionId!,
+      );
+      const targetSeat = seats.find((seat) => seat.seatNo === seatNo);
 
       if (!targetSeat) {
         throw new BadRequestException('좌석을 찾을 수 없습니다.');
@@ -233,7 +236,7 @@ export class SeatReservationService {
 
       // TODO: 실제로는 NotificationRequest 엔티티에 빈자리 예약 요청을 저장
       this.logger.debug(
-        `Empty seat reservation requested: ${studentId} - ${roomNo}/${setNo}`,
+        `Empty seat reservation requested: ${studentId} - ${roomNo}/${seatNo}`,
       );
 
       return {
@@ -277,7 +280,7 @@ export class SeatReservationService {
         studentId,
         user.schoolSessionId!,
         currentUsage.roomNo,
-        currentUsage.setNo,
+        currentUsage.seatNo,
       );
 
       if (!extendSuccess) {
@@ -288,7 +291,7 @@ export class SeatReservationService {
       extendedEndTime.setHours(extendedEndTime.getHours() + 2);
 
       this.logger.debug(
-        `Seat extended: ${studentId} - ${currentUsage.roomNo}/${currentUsage.setNo}`,
+        `Seat extended: ${studentId} - ${currentUsage.roomNo}/${currentUsage.seatNo}`,
       );
 
       return {

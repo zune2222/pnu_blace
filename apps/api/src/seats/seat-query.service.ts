@@ -29,14 +29,14 @@ export class SeatQueryService {
   ): Promise<SeatStatusDto[]> {
     try {
       const user = await this.getUserWithValidSession(studentId);
-      
+
       const seats = await this.schoolApiService.getSeatMap(
         roomNo,
         user.schoolSessionId!,
       );
 
       return seats.map((seat) => ({
-        setNo: seat.setNo,
+        seatNo: seat.seatNo,
         status: seat.status,
       }));
     } catch (error: any) {
@@ -67,15 +67,15 @@ export class SeatQueryService {
 
       const occupiedSeats = seats
         .filter((seat) => seat.status === 'OCCUPIED')
-        .map((seat) => seat.setNo);
+        .map((seat) => seat.seatNo);
 
       const unavailableSeats = seats
         .filter((seat) => seat.status === 'UNAVAILABLE')
-        .map((seat) => seat.setNo);
+        .map((seat) => seat.seatNo);
 
       const availableSeats = seats
         .filter((seat) => seat.status === 'AVAILABLE')
-        .map((seat) => seat.setNo);
+        .map((seat) => seat.seatNo);
 
       return {
         roomNo: roomInfo?.roomNo || roomNo,
@@ -85,7 +85,7 @@ export class SeatQueryService {
         unavailableSeats,
         availableSeats,
         seats: seats.map((seat) => ({
-          setNo: seat.setNo,
+          seatNo: seat.seatNo,
           status: seat.status,
         })),
         backgroundImageUrl: this.schoolApiService.getBackgroundImageUrl(roomNo),

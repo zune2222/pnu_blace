@@ -96,7 +96,7 @@ export class SeatScannerService {
       const currentTimestamp = new Date();
       const snapshot: SeatSnapshot[] = currentSeats.map((seat) => ({
         roomNo,
-        setNo: seat.setNo,
+        seatNo: seat.seatNo,
         status: seat.status,
         timestamp: currentTimestamp,
       }));

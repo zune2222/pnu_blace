@@ -171,11 +171,11 @@ export class SeatsController {
   /**
    * 좌석 반납 예측 시간 조회
    */
-  @Get(':roomNo/:setNo/prediction')
+  @Get(':roomNo/:seatNo/prediction')
   async getSeatPrediction(
     @Param('roomNo') roomNo: string,
-    @Param('setNo') setNo: string,
+    @Param('seatNo') seatNo: string,
   ): Promise<SeatVacancyPredictionDto> {
-    return this.seatsService.getSeatPrediction(roomNo, setNo);
+    return this.seatsService.getSeatPrediction(roomNo, seatNo);
   }
 }

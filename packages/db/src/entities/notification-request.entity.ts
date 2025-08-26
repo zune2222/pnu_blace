@@ -17,7 +17,7 @@ export class NotificationRequest {
 	roomNo!: string;
 
 	@Column()
-	setNo!: string;
+	seatNo!: string;
 
 	@Column({
 		type: "varchar",

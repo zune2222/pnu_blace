@@ -1,62 +1,66 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { SchoolApiService } from '../school-api/school-api.service';
+import { StatsService } from '../stats/stats.service';
 import { SeatVacancyPredictionDto } from '@pnu-blace/types';
 
 @Injectable()
 export class SeatPredictionService {
   private readonly logger = new Logger(SeatPredictionService.name);
 
-  constructor(private schoolApiService: SchoolApiService) {}
+  constructor(
+    private schoolApiService: SchoolApiService,
+    private statsService: StatsService,
+  ) {}
 
   /**
    * 좌석 반납 예측 시간 조회
    */
   async getSeatPrediction(
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<SeatVacancyPredictionDto> {
     try {
-      const loginResult = await this.schoolApiService.loginAsSystem();
-      if (!loginResult.success) {
-        throw new BadRequestException('좌석 정보 조회에 실패했습니다.');
-      }
-
-      const seats = await this.schoolApiService.getSeatMap(
-        roomNo,
-        loginResult.sessionID,
-      );
-      const targetSeat = seats.find((seat) => seat.setNo === setNo);
+      // 현재 좌석 상태 조회
+      const seats = await this.schoolApiService.getSeatMap(roomNo);
+      const targetSeat = seats.find((seat) => seat.seatNo === seatNo);
 
       if (!targetSeat) {
-        throw new BadRequestException('좌석을 찾을 수 없습니다.');
+        throw new Error(`좌석 ${seatNo}을 찾을 수 없습니다.`);
       }
 
-      if (targetSeat.status !== 'OCCUPIED') {
-        throw new BadRequestException('이 좌석은 현재 사용 중이 아닙니다.');
-      }
+      // 통계 서비스를 통한 예측 데이터 조회
+      const prediction = await this.statsService.getSeatPrediction(
+        roomNo,
+        seatNo,
+      );
 
-      // TODO: 실제로는 머신러닝 모델이나 사용 패턴 분석을 통해 예측
-      const now = new Date();
-      const predictedEndTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2시간 후
+      this.logger.debug(`Seat prediction requested: ${roomNo}/${seatNo}`);
 
-      this.logger.debug(`Seat prediction requested: ${roomNo}/${setNo}`);
-
+      // SeatVacancyPredictionDto 형식에 맞게 변환
       return {
-        setNo,
-        predictedEndTime: predictedEndTime.toISOString(),
+        seatNo: seatNo,
+        predictedEndTime: new Date(
+          Date.now() + 2 * 60 * 60 * 1000,
+        ).toISOString(), // 2시간 후
         confidence: 0.7, // 70% 확신
         message: '사용 패턴을 기반으로 한 예측입니다.',
+        currentStatus: targetSeat.status,
       };
-    } catch (error: any) {
-      this.logger.error(`Get seat prediction error: ${error.message}`);
-
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-
-      throw new BadRequestException(
-        '좌석 예측 정보 조회 중 오류가 발생했습니다.',
+    } catch (error) {
+      this.logger.error(
+        `Failed to get seat prediction: ${this.getErrorMessage(error)}`,
       );
+      throw error;
     }
+  }
+
+  /**
+   * 에러 메시지 안전하게 추출
+   */
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error);
   }
 }

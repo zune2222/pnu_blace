@@ -24,7 +24,9 @@ class DashboardApi {
   // 현재 내 좌석 조회
   async getCurrentSeat(): Promise<CurrentSeat | null> {
     try {
-      const mySeat = await apiClient.get<MySeatDto | null>("/api/v1/seats/my-seat");
+      const mySeat = await apiClient.get<MySeatDto | null>(
+        "/api/v1/seats/my-seat"
+      );
 
       // mySeat이 null이면 예약된 좌석이 없음
       if (!mySeat) {
@@ -41,19 +43,22 @@ class DashboardApi {
         Math.floor((endTime.getTime() - now.getTime()) / (1000 * 60))
       );
 
-      // setNo 값 검증 로깅
-      console.log('MySeat data:', {
+      // seatNo 값 검증 로깅
+      console.log("MySeat data validation:", {
         roomNo: mySeat.roomNo,
-        setNo: mySeat.setNo,
-        setNoType: typeof mySeat.setNo,
-        setNoValue: JSON.stringify(mySeat.setNo)
+        seatNo: mySeat.seatNo,
+        seatNoType: typeof mySeat.seatNo,
+        seatNoValue: JSON.stringify(mySeat.seatNo),
       });
 
       return {
-        ...mySeat,
-        roomName: roomInfo?.name || `열람실 ${mySeat.roomNo}`,
-        seatDisplayName: `${mySeat.setNo || '?'}번`,
-        remainingMinutes,
+        roomNo: mySeat.roomNo,
+        seatNo: mySeat.seatNo,
+        startTime: mySeat.startTime,
+        endTime: mySeat.endTime,
+        remainingTime: mySeat.remainingTime,
+        seatDisplayName: `${mySeat.seatNo || "?"}번`,
+        isActive: true,
       };
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) {
@@ -252,10 +257,10 @@ class DashboardApi {
   // 좌석 예약
   async reserveSeat(
     roomNo: string,
-    setNo: string
+    seatNo: string
   ): Promise<SeatActionResponseDto> {
     try {
-      const reserveRequest: ReserveSeatRequestDto = { roomNo, setNo };
+      const reserveRequest: ReserveSeatRequestDto = { roomNo, seatNo };
       return await apiClient.post<SeatActionResponseDto>(
         "/api/v1/seats/reserve",
         reserveRequest

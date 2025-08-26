@@ -8,9 +8,14 @@ import { SeatReservationService } from './seat-reservation.service';
 import { SeatRendererService } from './seat-renderer.service';
 import { SeatPredictionService } from './seat-prediction.service';
 import { SchoolApiModule } from '../school-api/school-api.module';
+import { StatsModule } from '../stats/stats.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, MyUsageLog]), SchoolApiModule],
+  imports: [
+    TypeOrmModule.forFeature([User, MyUsageLog]),
+    SchoolApiModule,
+    StatsModule,
+  ],
   controllers: [SeatsController],
   providers: [
     SeatsService,

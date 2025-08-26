@@ -1,15 +1,15 @@
 "use client";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { dashboardApi } from '../api';
-import { dashboardKeys } from './queries';
-import { 
-  ApiResponse, 
-  DashboardData, 
-  CurrentSeat, 
-  ReadingRoomInfo, 
-  InsightItem
-} from './types';
-import { SeatActionResponseDto, ExtendSeatResponseDto } from '@pnu-blace/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { dashboardApi } from "../api";
+import { dashboardKeys } from "./queries";
+import {
+  ApiResponse,
+  DashboardData,
+  CurrentSeat,
+  ReadingRoomInfo,
+  InsightItem,
+} from "./types";
+import { SeatActionResponseDto, ExtendSeatResponseDto } from "@pnu-blace/types";
 
 // 대시보드 전체 데이터 조회
 export const useDashboardData = () => {
@@ -62,10 +62,10 @@ export const useInsights = () => {
 // 좌석 예약 뮤테이션
 export const useReserveSeat = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ roomNo, setNo }: { roomNo: string; setNo: string }) => 
-      dashboardApi.reserveSeat(roomNo, setNo),
+    mutationFn: ({ roomNo, seatNo }: { roomNo: string; seatNo: string }) =>
+      dashboardApi.reserveSeat(roomNo, seatNo),
     onSuccess: () => {
       // 성공 시 관련 쿼리들 무효화
       queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
@@ -76,7 +76,7 @@ export const useReserveSeat = () => {
 // 좌석 반납 뮤테이션
 export const useReturnSeat = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => dashboardApi.returnSeat(),
     onSuccess: () => {
@@ -89,7 +89,7 @@ export const useReturnSeat = () => {
 // 좌석 연장 뮤테이션
 export const useExtendSeat = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => dashboardApi.extendSeat(),
     onSuccess: () => {
@@ -102,13 +102,20 @@ export const useExtendSeat = () => {
 // 즐겨찾기 토글 뮤테이션
 export const useToggleFavorite = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ roomNo, isFavorite }: { roomNo: string; isFavorite: boolean }) => 
-      dashboardApi.toggleFavorite(roomNo, isFavorite),
+    mutationFn: ({
+      roomNo,
+      isFavorite,
+    }: {
+      roomNo: string;
+      isFavorite: boolean;
+    }) => dashboardApi.toggleFavorite(roomNo, isFavorite),
     onSuccess: () => {
       // 성공 시 즐겨찾기 데이터 무효화
-      queryClient.invalidateQueries({ queryKey: dashboardKeys.favoriteRooms() });
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.favoriteRooms(),
+      });
       queryClient.invalidateQueries({ queryKey: dashboardKeys.data() });
     },
   });

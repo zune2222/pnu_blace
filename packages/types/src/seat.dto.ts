@@ -2,7 +2,7 @@ import { IsString, IsNotEmpty } from "class-validator";
 
 // GET /seats/:roomNo
 export class SeatStatusDto {
-	setNo: string;
+	seatNo: string;
 	status: "AVAILABLE" | "OCCUPIED" | "UNAVAILABLE";
 }
 
@@ -21,7 +21,7 @@ export class SeatDetailDto {
 // GET /seats/my-seat
 export class MySeatDto {
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	startTime: string;
 	endTime: string;
 	remainingTime?: string;
@@ -35,7 +35,7 @@ export class ReserveSeatRequestDto {
 
 	@IsString()
 	@IsNotEmpty()
-	setNo: string;
+	seatNo: string;
 }
 
 // Response DTOs
@@ -50,10 +50,11 @@ export class ExtendSeatResponseDto {
 	message: string;
 }
 
-// GET /seats/:roomNo/:setNo/prediction
+// GET /seats/:roomNo/:seatNo/prediction
 export class SeatVacancyPredictionDto {
-	setNo: string;
+	seatNo: string;
 	predictedEndTime: string;
 	confidence: number; // 0-1 사이의 값
 	message: string;
+	currentStatus?: "AVAILABLE" | "OCCUPIED" | "UNAVAILABLE"; // 현재 좌석 상태
 }

@@ -8,14 +8,14 @@ export interface LoginResult {
 
 // 좌석 정보
 export interface SeatInfo {
-	setNo: string;
+	seatNo: string;
 	status: "OCCUPIED" | "AVAILABLE" | "UNAVAILABLE";
 }
 
 // 내 좌석 정보
 export interface MySeatInfo {
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	startTime: string;
 	endTime: string;
 }

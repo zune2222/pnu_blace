@@ -39,12 +39,12 @@ export class StatsController {
   /**
    * 특정 좌석의 이용 패턴 예측
    */
-  @Get('prediction/:roomNo/:setNo')
+  @Get('prediction/:roomNo/:seatNo')
   async getSeatPrediction(
     @Param('roomNo') roomNo: string,
-    @Param('setNo') setNo: string,
+    @Param('seatNo') seatNo: string,
   ): Promise<SeatPredictionDto> {
-    return this.statsService.getSeatPrediction(roomNo, setNo);
+    return this.statsService.getSeatPrediction(roomNo, seatNo);
   }
 }
 

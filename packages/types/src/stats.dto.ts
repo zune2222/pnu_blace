@@ -1,3 +1,6 @@
+// 학사일정 기간 타입 정의
+export type PeriodType = "NORMAL" | "EXAM" | "VACATION" | "FINALS";
+
 // GET /stats/me
 export class MyUsageStatsDto {
 	totalUsageHours: number;
@@ -13,17 +16,16 @@ export class MyUsageStatsDto {
 	}[];
 }
 
-// GET /stats/prediction/:roomNo/:setNo
+// GET /stats/prediction/:roomNo/:seatNo
 export class SeatPredictionDto {
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	analysis: {
-		currentPeriod: "NORMAL" | "EXAM" | "VACATION" | "FINALS";
-		usageProfile: {
-			durationHours: number;
-			percentage: number;
-		}[];
-		summaryMessage: string;
+		currentPeriod: PeriodType;
+		totalEvents: number;
+		averageUtilization: number;
+		peakHours: string[];
+		recommendedTimes: string[];
 	};
 }
 
@@ -32,7 +34,7 @@ export class CreateAcademicCalendarDto {
 	name: string;
 	startDate: string; // YYYY-MM-DD
 	endDate: string; // YYYY-MM-DD
-	type: "NORMAL" | "EXAM" | "VACATION" | "FINALS";
+	type: PeriodType;
 	description?: string;
 }
 

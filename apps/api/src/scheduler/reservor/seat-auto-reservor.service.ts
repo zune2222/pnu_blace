@@ -12,7 +12,7 @@ export class SeatAutoReservorService {
    * 자동 좌석 예약 시도
    */
   async reserveSeat(request: ReservationRequest): Promise<ReservationResult> {
-    const { studentId, roomNo, setNo } = request;
+    const { studentId, roomNo, seatNo } = request;
 
     try {
       // 시스템 계정으로 예약 시도 (실제로는 해당 사용자의 세션 필요)
@@ -25,7 +25,7 @@ export class SeatAutoReservorService {
         studentId,
         loginResult.sessionID!,
         roomNo,
-        setNo,
+        seatNo,
       );
 
       if (success) {
@@ -33,7 +33,7 @@ export class SeatAutoReservorService {
           success: true,
           studentId,
           roomNo,
-          setNo,
+          seatNo,
           message: 'Seat reserved successfully',
           timestamp: new Date(),
           reservedAt: new Date(),
@@ -43,7 +43,7 @@ export class SeatAutoReservorService {
           success: false,
           studentId,
           roomNo,
-          setNo,
+          seatNo,
           message: 'Reservation failed',
           timestamp: new Date(),
           error: 'Reservation failed - seat may no longer be available',
@@ -57,7 +57,7 @@ export class SeatAutoReservorService {
         success: false,
         studentId,
         roomNo,
-        setNo,
+        seatNo,
         message: 'Auto reservation failed',
         timestamp: new Date(),
         error: errorMessage,
@@ -94,7 +94,7 @@ export class SeatAutoReservorService {
     hasReservation: boolean;
     reservationInfo?: {
       roomNo: string;
-      setNo: string;
+      seatNo: string;
       roomName: string;
     };
     error?: string;
@@ -163,7 +163,7 @@ export class SeatAutoReservorService {
    */
   async checkSeatAvailability(
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<{
     available: boolean;
     status: 'AVAILABLE' | 'OCCUPIED' | 'UNAVAILABLE';
@@ -180,7 +180,7 @@ export class SeatAutoReservorService {
         loginResult.sessionID,
       );
 
-      const targetSeat = seatMap.find((seat) => seat.setNo === setNo);
+      const targetSeat = seatMap.find((seat) => seat.seatNo === seatNo);
 
       if (!targetSeat) {
         return {
@@ -197,7 +197,7 @@ export class SeatAutoReservorService {
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
       this.logger.error(
-        `Failed to check seat availability ${roomNo}/${setNo}: ${errorMessage}`,
+        `Failed to check seat availability ${roomNo}/${seatNo}: ${errorMessage}`,
       );
 
       return {

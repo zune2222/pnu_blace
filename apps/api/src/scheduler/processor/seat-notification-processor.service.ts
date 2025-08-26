@@ -14,7 +14,7 @@ export class SeatNotificationProcessorService {
   async processChangeEvents(changes: SeatChangeEvent[]): Promise<void> {
     for (const change of changes) {
       if (change.event === 'VACATED') {
-        await this.processVacantSeatNotifications(change.roomNo, change.setNo);
+        await this.processVacantSeatNotifications(change.roomNo, change.seatNo);
       }
     }
   }
@@ -24,7 +24,7 @@ export class SeatNotificationProcessorService {
    */
   async processVacantSeatNotifications(
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<{
     notificationsSent: number;
     autoReservationsRequested: number;
@@ -41,7 +41,7 @@ export class SeatNotificationProcessorService {
       const pendingNotifications =
         await this.notificationsService.getActiveNotificationsForSeat(
           roomNo,
-          setNo,
+          seatNo,
         );
 
       if (pendingNotifications.length === 0) {
@@ -58,7 +58,7 @@ export class SeatNotificationProcessorService {
         }
 
         // 알림 발송 처리
-        await this.sendNotification(firstNotification, roomNo, setNo);
+        await this.sendNotification(firstNotification, roomNo, seatNo);
         result.notificationsSent = 1;
 
         // 알림 상태를 완료로 변경
@@ -89,7 +89,7 @@ export class SeatNotificationProcessorService {
   private async sendNotification(
     notification: { user: { studentId: string } },
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<void> {
     // TODO: 실제 알림 발송 구현 (푸시 알림, 이메일 등)
     // 현재는 로그만 기록
@@ -117,13 +117,13 @@ export class SeatNotificationProcessorService {
   /**
    * 특정 좌석의 모든 알림 취소
    */
-  cancelSeatNotifications(roomNo: string, setNo: string): Promise<number> {
+  cancelSeatNotifications(roomNo: string, seatNo: string): Promise<number> {
     try {
       // TODO: NotificationsService에 해당 메서드 구현 필요
       return Promise.resolve(0);
     } catch (error) {
       this.logger.error(
-        `Failed to cancel notifications for seat ${roomNo}/${setNo}: ${this.getErrorMessage(error)}`,
+        `Failed to cancel notifications for seat ${roomNo}/${seatNo}: ${this.getErrorMessage(error)}`,
       );
       throw error;
     }

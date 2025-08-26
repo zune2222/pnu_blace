@@ -61,11 +61,11 @@ export class SeatChangeDetectorService {
 
     // 좌석별로 상태 변화 확인
     const previousMap = new Map(
-      previousSnapshot.map((seat) => [seat.setNo, seat.status]),
+      previousSnapshot.map((seat) => [seat.seatNo, seat.status]),
     );
 
     for (const currentSeat of currentSnapshot) {
-      const previousStatus = previousMap.get(currentSeat.setNo);
+      const previousStatus = previousMap.get(currentSeat.seatNo);
 
       if (previousStatus && previousStatus !== currentSeat.status) {
         // 상태 변화 감지
@@ -74,7 +74,7 @@ export class SeatChangeDetectorService {
         if (event) {
           changes.push({
             roomNo,
-            setNo: currentSeat.setNo,
+            seatNo: currentSeat.seatNo,
             previousStatus,
             currentStatus: currentSeat.status,
             event,
@@ -114,7 +114,7 @@ export class SeatChangeDetectorService {
 
       const eventLog = this.seatEventLogRepository.create({
         roomNo: change.roomNo,
-        setNo: change.setNo,
+        seatNo: change.seatNo,
         event: change.event,
         timestamp: change.timestamp,
         libraryName: this.getRoomName(change.roomNo),

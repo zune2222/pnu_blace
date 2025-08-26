@@ -8,7 +8,7 @@ export class CreateNotificationRequestDto {
 
 	@IsString()
 	@IsNotEmpty()
-	setNo: string;
+	seatNo: string;
 
 	@IsBoolean()
 	autoReserve: boolean;
@@ -18,7 +18,7 @@ export class CreateNotificationRequestDto {
 export class NotificationRequestDto {
 	id: number;
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	autoReserve: boolean;
 	createdAt: Date;
 	isActive: boolean;

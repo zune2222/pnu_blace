@@ -96,7 +96,10 @@ export class SeatsService {
     studentId: string,
     reserveSeatDto: ReserveSeatRequestDto,
   ): Promise<SeatActionResponseDto> {
-    return this.seatReservationService.reserveEmptySeat(studentId, reserveSeatDto);
+    return this.seatReservationService.reserveEmptySeat(
+      studentId,
+      reserveSeatDto,
+    );
   }
 
   /**
@@ -111,8 +114,8 @@ export class SeatsService {
    */
   async getSeatPrediction(
     roomNo: string,
-    setNo: string,
+    seatNo: string,
   ): Promise<SeatVacancyPredictionDto> {
-    return this.seatPredictionService.getSeatPrediction(roomNo, setNo);
+    return this.seatPredictionService.getSeatPrediction(roomNo, seatNo);
   }
 }

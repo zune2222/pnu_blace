@@ -9,7 +9,7 @@ export class SeatEventLog {
 	roomNo!: string;
 
 	@Column()
-	setNo!: string;
+	seatNo!: string;
 
 	@Column({ nullable: true })
 	libraryName?: string;

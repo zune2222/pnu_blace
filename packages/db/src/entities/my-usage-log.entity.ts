@@ -16,7 +16,7 @@ export class MyUsageLog {
 	roomNo!: string;
 
 	@Column()
-	setNo!: string;
+	seatNo!: string;
 
 	@Column({ type: "timestamp" })
 	startTime!: Date;

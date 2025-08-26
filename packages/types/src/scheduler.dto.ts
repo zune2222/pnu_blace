@@ -1,7 +1,7 @@
 // 좌석 스냅샷 (특정 시점의 좌석 상태)
 export interface SeatSnapshot {
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	status: "OCCUPIED" | "AVAILABLE" | "UNAVAILABLE";
 	timestamp: Date;
 }
@@ -10,7 +10,7 @@ export interface SeatSnapshot {
 export interface ReservationRequest {
 	studentId: string;
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	requestedAt: Date;
 }
 
@@ -19,7 +19,7 @@ export interface ReservationResult {
 	success: boolean;
 	studentId: string;
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	message: string;
 	timestamp: Date;
 	reservedAt?: Date;
@@ -29,7 +29,7 @@ export interface ReservationResult {
 // 좌석 상태 변화 이벤트
 export interface SeatChangeEvent {
 	roomNo: string;
-	setNo: string;
+	seatNo: string;
 	previousStatus: string;
 	currentStatus: string;
 	event: "OCCUPIED" | "VACATED";
