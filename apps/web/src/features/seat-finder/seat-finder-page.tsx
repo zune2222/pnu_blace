@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { RoomInfo } from "@pnu-blace/types";
-import { useRooms } from "@/entities/room";
+import { useRooms, RoomInfo } from "@/entities/room";
 import { RoomList } from "./ui/room-list";
 
 export const SeatFinderPage = () => {

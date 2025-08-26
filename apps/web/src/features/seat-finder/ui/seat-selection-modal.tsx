@@ -79,8 +79,12 @@ export const SeatSelectionModal = ({
   const getPredictedTime = () => {
     if (!prediction) return "예측 중...";
 
-    // SeatPredictionDto에는 predictedEndTime이 없으므로 분석 결과를 표시
-    return prediction.analysis?.summaryMessage || "분석 중...";
+    // SeatPredictionDto의 분석 결과를 기반으로 메시지 생성
+    const analysis = prediction.analysis;
+    if (analysis) {
+      return `평균 ${analysis.averageUtilization}% 사용률, 추천 시간: ${analysis.recommendedTimes.slice(0, 2).join(", ")}`;
+    }
+    return "분석 중...";
   };
 
   const handleAction = async (type: "reserve" | "reserve-empty") => {

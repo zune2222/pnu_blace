@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
-import { QuickInsights, InsightItem, InsightType } from "@/entities/dashboard";
+import { InsightItem } from "@/entities/dashboard";
+
+type InsightType = "prediction" | "tip" | "statistic" | "usage" | "recommendation";
+type QuickInsights = {
+  items: InsightItem[];
+  lastUpdated: string;
+};
 
 // 인사이트 타입별 아이콘
 const getInsightIcon = (type: InsightType) => {

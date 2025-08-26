@@ -1,7 +1,12 @@
 "use client";
 import React from "react";
 import { Button } from "@/shared/ui";
-import { ReadingRoom, FavoriteRooms } from "@/entities/dashboard";
+import { ReadingRoomInfo } from "@/entities/dashboard";
+
+type FavoriteRooms = {
+  rooms: ReadingRoomInfo[];
+  lastUpdated: string;
+};
 
 interface FavoriteRoomsSectionProps {
   favoriteRooms: FavoriteRooms | null;
