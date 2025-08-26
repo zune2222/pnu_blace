@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && yarn workspace web build",
+  "buildCommand": "cd ../.. && yarn build:web",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
   "installCommand": "cd ../.. && yarn install"
