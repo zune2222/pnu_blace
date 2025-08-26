@@ -68,6 +68,33 @@ export const metadata: Metadata = {
   title: "PNU Blace",
   description: "부산대학교 도서관을 더욱 편리하게",
   keywords: ["부산대학교", "도서관", "좌석예약", "자동예약", "PNU", "Blace"],
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      {
+        rel: "android-chrome-192x192",
+        url: "/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        rel: "android-chrome-512x512", 
+        url: "/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  },
+  manifest: "/site.webmanifest",
+  themeColor: "#ffffff",
+  viewport: "width=device-width, initial-scale=1",
 };
 
 // 다크 모드 초기화 스크립트 (번쩍임 방지)
