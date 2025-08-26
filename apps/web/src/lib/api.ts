@@ -1,3 +1,5 @@
+import { RoomInfo } from "@pnu-blace/types";
+
 // API 기본 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 const API_TIMEOUT = 10000; // 10초
@@ -128,8 +130,8 @@ export class ApiClient {
   }
 
   // 열람실 목록 조회
-  async getRooms() {
-    return this.get("/api/v1/rooms");
+  async getRooms(): Promise<RoomInfo[]> {
+    return this.get<RoomInfo[]>("/api/v1/rooms");
   }
 
   // 토큰 관리 메서드
