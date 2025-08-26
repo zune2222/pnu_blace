@@ -36,10 +36,11 @@ export const CurrentSeatWidget: React.FC<CurrentSeatWidgetProps> = ({
 }) => {
   // 좌석 취소 핸들러
   const handleCancelReservation = async () => {
-    if (!currentSeat?.reservationId) return;
+    if (!currentSeat) return;
 
     try {
-      await cancelReservationProp(currentSeat.reservationId);
+      // roomNo와 seatNo로 예약 취소
+      await cancelReservationProp(`${currentSeat.roomNo}-${currentSeat.seatNo}`);
     } catch (err) {
       console.error("예약 취소 실패:", err);
     }
