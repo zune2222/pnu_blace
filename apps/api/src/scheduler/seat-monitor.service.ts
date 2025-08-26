@@ -27,8 +27,6 @@ export class SeatMonitorService {
    */
   @Cron(CronExpression.EVERY_MINUTE)
   async collectSeatData() {
-    this.logger.debug('Starting seat data collection...');
-
     try {
       // 모든 열람실 스캔
       const roomSnapshots = await this.seatScannerService.scanAllRooms();
@@ -38,7 +36,6 @@ export class SeatMonitorService {
       // 각 열람실별로 변화 감지 및 알림 처리
       for (const [roomNo, snapshot] of roomSnapshots) {
         if (snapshot.length === 0) {
-          this.logger.warn(`No seat data found for room ${roomNo}`);
           continue;
         }
 
@@ -65,8 +62,6 @@ export class SeatMonitorService {
           autoReservationRequests,
         );
       }
-
-      this.logger.debug('Seat data collection completed');
     } catch (error) {
       this.logger.error(
         `Seat data collection failed: ${this.getErrorMessage(error)}`,
@@ -78,8 +73,6 @@ export class SeatMonitorService {
    * 수동으로 특정 열람실 스캔 (테스트용)
    */
   async scanRoom(roomNo: string): Promise<void> {
-    this.logger.debug(`Manual scan requested for room ${roomNo}`);
-
     try {
       const snapshot = await this.seatScannerService.scanRoom(roomNo);
       const changes = await this.seatChangeDetectorService.detectChanges(

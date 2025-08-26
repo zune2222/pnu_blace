@@ -46,10 +46,6 @@ export class SeatChangeDetectorService {
       await this.logSeatEvent(change);
     }
 
-    this.logger.debug(
-      `Detected ${changes.length} seat changes in room ${roomNo}`,
-    );
-
     return changes;
   }
 
@@ -84,10 +80,6 @@ export class SeatChangeDetectorService {
             event,
             timestamp: currentSeat.timestamp,
           });
-
-          this.logger.debug(
-            `Seat ${roomNo}/${currentSeat.setNo}: ${previousStatus} → ${currentSeat.status}`,
-          );
         }
       }
     }
@@ -130,9 +122,6 @@ export class SeatChangeDetectorService {
       });
 
       await this.seatEventLogRepository.save(eventLog);
-      this.logger.debug(
-        `Logged seat event: ${change.roomNo}/${change.setNo} - ${change.event}`,
-      );
     } catch (error) {
       this.logger.error(
         `Failed to log seat event: ${this.getErrorMessage(error)}`,
@@ -179,7 +168,6 @@ export class SeatChangeDetectorService {
    */
   clearAllSnapshots(): void {
     this.previousSnapshots.clear();
-    this.logger.debug('Cleared all previous snapshots');
   }
 
   /**

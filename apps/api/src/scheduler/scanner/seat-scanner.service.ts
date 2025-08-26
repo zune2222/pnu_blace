@@ -33,13 +33,10 @@ export class SeatScannerService {
    * 모든 모니터링 대상 열람실의 좌석 상태를 수집
    */
   async scanAllRooms(): Promise<Map<string, SeatSnapshot[]>> {
-    this.logger.debug('Starting seat data collection for all rooms...');
-
     try {
       // 시스템 계정으로 로그인
       const loginResult = await this.schoolApiService.loginAsSystem();
       if (!loginResult.success) {
-        this.logger.error('Failed to login as system account');
         throw new Error('System login failed');
       }
 
@@ -50,9 +47,6 @@ export class SeatScannerService {
         try {
           const snapshot = await this.scanRoom(roomNo, loginResult.sessionID);
           results.set(roomNo, snapshot);
-          this.logger.debug(
-            `Scanned room ${roomNo} (${this.MONITORED_ROOMS[roomNo]}): ${snapshot.length} seats`,
-          );
         } catch (error) {
           this.logger.error(
             `Failed to scan room ${roomNo}: ${this.getErrorMessage(error)}`,
@@ -62,7 +56,6 @@ export class SeatScannerService {
         }
       }
 
-      this.logger.debug(`Completed scanning ${results.size} rooms`);
       return results;
     } catch (error) {
       this.logger.error(
@@ -97,7 +90,6 @@ export class SeatScannerService {
       );
 
       if (currentSeats.length === 0) {
-        this.logger.warn(`No seat data found for room ${roomNo}`);
         return [];
       }
 
@@ -120,7 +112,6 @@ export class SeatScannerService {
       if (shouldLogout && currentSessionID) {
         // TODO: 필요시 세션 정리 로직 구현
         // 현재는 학교 API에 logout 메서드가 없으므로 별도 처리 없음
-        this.logger.debug(`Session cleanup for: ${currentSessionID}`);
       }
     }
   }

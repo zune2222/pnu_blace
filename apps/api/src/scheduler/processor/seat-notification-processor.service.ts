@@ -45,13 +45,8 @@ export class SeatNotificationProcessorService {
         );
 
       if (pendingNotifications.length === 0) {
-        this.logger.debug(`No pending notifications for ${roomNo}/${setNo}`);
         return result;
       }
-
-      this.logger.debug(
-        `Found ${pendingNotifications.length} notifications for ${roomNo}/${setNo}`,
-      );
 
       // 첫 번째 알림만 처리 (FIFO)
       const firstNotification = pendingNotifications[0];
@@ -60,9 +55,6 @@ export class SeatNotificationProcessorService {
         // 자동 예약이 설정된 경우 플래그 설정
         if (firstNotification.autoReserve) {
           result.autoReservationsRequested = 1;
-          this.logger.debug(
-            `Auto-reservation requested for ${firstNotification.user.studentId}: ${roomNo}/${setNo}`,
-          );
         }
 
         // 알림 발송 처리
@@ -72,10 +64,6 @@ export class SeatNotificationProcessorService {
         // 알림 상태를 완료로 변경
         await this.notificationsService.markNotificationAsProcessed(
           firstNotification.requestId,
-        );
-
-        this.logger.debug(
-          `Notification processed for ${firstNotification.user.studentId}: ${roomNo}/${setNo}`,
         );
       } catch (error) {
         const errorMessage = this.getErrorMessage(error);
@@ -107,10 +95,6 @@ export class SeatNotificationProcessorService {
     // 현재는 로그만 기록
     await new Promise<void>((resolve) => setTimeout(resolve, 10)); // 비동기 작업 시뮬레이션
 
-    this.logger.debug(
-      `Notification sent to ${notification.user.studentId}: ${roomNo}/${setNo} is available`,
-    );
-
     // 여기에 실제 알림 발송 로직 구현
     // 예: FCM 푸시 알림, 이메일 발송, SMS 등
   }
@@ -121,7 +105,6 @@ export class SeatNotificationProcessorService {
   cancelUserNotifications(studentId: string): Promise<number> {
     try {
       // TODO: NotificationsService에 해당 메서드 구현 필요
-      this.logger.debug(`Would cancel notifications for user ${studentId}`);
       return Promise.resolve(0);
     } catch (error) {
       this.logger.error(
@@ -137,9 +120,6 @@ export class SeatNotificationProcessorService {
   cancelSeatNotifications(roomNo: string, setNo: string): Promise<number> {
     try {
       // TODO: NotificationsService에 해당 메서드 구현 필요
-      this.logger.debug(
-        `Would cancel notifications for seat ${roomNo}/${setNo}`,
-      );
       return Promise.resolve(0);
     } catch (error) {
       this.logger.error(
@@ -155,7 +135,6 @@ export class SeatNotificationProcessorService {
   cleanupExpiredNotifications(): Promise<number> {
     try {
       // TODO: NotificationsService에 해당 메서드 구현 필요
-      this.logger.debug('Would cleanup expired notifications');
       return Promise.resolve(0);
     } catch (error) {
       this.logger.error(

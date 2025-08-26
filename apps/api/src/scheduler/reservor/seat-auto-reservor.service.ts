@@ -14,10 +14,6 @@ export class SeatAutoReservorService {
   async reserveSeat(request: ReservationRequest): Promise<ReservationResult> {
     const { studentId, roomNo, setNo } = request;
 
-    this.logger.debug(
-      `Attempting auto reservation for ${studentId}: ${roomNo}/${setNo}`,
-    );
-
     try {
       // 시스템 계정으로 예약 시도 (실제로는 해당 사용자의 세션 필요)
       const loginResult = await this.schoolApiService.loginAsSystem();
@@ -33,9 +29,6 @@ export class SeatAutoReservorService {
       );
 
       if (success) {
-        this.logger.debug(
-          `Auto-reserved seat for ${studentId}: ${roomNo}/${setNo}`,
-        );
         return {
           success: true,
           studentId,
@@ -78,10 +71,6 @@ export class SeatAutoReservorService {
   async reserveSeats(
     requests: ReservationRequest[],
   ): Promise<ReservationResult[]> {
-    this.logger.debug(
-      `Processing ${requests.length} auto reservation requests`,
-    );
-
     const results: ReservationResult[] = [];
 
     // 순차적으로 처리 (동시 예약 시 충돌 방지)
@@ -94,11 +83,6 @@ export class SeatAutoReservorService {
         await this.sleep(1000); // 1초 대기
       }
     }
-
-    const successCount = results.filter((r) => r.success).length;
-    this.logger.debug(
-      `Completed batch reservation: ${successCount}/${requests.length} successful`,
-    );
 
     return results;
   }
@@ -123,7 +107,6 @@ export class SeatAutoReservorService {
 
       // TODO: 실제 사용자 예약 상태 조회 API 호출
       // 현재는 더미 구현
-      this.logger.debug(`Checking reservation status for ${studentId}`);
 
       return {
         hasReservation: false,
@@ -157,7 +140,6 @@ export class SeatAutoReservorService {
 
       // TODO: 실제 예약 취소 API 호출
       // 현재는 더미 구현
-      this.logger.debug(`Cancelling reservation for ${studentId}`);
 
       return {
         success: true,
