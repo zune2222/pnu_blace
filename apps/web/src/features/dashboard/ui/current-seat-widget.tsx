@@ -1,196 +1,87 @@
 "use client";
 import React from "react";
-import Link from "next/link";
-import { CurrentSeat } from "@/entities/dashboard";
+import { CurrentSeatWidgetProps } from "@pnu-blace/types";
+import { SeatInfoDisplay } from "./seat-info-display";
+import { SeatActionButtons } from "./seat-action-buttons";
+import { NoSeatMessage } from "./no-seat-message";
+import { LoadingState } from "./loading-state";
+import { ErrorState } from "./error-state";
+import { getStatusBadge } from "./status-badge";
+import { createSeatCancelHandler, createSeatExtendHandler } from "../lib/seat-handlers";
+import { useRealTimeRemaining } from "../lib/use-real-time-remaining";
+import { toast } from "sonner";
 
-// 남은 시간을 포맷하는 유틸 함수
-const formatRemainingTime = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const secs = 0; // API에서 초 단위는 제공되지 않으므로 0으로 설정
-  return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
-
-// 좌석 상태 배지 (현재 좌석이 있으면 ACTIVE)
-const getStatusBadge = () => {
-  return {
-    color: "green",
-    text: "ACTIVE",
-    bgClass:
-      "bg-green-500/10 text-green-600 dark:bg-green-400/10 dark:text-green-400",
-  };
-};
-
-interface CurrentSeatWidgetProps {
-  currentSeat: CurrentSeat | null;
-  isLoading: boolean;
-  error: string | null;
-  cancelReservation: (reservationId: string) => Promise<void>;
-}
 
 export const CurrentSeatWidget: React.FC<CurrentSeatWidgetProps> = ({
   currentSeat,
   isLoading,
   error,
   cancelReservation: cancelReservationProp,
+  extendReservation: extendReservationProp,
+  isExtending,
+  isCancelling,
 }) => {
-  // 좌석 취소 핸들러
-  const handleCancelReservation = async () => {
-    if (!currentSeat) return;
+  // 실시간 남은 시간 계산
+  const { remainingMinutes: realTimeRemainingMinutes, remainingSeconds } = useRealTimeRemaining({
+    endTime: currentSeat?.endTime,
+    initialRemainingMinutes: currentSeat?.remainingMinutes || 0,
+  });
 
-    try {
-      // roomNo와 seatNo로 예약 취소
-      await cancelReservationProp(`${currentSeat.roomNo}-${currentSeat.seatNo}`);
-    } catch (err) {
-      console.error("예약 취소 실패:", err);
-    }
+  // 연장 가능 여부 (2시간 = 120분 이하일 때)
+  const isExtendDisabled = realTimeRemainingMinutes > 120;
+
+  const handleCancelReservation = createSeatCancelHandler(
+    currentSeat,
+    cancelReservationProp
+  );
+
+  const handleExtendReservation = createSeatExtendHandler(
+    currentSeat,
+    extendReservationProp
+  );
+
+  // 비활성화된 연장 버튼 클릭 시 안내 메시지
+  const handleExtendDisabledClick = () => {
+    const hours = Math.floor(realTimeRemainingMinutes / 60);
+    const minutes = realTimeRemainingMinutes % 60;
+    toast.info("좌석 연장 안내", {
+      description: `이용시간이 2시간 이하 남았을 때 연장 가능합니다. (현재 ${hours}시간 ${minutes}분 남음)`,
+    });
   };
 
-  // 로딩 상태
   if (isLoading) {
-    return (
-      <section className="py-20 md:py-32">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="text-2xl text-muted-foreground font-light">
-            좌석 정보를 불러오는 중...
-          </div>
-        </div>
-      </section>
-    );
+    return <LoadingState />;
   }
 
-  // 에러 상태
   if (error) {
-    return (
-      <section className="py-20 md:py-32">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="text-xl text-red-600 font-light">{error}</div>
-        </div>
-      </section>
-    );
+    return <ErrorState error={error} />;
   }
 
   const isReserved = currentSeat !== null;
-  const statusBadge = isReserved ? getStatusBadge() : null;
 
   return (
     <section className="py-20 md:py-32">
       <div className="max-w-4xl mx-auto">
         {isReserved ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-            {/* 왼쪽: 좌석 정보 */}
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-2 h-2 bg-${statusBadge?.color}-500 rounded-full animate-pulse`}
-                  ></div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full font-medium tracking-wide ${statusBadge?.bgClass}`}
-                  >
-                    {statusBadge?.text}
-                  </span>
-                </div>
-
-                <h1 className="text-4xl md:text-5xl font-extralight text-foreground leading-tight">
-                  내 좌석
-                </h1>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-3xl md:text-4xl font-extralight text-foreground mb-2">
-                    {currentSeat?.roomName}
-                  </h2>
-                  <p className="text-xl text-muted-foreground/70 font-light">
-                    {currentSeat?.seatDisplayName}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-6 pt-4">
-                <Link
-                  href="#"
-                  className="group inline-flex items-center space-x-3 text-lg font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
-                >
-                  <span>시간 연장</span>
-                  <svg
-                    className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </Link>
-
-                <button
-                  onClick={handleCancelReservation}
-                  className="text-base text-muted-foreground/50 font-light hover:text-muted-foreground transition-colors duration-300"
-                >
-                  반납
-                </button>
-              </div>
-            </div>
-
-            {/* 오른쪽: 시간 정보 */}
-            <div className="text-center lg:text-right space-y-6">
-              <div>
-                <p className="text-sm text-muted-foreground/60 font-light mb-4 tracking-wide uppercase">
-                  Time Remaining
-                </p>
-                <div className="font-mono text-6xl md:text-7xl font-extralight text-foreground leading-none">
-                  {currentSeat?.remainingMinutes
-                    ? formatRemainingTime(currentSeat.remainingMinutes)
-                    : "0:00:00"}
-                </div>
-              </div>
-            </div>
+          <div className="space-y-8">
+            <SeatInfoDisplay
+              roomName={currentSeat.roomName}
+              seatDisplayName={currentSeat.seatDisplayName}
+              remainingMinutes={realTimeRemainingMinutes}
+              remainingSeconds={remainingSeconds}
+              statusBadge={getStatusBadge()}
+            />
+            <SeatActionButtons
+              onExtend={handleExtendReservation}
+              onCancel={handleCancelReservation}
+              isExtending={isExtending}
+              isCancelling={isCancelling}
+              isExtendDisabled={isExtendDisabled}
+              onExtendDisabledClick={handleExtendDisabledClick}
+            />
           </div>
         ) : (
-          <div className="text-center space-y-12">
-            <div className="space-y-8">
-              <h1 className="text-5xl md:text-6xl font-extralight text-foreground leading-tight">
-                내 좌석
-              </h1>
-
-              <div className="space-y-6">
-                <h3 className="text-2xl md:text-3xl font-extralight text-foreground">
-                  예약한 좌석이 없습니다
-                </h3>
-                <p className="text-lg text-muted-foreground/70 font-light leading-relaxed max-w-2xl mx-auto">
-                  새로운 학습 공간을 찾아보세요
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <Link
-                href="/seats"
-                className="group inline-flex items-center space-x-4 text-xl font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
-              >
-                <span>좌석 찾기</span>
-                <svg
-                  className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
-              </Link>
-            </div>
-          </div>
+          <NoSeatMessage />
         )}
       </div>
     </section>

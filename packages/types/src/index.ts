@@ -7,3 +7,4 @@ export * from "./stats.dto";
 export * from "./school-api.dto";
 export * from "./scheduler.dto";
 export * from "./room.dto";
+export * from "./dashboard.dto";

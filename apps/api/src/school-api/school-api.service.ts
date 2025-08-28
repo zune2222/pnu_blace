@@ -141,7 +141,7 @@ export class SchoolApiService {
     sessionID: string | null,
     roomNo: string,
     seatNo: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; message?: string; requiresGateEntry?: boolean }> {
     try {
       const currentSessionID =
         sessionID || (await this.loginAsSystem()).sessionID;
@@ -165,11 +165,18 @@ export class SchoolApiService {
         `Reserve seat response data: ${JSON.stringify(response.data)}`,
       );
 
+      // XML 응답인 경우 파싱
+      if (response.status === 200 && typeof response.data === 'string') {
+        const xmlResult = this.parseReserveSeatXml(response.data);
+        return xmlResult;
+      }
+
+      // JSON 응답인 경우 (기존 로직)
       const isSuccess =
         response.status === 200 && response.data?.success !== false;
       this.logger.debug(`Reserve seat result: ${isSuccess}`);
 
-      return isSuccess;
+      return { success: isSuccess };
     } catch (error: any) {
       this.logger.error(`Reserve seat error: ${error.message}`);
       if (error.response) {
@@ -178,7 +185,61 @@ export class SchoolApiService {
           `Error response data: ${JSON.stringify(error.response.data)}`,
         );
       }
-      return false;
+      return { success: false, message: '좌석 발권 중 오류가 발생했습니다.' };
+    }
+  }
+
+  /**
+   * 좌석 발권 XML 응답 파싱
+   */
+  private parseReserveSeatXml(xmlData: string): {
+    success: boolean;
+    message?: string;
+    requiresGateEntry?: boolean;
+  } {
+    try {
+      this.logger.debug(`Parsing reserve seat XML: ${xmlData}`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const resultCode = extractCDATA('resultCode');
+      const resultMsg = extractCDATA('resultMsg');
+
+      this.logger.debug(
+        `Reserve seat result - code: ${resultCode}, message: ${resultMsg}`,
+      );
+
+      // resultCode가 '0'이면 성공, '1'이면 실패
+      if (resultCode === '0') {
+        const message = resultMsg || '좌석이 성공적으로 발권되었습니다.';
+        
+        // 출입게이트 통과 안내 메시지 포함 여부 확인
+        const requiresGateEntry = message.includes('출입게이트') || message.includes('15분');
+        
+        return { 
+          success: true, 
+          message,
+          requiresGateEntry 
+        };
+      } else {
+        return {
+          success: false,
+          message: resultMsg || '좌석 발권에 실패했습니다.',
+        };
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse reserve seat XML: ${this.getErrorMessage(error)}`,
+      );
+      return { success: false, message: '응답 처리 중 오류가 발생했습니다.' };
     }
   }
 
@@ -190,7 +251,7 @@ export class SchoolApiService {
     sessionID: string | null,
     roomNo: string,
     seatNo: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       const currentSessionID =
         sessionID || (await this.loginAsSystem()).sessionID;
@@ -198,10 +259,9 @@ export class SchoolApiService {
       this.logger.debug(
         `Attempting to return seat: ${userID} - ${roomNo}/${seatNo}`,
       );
-
       const response = await this.httpClient.post(
         '/returnSeat.do',
-        `userID=${userID}&roomNo=${roomNo}&seatNo=${seatNo}`,
+        `userID=${userID}&seatNo=${seatNo}&roomNo=${roomNo}`,
         {
           headers: {
             Cookie: `JSESSIONID=${currentSessionID}`,
@@ -209,10 +269,71 @@ export class SchoolApiService {
         },
       );
 
-      return response.status === 200 && response.data?.success !== false;
+      this.logger.debug(`Return seat response status: ${response.status}`);
+      this.logger.debug(
+        `Return seat response data: ${JSON.stringify(response.data)}`,
+      );
+
+      // XML 응답인 경우 파싱
+      if (response.status === 200 && typeof response.data === 'string') {
+        const xmlResult = this.parseReturnSeatXml(response.data);
+        return xmlResult;
+      }
+
+      // JSON 응답인 경우 (기존 로직)
+      const isSuccess =
+        response.status === 200 && response.data?.success !== false;
+      return { success: isSuccess };
     } catch (error: any) {
       this.logger.error(`Return seat error: ${error.message}`);
-      return false;
+      return { success: false, message: '좌석 반납 중 오류가 발생했습니다.' };
+    }
+  }
+
+  /**
+   * 좌석 반납 XML 응답 파싱
+   */
+  private parseReturnSeatXml(xmlData: string): {
+    success: boolean;
+    message?: string;
+  } {
+    try {
+      this.logger.debug(`Parsing return seat XML: ${xmlData}`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const resultCode = extractCDATA('resultCode');
+      const resultMsg = extractCDATA('resultMsg');
+
+      this.logger.debug(
+        `Return seat result - code: ${resultCode}, message: ${resultMsg}`,
+      );
+
+      // resultCode가 '0'이면 성공, '1'이면 실패
+      if (resultCode === '0') {
+        return {
+          success: true,
+          message: resultMsg || '좌석이 성공적으로 반납되었습니다.',
+        };
+      } else {
+        return {
+          success: false,
+          message: resultMsg || '좌석 반납에 실패했습니다.',
+        };
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse return seat XML: ${this.getErrorMessage(error)}`,
+      );
+      return { success: false, message: '응답 처리 중 오류가 발생했습니다.' };
     }
   }
 
@@ -224,7 +345,7 @@ export class SchoolApiService {
     sessionID: string | null,
     roomNo: string,
     seatNo: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       const currentSessionID =
         sessionID || (await this.loginAsSystem()).sessionID;
@@ -243,10 +364,71 @@ export class SchoolApiService {
         },
       );
 
-      return response.status === 200 && response.data?.success !== false;
+      this.logger.debug(`Extend seat response status: ${response.status}`);
+      this.logger.debug(
+        `Extend seat response data: ${JSON.stringify(response.data)}`,
+      );
+
+      // XML 응답인 경우 파싱
+      if (response.status === 200 && typeof response.data === 'string') {
+        const xmlResult = this.parseExtendSeatXml(response.data);
+        return xmlResult;
+      }
+
+      // JSON 응답인 경우 (기존 로직)
+      const isSuccess =
+        response.status === 200 && response.data?.success !== false;
+      return { success: isSuccess };
     } catch (error: any) {
       this.logger.error(`Extend seat error: ${error.message}`);
-      return false;
+      return { success: false, message: '좌석 연장 중 오류가 발생했습니다.' };
+    }
+  }
+
+  /**
+   * 좌석 연장 XML 응답 파싱
+   */
+  private parseExtendSeatXml(xmlData: string): {
+    success: boolean;
+    message?: string;
+  } {
+    try {
+      this.logger.debug(`Parsing extend seat XML: ${xmlData}`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const resultCode = extractCDATA('resultCode');
+      const resultMsg = extractCDATA('resultMsg');
+
+      this.logger.debug(
+        `Extend seat result - code: ${resultCode}, message: ${resultMsg}`,
+      );
+
+      // resultCode가 '0'이면 성공, '1'이면 실패
+      if (resultCode === '0') {
+        return {
+          success: true,
+          message: resultMsg || '좌석이 성공적으로 연장되었습니다.',
+        };
+      } else {
+        return {
+          success: false,
+          message: resultMsg || '좌석 연장에 실패했습니다.',
+        };
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse extend seat XML: ${this.getErrorMessage(error)}`,
+      );
+      return { success: false, message: '응답 처리 중 오류가 발생했습니다.' };
     }
   }
 

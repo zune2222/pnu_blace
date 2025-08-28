@@ -14,8 +14,6 @@ import {
   SeatActionResponseDto,
   ExtendSeatResponseDto,
   MyUsageStatsDto,
-  SeatPredictionDto,
-  SeatDetailDto,
 } from "@pnu-blace/types";
 
 class DashboardApi {
@@ -34,22 +32,33 @@ class DashboardApi {
       }
 
       // 백엔드 데이터를 프론트엔드 형식으로 변환
-      const roomInfo = READING_ROOMS[mySeat.roomNo];
-      const startTime = new Date(mySeat.startTime);
-      const endTime = new Date(mySeat.endTime);
+      // 시간 문자열이 "HH:MM" 형식인 경우 오늘 날짜와 결합
+      const today = new Date();
+      const endTime = mySeat.endTime.includes(':')
+        ? new Date(`${today.toDateString()} ${mySeat.endTime}`)
+        : new Date(mySeat.endTime);
       const now = new Date();
-      const remainingMinutes = Math.max(
-        0,
-        Math.floor((endTime.getTime() - now.getTime()) / (1000 * 60))
-      );
+      
+      // 남은 시간 계산: remainingTime 문자열을 우선 사용, 없으면 endTime으로 계산
+      let remainingMinutes = 0;
+      
+      if (mySeat.remainingTime && mySeat.remainingTime !== '') {
+        // "0시간 01분 남음" 형식의 remainingTime을 분으로 변환
+        const timeStr = mySeat.remainingTime;
+        const hoursMatch = timeStr.match(/(\d+)시간/);
+        const minutesMatch = timeStr.match(/(\d+)분/);
+        
+        const hours = hoursMatch ? parseInt(hoursMatch[1] || '0', 10) : 0;
+        const minutes = minutesMatch ? parseInt(minutesMatch[1] || '0', 10) : 0;
+        remainingMinutes = hours * 60 + minutes;
+      } else if (mySeat.endTime) {
+        // endTime으로 남은 시간 계산
+        remainingMinutes = Math.max(
+          0,
+          Math.floor((endTime.getTime() - now.getTime()) / (1000 * 60))
+        );
+      }
 
-      // seatNo 값 검증 로깅
-      console.log("MySeat data validation:", {
-        roomNo: mySeat.roomNo,
-        seatNo: mySeat.seatNo,
-        seatNoType: typeof mySeat.seatNo,
-        seatNoValue: JSON.stringify(mySeat.seatNo),
-      });
 
       return {
         roomNo: mySeat.roomNo,
@@ -57,7 +66,9 @@ class DashboardApi {
         startTime: mySeat.startTime,
         endTime: mySeat.endTime,
         remainingTime: mySeat.remainingTime,
-        seatDisplayName: `${mySeat.seatNo || "?"}번`,
+        roomName: mySeat.roomName || `열람실 ${mySeat.roomNo}`,
+        seatDisplayName: mySeat.seatDisplayName || `${mySeat.seatNo || "?"}번`,
+        remainingMinutes,
         isActive: true,
       };
     } catch (error) {
@@ -320,28 +331,6 @@ class DashboardApi {
     }
   }
 
-  // 좌석 상태 조회 (특정 열람실)
-  async getRoomSeats(roomNo: string): Promise<SeatStatusDto[]> {
-    try {
-      return await apiClient.get<SeatStatusDto[]>(`/api/v1/seats/${roomNo}`);
-    } catch (error) {
-      throw new Error("좌석 상태를 불러올 수 없습니다");
-    }
-  }
-
-  // 좌석 상세 정보 조회
-  async getSeatDetail(roomNo: string): Promise<SeatDetailDto | null> {
-    try {
-      return await apiClient.get<SeatDetailDto>(
-        `/api/v1/seats/${roomNo}/detail`
-      );
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 404) {
-        return null; // 좌석 상세 정보가 없음
-      }
-      throw new Error("좌석 상세 정보를 불러올 수 없습니다");
-    }
-  }
 
   // 즐겨찾기 토글 (로컬 관리)
   async toggleFavorite(roomNo: string, isFavorite: boolean): Promise<void> {

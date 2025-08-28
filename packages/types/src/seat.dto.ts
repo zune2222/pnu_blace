@@ -25,6 +25,8 @@ export class MySeatDto {
 	startTime: string;
 	endTime: string;
 	remainingTime?: string;
+	roomName?: string;
+	seatDisplayName?: string;
 }
 
 // POST /seats/reserve
@@ -42,6 +44,7 @@ export class ReserveSeatRequestDto {
 export class SeatActionResponseDto {
 	success: boolean;
 	message: string;
+	requiresGateEntry?: boolean;
 }
 
 export class ExtendSeatResponseDto {
