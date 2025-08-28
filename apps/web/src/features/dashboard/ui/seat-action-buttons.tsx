@@ -52,9 +52,27 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
       <button
         onClick={onCancel}
         disabled={isCancelling}
-        className="text-base text-muted-foreground/50 font-light hover:text-muted-foreground transition-colors duration-300 disabled:text-muted-foreground/30 disabled:cursor-not-allowed"
+        className="group inline-flex items-center space-x-3 text-base text-muted-foreground/50 font-light hover:text-muted-foreground transition-colors duration-300 disabled:text-muted-foreground/30 disabled:cursor-not-allowed"
       >
-        {isCancelling ? "반납 중..." : "반납"}
+        <span>{isCancelling ? "반납 중..." : "반납"}</span>
+        {!isCancelling && (
+          <svg
+            className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M13 7l5 5m0 0l-5 5m5-5H6"
+            />
+          </svg>
+        )}
+        {isCancelling && (
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+        )}
       </button>
     </div>
   );
