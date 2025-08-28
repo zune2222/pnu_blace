@@ -6,6 +6,7 @@ export interface SeatInfoDisplayProps {
   roomName: string;
   seatDisplayName: string;
   remainingMinutes?: number;
+  remainingSeconds?: number;
   statusBadge: StatusBadgeProps;
 }
 
@@ -13,6 +14,7 @@ export const SeatInfoDisplay: React.FC<SeatInfoDisplayProps> = ({
   roomName,
   seatDisplayName,
   remainingMinutes,
+  remainingSeconds = 0,
   statusBadge,
 }) => {
   return (
@@ -46,7 +48,7 @@ export const SeatInfoDisplay: React.FC<SeatInfoDisplayProps> = ({
             Time Remaining
           </p>
           <div className="font-mono text-6xl md:text-7xl font-extralight text-foreground leading-none">
-            {remainingMinutes ? formatRemainingTime(remainingMinutes) : "0:00:00"}
+            {remainingMinutes ? formatRemainingTime(remainingMinutes, remainingSeconds) : "0:00:00"}
           </div>
         </div>
       </div>
