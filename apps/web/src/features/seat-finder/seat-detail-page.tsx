@@ -11,6 +11,7 @@ import {
 import { apiClient } from "@/lib/api";
 import { SeatSelectionModal } from "./ui";
 import React from "react"; // Added for React.Fragment
+import { toast } from "sonner";
 
 interface SeatDetailPageProps {
   roomNo: string;
@@ -90,8 +91,15 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSeatData(updatedData);
         setSelectedSeat(null);
 
-        // 성공 메시지 표시 (실제로는 토스트나 알림 사용)
-        alert("좌석이 성공적으로 발권되었습니다!");
+        // 성공 메시지 표시
+        if (response.requiresGateEntry) {
+          toast.success("좌석이 성공적으로 발권되었습니다!", {
+            description: "15분 이내에 출입게이트를 통과해주세요.",
+            duration: 5000,
+          });
+        } else {
+          toast.success(response.message || "좌석이 성공적으로 발권되었습니다!");
+        }
       }
     } catch (err: any) {
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
@@ -140,9 +148,10 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSelectedSeat(null);
 
         // 성공 메시지 표시
-        alert(
-          "빈자리 발권 예약이 완료되었습니다. 좌석이 비워지면 자동으로 발권됩니다."
-        );
+        toast.success("빈자리 발권 예약이 완료되었습니다!", {
+          description: "좌석이 비워지면 자동으로 발권됩니다.",
+          duration: 4000,
+        });
       }
     } catch (err: any) {
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음

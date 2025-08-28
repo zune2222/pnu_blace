@@ -9,7 +9,6 @@ import {
   ReadingRoomInfo,
   InsightItem,
 } from "./types";
-import { SeatActionResponseDto, ExtendSeatResponseDto } from "@pnu-blace/types";
 
 // 대시보드 전체 데이터 조회
 export const useDashboardData = () => {

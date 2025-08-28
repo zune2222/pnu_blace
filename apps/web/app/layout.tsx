@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Header, Footer } from "@/widgets";
 import { QueryProvider } from "@/providers";
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "../public/GeistVF.woff",
@@ -150,6 +151,12 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <Toaster 
+            richColors 
+            position="bottom-right" 
+            expand={true}
+            visibleToasts={5}
+          />
         </QueryProvider>
       </body>
     </html>

@@ -20,32 +20,19 @@ export const useDashboardData = () => {
 
   const dashboardData = dashboardResponse?.data;
 
-  // 좌석 반납 (기존 cancelReservation 대신)
-  const cancelReservation = async (reservationId?: string) => {
-    try {
-      await returnSeatMutation.mutateAsync();
-    } catch (err) {
-      throw err;
-    }
+  // 좌석 반납
+  const cancelReservation = async () => {
+    await returnSeatMutation.mutateAsync();
   };
 
-  // 좌석 연장 (연장 시간 매개변수 없음 - 백엔드에서 자동 연장)
-  const extendReservation = async (reservationId?: string, duration?: number) => {
-    try {
-      const result = await extendSeatMutation.mutateAsync();
-      return result;
-    } catch (err) {
-      throw err;
-    }
+  // 좌석 연장
+  const extendReservation = async () => {
+    await extendSeatMutation.mutateAsync();
   };
 
   // 즐겨찾기 토글
   const toggleFavorite = async (roomNo: string, isFavorite: boolean) => {
-    try {
-      await toggleFavoriteMutation.mutateAsync({ roomNo, isFavorite });
-    } catch (err) {
-      throw err;
-    }
+    await toggleFavoriteMutation.mutateAsync({ roomNo, isFavorite });
   };
 
   // 에러 메시지 처리

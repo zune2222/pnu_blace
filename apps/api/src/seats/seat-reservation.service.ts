@@ -56,7 +56,18 @@ export class SeatReservationService {
         throw new NotFoundException('발권한 좌석이 없습니다.');
       }
 
-      return mySeat;
+      // 추가 정보 조회를 위해 room 정보 가져오기
+      const roomInfo = await this.schoolApiService.getRoomInfo(
+        mySeat.roomNo,
+        user.schoolSessionId,
+      );
+
+      // MySeatDto에 추가 정보 포함
+      return {
+        ...mySeat,
+        roomName: roomInfo?.roomName || `열람실 ${mySeat.roomNo}`,
+        seatDisplayName: `${mySeat.seatNo}번`,
+      };
     } catch (error: any) {
       this.logger.error(`Get my seat error: ${error.message}`);
 
@@ -99,15 +110,17 @@ export class SeatReservationService {
         }
       }
 
-      const reserveSuccess = await this.schoolApiService.reserveSeat(
+      const reserveResult = await this.schoolApiService.reserveSeat(
         studentId,
         user.schoolSessionId!,
         roomNo,
         seatNo,
       );
 
-      if (!reserveSuccess) {
-        throw new BadRequestException('좌석 발권에 실패했습니다.');
+      if (!reserveResult.success) {
+        throw new BadRequestException(
+          reserveResult.message || '좌석 발권에 실패했습니다.',
+        );
       }
 
       const usageLog = this.myUsageLogRepository.create({
@@ -123,7 +136,8 @@ export class SeatReservationService {
 
       return {
         success: true,
-        message: '좌석이 성공적으로 발권되었습니다.',
+        message: reserveResult.message || '좌석이 성공적으로 발권되었습니다.',
+        requiresGateEntry: (reserveResult as any).requiresGateEntry || false,
       };
     } catch (error: any) {
       this.logger.error(`Reserve seat error: ${error.message}`);
@@ -145,38 +159,44 @@ export class SeatReservationService {
    */
   async returnSeat(studentId: string): Promise<SeatActionResponseDto> {
     try {
+      // 학교 API에서 현재 좌석 정보 조회
+      const mySeat = await this.getMySeat(studentId);
+      if (!mySeat) {
+        throw new NotFoundException('예약한 좌석이 없습니다.');
+      }
+
+      const user = await this.getUserWithValidSession(studentId);
+
+      const returnResult = await this.schoolApiService.returnSeat(
+        studentId,
+        user.schoolSessionId!,
+        mySeat.roomNo,
+        mySeat.seatNo,
+      );
+
+      if (!returnResult.success) {
+        throw new BadRequestException(
+          returnResult.message || '좌석 반납에 실패했습니다.',
+        );
+      }
+
+      // DB에서 현재 사용 중인 기록 찾아서 종료 시간 업데이트
       const currentUsage = await this.myUsageLogRepository.findOne({
         where: {
           studentId,
+          roomNo: mySeat.roomNo,
+          seatNo: mySeat.seatNo,
           endTime: null as any,
         },
       });
 
-      if (!currentUsage) {
-        throw new NotFoundException('예약한 좌석이 없습니다.');
+      if (currentUsage) {
+        currentUsage.endTime = new Date();
+        await this.myUsageLogRepository.save(currentUsage);
       }
-
-      const loginResult = await this.schoolApiService.loginAsSystem();
-      if (!loginResult.success) {
-        throw new BadRequestException('좌석 반납에 실패했습니다.');
-      }
-
-      const returnSuccess = await this.schoolApiService.returnSeat(
-        studentId,
-        loginResult.sessionID!,
-        currentUsage.roomNo,
-        currentUsage.seatNo,
-      );
-
-      if (!returnSuccess) {
-        throw new BadRequestException('좌석 반납에 실패했습니다.');
-      }
-
-      currentUsage.endTime = new Date();
-      await this.myUsageLogRepository.save(currentUsage);
 
       this.logger.debug(
-        `Seat returned: ${studentId} - ${currentUsage.roomNo}/${currentUsage.seatNo}`,
+        `Seat returned: ${studentId} - ${mySeat.roomNo}/${mySeat.seatNo}`,
       );
 
       return {
@@ -263,41 +283,39 @@ export class SeatReservationService {
    */
   async extendSeat(studentId: string): Promise<ExtendSeatResponseDto> {
     try {
-      const currentUsage = await this.myUsageLogRepository.findOne({
-        where: {
-          studentId,
-          endTime: null as any,
-        },
-      });
-
-      if (!currentUsage) {
+      // 학교 API에서 현재 좌석 정보 조회
+      const mySeat = await this.getMySeat(studentId);
+      if (!mySeat) {
         throw new NotFoundException('예약한 좌석이 없습니다.');
       }
 
       const user = await this.getUserWithValidSession(studentId);
 
-      const extendSuccess = await this.schoolApiService.extendSeat(
+      const extendResult = await this.schoolApiService.extendSeat(
         studentId,
         user.schoolSessionId!,
-        currentUsage.roomNo,
-        currentUsage.seatNo,
+        mySeat.roomNo,
+        mySeat.seatNo,
       );
 
-      if (!extendSuccess) {
-        throw new BadRequestException('좌석 연장에 실패했습니다.');
+      if (!extendResult.success) {
+        throw new BadRequestException(
+          extendResult.message || '좌석 연장에 실패했습니다.',
+        );
       }
 
+      // 연장 후 새로운 종료 시간 계산 (2시간 추가)
       const extendedEndTime = new Date();
       extendedEndTime.setHours(extendedEndTime.getHours() + 2);
 
       this.logger.debug(
-        `Seat extended: ${studentId} - ${currentUsage.roomNo}/${currentUsage.seatNo}`,
+        `Seat extended: ${studentId} - ${mySeat.roomNo}/${mySeat.seatNo}`,
       );
 
       return {
         success: true,
         endTime: extendedEndTime.toISOString(),
-        message: '좌석이 성공적으로 연장되었습니다.',
+        message: extendResult.message || '좌석이 성공적으로 연장되었습니다.',
       };
     } catch (error: any) {
       this.logger.error(`Extend seat error: ${error.message}`);
