@@ -8,11 +8,19 @@ import {
   ExtendSeatResponseDto,
   SeatDetailDto,
   SeatVacancyPredictionDto,
+  AutoExtensionConfigDto,
+  UpdateAutoExtensionConfigDto,
+  AutoExtensionStatsDto,
+  QueueRequestDto,
+  QueueStatusDto,
+  QueueStatsDto,
 } from '@pnu-blace/types';
 import { SeatQueryService } from './seat-query.service';
 import { SeatReservationService } from './seat-reservation.service';
 import { SeatRendererService } from './seat-renderer.service';
 import { SeatPredictionService } from './seat-prediction.service';
+import { SeatAutoExtensionService } from './seat-auto-extension.service';
+import { SeatQueueService } from './seat-queue.service';
 
 @Injectable()
 export class SeatsService {
@@ -22,6 +30,8 @@ export class SeatsService {
     private seatReservationService: SeatReservationService,
     private seatRendererService: SeatRendererService,
     private seatPredictionService: SeatPredictionService,
+    private seatAutoExtensionService: SeatAutoExtensionService,
+    private seatQueueService: SeatQueueService,
   ) {}
 
   /**

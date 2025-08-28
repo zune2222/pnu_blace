@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { SeatsService } from './seats.service';
@@ -21,6 +22,13 @@ import {
   ExtendSeatResponseDto,
   SeatDetailDto,
   SeatVacancyPredictionDto,
+  AutoExtensionConfigDto,
+  UpdateAutoExtensionConfigDto,
+  AutoExtensionStatsDto,
+  QueueRequestDto,
+  AddToQueueRequestDto,
+  QueueStatusDto,
+  QueueStatsDto,
 } from '@pnu-blace/types';
 
 @Controller('api/v1/seats')
@@ -177,5 +185,151 @@ export class SeatsController {
     @Param('seatNo') seatNo: string,
   ): Promise<SeatVacancyPredictionDto> {
     return this.seatsService.getSeatPrediction(roomNo, seatNo);
+  }
+
+  // ================================
+  // 자동 연장 관련 엔드포인트
+  // ================================
+
+  /**
+   * 자동 연장 설정 조회
+   */
+  @Get('auto-extension/config')
+  @UseGuards(JwtAuthGuard)
+  async getAutoExtensionConfig(@Request() req): Promise<AutoExtensionConfigDto | null> {
+    const user = req.user;
+    return this.seatsService.getAutoExtensionConfig(user.studentId);
+  }
+
+  /**
+   * 자동 연장 설정 업데이트
+   */
+  @Post('auto-extension/config')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async updateAutoExtensionConfig(
+    @Request() req,
+    @Body() configDto: UpdateAutoExtensionConfigDto,
+  ): Promise<AutoExtensionConfigDto> {
+    const user = req.user;
+    return this.seatsService.updateAutoExtensionConfig(user.studentId, configDto);
+  }
+
+  /**
+   * 자동 연장 토글 (활성화/비활성화)
+   */
+  @Post('auto-extension/toggle')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async toggleAutoExtension(
+    @Request() req,
+    @Body() body: { isEnabled: boolean },
+  ): Promise<AutoExtensionConfigDto> {
+    const user = req.user;
+    return this.seatsService.toggleAutoExtension(user.studentId, body.isEnabled);
+  }
+
+  /**
+   * 자동 연장 통계 조회
+   */
+  @Get('auto-extension/stats')
+  @UseGuards(JwtAuthGuard)
+  async getAutoExtensionStats(@Request() req): Promise<AutoExtensionStatsDto> {
+    const user = req.user;
+    return this.seatsService.getAutoExtensionStats(user.studentId);
+  }
+
+  /**
+   * 수동으로 자동 연장 실행 (테스트용)
+   */
+  @Post('auto-extension/execute')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async executeAutoExtension(@Request() req): Promise<SeatActionResponseDto> {
+    const user = req.user;
+    return this.seatsService.executeAutoExtension(user.studentId);
+  }
+
+  // ================================
+  // 대기열 관련 엔드포인트
+  // ================================
+
+  /**
+   * 자동 연장 대기열에 추가
+   */
+  @Post('queue/auto-extension')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async addAutoExtensionToQueue(
+    @Request() req,
+    @Body() queueDto: AddToQueueRequestDto,
+  ): Promise<QueueRequestDto> {
+    const user = req.user;
+    return this.seatsService.addAutoExtensionToQueue(user.studentId, queueDto.scheduledAt);
+  }
+
+  /**
+   * 좌석 예약 대기열에 추가
+   */
+  @Post('queue/reservation')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async addSeatReservationToQueue(
+    @Request() req,
+    @Body() queueDto: AddToQueueRequestDto,
+  ): Promise<QueueRequestDto> {
+    const user = req.user;
+    const { roomNo, seatNo, scheduledAt } = queueDto;
+    
+    if (!roomNo || !seatNo) {
+      throw new BadRequestException('roomNo와 seatNo는 필수입니다.');
+    }
+
+    return this.seatsService.addSeatReservationToQueue(
+      user.studentId,
+      roomNo,
+      seatNo,
+      scheduledAt,
+    );
+  }
+
+  /**
+   * 사용자 대기열 상태 조회
+   */
+  @Get('queue/status')
+  @UseGuards(JwtAuthGuard)
+  async getUserQueueStatus(@Request() req): Promise<QueueStatusDto> {
+    const user = req.user;
+    return this.seatsService.getUserQueueStatus(user.studentId);
+  }
+
+  /**
+   * 대기열에서 요청 취소
+   */
+  @Post('queue/:requestType/cancel')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async cancelQueueRequest(
+    @Request() req,
+    @Param('requestType') requestType: 'auto-extension' | 'seat-reservation',
+  ): Promise<SeatActionResponseDto> {
+    const user = req.user;
+    const mappedType = requestType === 'auto-extension' ? 'AUTO_EXTENSION' : 'SEAT_RESERVATION';
+    
+    const success = await this.seatsService.cancelQueueRequest(user.studentId, mappedType);
+    
+    return {
+      success,
+      message: success ? '대기열 요청이 취소되었습니다.' : '취소할 요청을 찾을 수 없습니다.',
+    };
+  }
+
+  /**
+   * 대기열 통계 조회 (관리자용)
+   */
+  @Get('queue/stats')
+  @UseGuards(JwtAuthGuard)
+  async getQueueStats(): Promise<QueueStatsDto> {
+    return this.seatsService.getQueueStats();
   }
 }
