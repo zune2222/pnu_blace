@@ -20,7 +20,7 @@ export class SeatQueueService {
   ) {}
 
   /**
-   * 빈자리 예약 요청을 큐에 추가 (기존 reserveEmptySeat와 통합)
+   * 빈자리 예약 요청을 큐에 추가
    */
   async addEmptySeaReservationToQueue(
     studentId: string,
@@ -39,10 +39,14 @@ export class SeatQueueService {
     });
 
     if (existingRequest) {
-      throw new BadRequestException('이미 대기 중인 빈자리 예약 요청이 있습니다.');
+      throw new BadRequestException(
+        '이미 대기 중인 빈자리 예약 요청이 있습니다.',
+      );
     }
 
-    const queuePosition = await this.getNextQueuePosition('EMPTY_SEAT_RESERVATION');
+    const queuePosition = await this.getNextQueuePosition(
+      'EMPTY_SEAT_RESERVATION',
+    );
 
     const queueRequest = this.queueRequestRepository.create({
       studentId,
@@ -58,7 +62,9 @@ export class SeatQueueService {
     });
 
     const savedRequest = await this.queueRequestRepository.save(queueRequest);
-    this.logger.log(`Empty seat reservation request added to queue for ${studentId}, position: ${queuePosition}`);
+    this.logger.log(
+      `Empty seat reservation request added to queue for ${studentId}, position: ${queuePosition}`,
+    );
 
     return savedRequest;
   }
@@ -82,7 +88,9 @@ export class SeatQueueService {
     });
 
     if (existingRequest) {
-      throw new BadRequestException('이미 대기 중인 좌석 예약 요청이 있습니다.');
+      throw new BadRequestException(
+        '이미 대기 중인 좌석 예약 요청이 있습니다.',
+      );
     }
 
     const queuePosition = await this.getNextQueuePosition('SEAT_RESERVATION');
@@ -100,7 +108,9 @@ export class SeatQueueService {
     });
 
     const savedRequest = await this.queueRequestRepository.save(queueRequest);
-    this.logger.log(`Seat reservation request added to queue for ${studentId}, position: ${queuePosition}`);
+    this.logger.log(
+      `Seat reservation request added to queue for ${studentId}, position: ${queuePosition}`,
+    );
 
     return savedRequest;
   }
@@ -126,8 +136,12 @@ export class SeatQueueService {
     });
 
     return {
-      emptySeatReservation: userRequests.find(req => req.requestType === 'EMPTY_SEAT_RESERVATION'),
-      seatReservation: userRequests.find(req => req.requestType === 'SEAT_RESERVATION'),
+      emptySeatReservation: userRequests.find(
+        (req) => req.requestType === 'EMPTY_SEAT_RESERVATION',
+      ),
+      seatReservation: userRequests.find(
+        (req) => req.requestType === 'SEAT_RESERVATION',
+      ),
       totalWaiting,
     };
   }
@@ -137,7 +151,7 @@ export class SeatQueueService {
    */
   async getNextQueueRequests(limit = 10): Promise<QueueRequest[]> {
     const now = new Date();
-    
+
     return this.queueRequestRepository.find({
       where: {
         status: 'WAITING',
@@ -220,16 +234,18 @@ export class SeatQueueService {
 
       await this.queueRequestRepository.save(queueRequest);
       return result;
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : '알 수 없는 오류';
+
       queueRequest.status = 'FAILED';
       queueRequest.errorMessage = errorMessage;
       await this.queueRequestRepository.save(queueRequest);
 
-      this.logger.error(`Queue processing failed for request ${queueId}: ${errorMessage}`);
-      
+      this.logger.error(
+        `Queue processing failed for request ${queueId}: ${errorMessage}`,
+      );
+
       return {
         success: false,
         message: '큐 처리 중 오류가 발생했습니다.',
@@ -241,7 +257,10 @@ export class SeatQueueService {
   /**
    * 큐에서 요청 취소
    */
-  async cancelQueueRequest(studentId: string, requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION'): Promise<boolean> {
+  async cancelQueueRequest(
+    studentId: string,
+    requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION',
+  ): Promise<boolean> {
     const queueRequest = await this.queueRequestRepository.findOne({
       where: {
         studentId,
@@ -267,7 +286,9 @@ export class SeatQueueService {
   /**
    * 큐 순서 재정렬
    */
-  private async reorderQueue(requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION'): Promise<void> {
+  private async reorderQueue(
+    requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION',
+  ): Promise<void> {
     const waitingRequests = await this.queueRequestRepository.find({
       where: {
         requestType,
@@ -290,7 +311,9 @@ export class SeatQueueService {
   /**
    * 다음 큐 위치 계산
    */
-  private async getNextQueuePosition(requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION'): Promise<number> {
+  private async getNextQueuePosition(
+    requestType: 'EMPTY_SEAT_RESERVATION' | 'SEAT_RESERVATION',
+  ): Promise<number> {
     const maxPosition = await this.queueRequestRepository
       .createQueryBuilder('queue')
       .select('MAX(queue.queuePosition)', 'maxPosition')
@@ -321,9 +344,12 @@ export class SeatQueueService {
 
       // 현재 좌석이 있고 자동 반납 옵션이 활성화된 경우
       if (currentSeat && queueRequest.autoReturnCurrent) {
-        this.logger.log(`Auto returning current seat for ${studentId} before empty reservation`);
-        
-        const returnResult = await this.seatReservationService.returnSeat(studentId);
+        this.logger.log(
+          `Auto returning current seat for ${studentId} before empty reservation`,
+        );
+
+        const returnResult =
+          await this.seatReservationService.returnSeat(studentId);
         if (!returnResult.success) {
           return {
             success: false,
@@ -333,11 +359,14 @@ export class SeatQueueService {
         }
       }
 
-      // 빈자리 예약 시도
-      const result = await this.seatReservationService.reserveEmptySeat(studentId, {
-        roomNo,
-        seatNo,
-      });
+      // 좌석 예약 시도
+      const result = await this.seatReservationService.reserveSeat(
+        studentId,
+        {
+          roomNo,
+          seatNo,
+        },
+      );
 
       if (result.success && currentSeat && queueRequest.autoReturnCurrent) {
         return {
@@ -351,8 +380,9 @@ export class SeatQueueService {
         message: result.message || '빈자리 예약이 완료되었습니다.',
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '빈자리 예약에 실패했습니다.';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : '빈자리 예약에 실패했습니다.';
+
       return {
         success: false,
         message: '빈자리 예약에 실패했습니다.',
@@ -380,8 +410,9 @@ export class SeatQueueService {
         message: result.message || '좌석 예약이 완료되었습니다.',
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '좌석 예약에 실패했습니다.';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : '좌석 예약에 실패했습니다.';
+
       return {
         success: false,
         message: '좌석 예약에 실패했습니다.',
@@ -400,14 +431,19 @@ export class SeatQueueService {
     seatReservationWaiting: number;
     avgProcessingTime: number;
   }> {
-    const [totalWaiting, totalProcessing, emptySeatWaiting, seatReservationWaiting] = await Promise.all([
+    const [
+      totalWaiting,
+      totalProcessing,
+      emptySeatWaiting,
+      seatReservationWaiting,
+    ] = await Promise.all([
       this.queueRequestRepository.count({ where: { status: 'WAITING' } }),
       this.queueRequestRepository.count({ where: { status: 'PROCESSING' } }),
-      this.queueRequestRepository.count({ 
-        where: { status: 'WAITING', requestType: 'EMPTY_SEAT_RESERVATION' } 
+      this.queueRequestRepository.count({
+        where: { status: 'WAITING', requestType: 'EMPTY_SEAT_RESERVATION' },
       }),
-      this.queueRequestRepository.count({ 
-        where: { status: 'WAITING', requestType: 'SEAT_RESERVATION' } 
+      this.queueRequestRepository.count({
+        where: { status: 'WAITING', requestType: 'SEAT_RESERVATION' },
       }),
     ]);
 
@@ -426,7 +462,9 @@ export class SeatQueueService {
         }
         return sum;
       }, 0);
-      avgProcessingTime = Math.round(totalProcessingTime / recentCompletedRequests.length / 1000); // 초 단위
+      avgProcessingTime = Math.round(
+        totalProcessingTime / recentCompletedRequests.length / 1000,
+      ); // 초 단위
     }
 
     return {
@@ -439,17 +477,95 @@ export class SeatQueueService {
   }
 
   /**
+   * 대기 중인 큐 요청들을 처리
+   */
+  async processQueue(): Promise<{
+    processed: number;
+    successful: number;
+    failed: number;
+  }> {
+    // 처리 대기 중인 요청들을 가져옴 (스케줄 시간이 지났거나 즉시 처리)
+    const pendingRequests = await this.queueRequestRepository.find({
+      where: [
+        { status: 'WAITING', scheduledAt: LessThan(new Date()) },
+        { status: 'WAITING', scheduledAt: null as any },
+      ],
+      order: { priority: 'DESC', createdAt: 'ASC' },
+      take: 10, // 한 번에 최대 10개씩 처리
+    });
+
+    let processed = 0;
+    let successful = 0;
+    let failed = 0;
+
+    for (const request of pendingRequests) {
+      processed++;
+
+      try {
+        // 요청 처리 상태로 변경
+        request.status = 'PROCESSING';
+        await this.queueRequestRepository.save(request);
+
+        // 실제 좌석 예약 처리
+        const result = await this.processEmptySeatReservation(
+          request.studentId,
+          request.roomNo!,
+          request.seatNo!,
+          request
+        );
+
+        // 결과에 따라 상태 업데이트
+        if (result.success) {
+          request.status = 'COMPLETED';
+          successful++;
+          this.logger.log(`Queue processed successfully for ${request.studentId}: ${request.roomNo}/${request.seatNo}`);
+        } else {
+          // 재시도 횟수 확인
+          if (request.retryCount >= request.maxRetries) {
+            request.status = 'FAILED';
+            request.errorMessage = result.message;
+            failed++;
+            this.logger.warn(`Queue processing failed permanently for ${request.studentId}: ${result.message}`);
+          } else {
+            // 재시도
+            request.status = 'WAITING';
+            request.retryCount++;
+            request.errorMessage = result.message;
+            // 1분 후 재시도하도록 스케줄 조정
+            request.scheduledAt = new Date(Date.now() + 60 * 1000);
+            this.logger.debug(`Queue processing failed, will retry for ${request.studentId}: ${result.message}`);
+          }
+        }
+
+        request.processedAt = new Date();
+        await this.queueRequestRepository.save(request);
+
+      } catch (error) {
+        failed++;
+        request.status = 'FAILED';
+        request.errorMessage = error instanceof Error ? error.message : String(error);
+        request.processedAt = new Date();
+        await this.queueRequestRepository.save(request);
+        
+        this.logger.error(`Queue processing error for ${request.studentId}: ${request.errorMessage}`);
+      }
+    }
+
+    return { processed, successful, failed };
+  }
+
+  /**
    * 오래된 완료/실패된 큐 요청 정리 (1주일 이상)
    */
-  async cleanupOldQueueRequests(): Promise<number> {
+  async cleanupOldRequests(): Promise<{ cleaned: number }> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    
+
     const result = await this.queueRequestRepository.delete({
       status: In(['COMPLETED', 'FAILED', 'CANCELED']),
       updatedAt: LessThan(oneWeekAgo),
     });
 
     this.logger.log(`Cleaned up ${result.affected || 0} old queue requests`);
-    return result.affected || 0;
+    return { cleaned: result.affected || 0 };
   }
 }

@@ -32,7 +32,7 @@ export class SeatQueryService {
 
       const seats = await this.schoolApiService.getSeatMap(
         roomNo,
-        user.schoolSessionId!,
+        user.schoolSessionId,
       );
 
       return seats.map((seat) => ({
@@ -57,12 +57,12 @@ export class SeatQueryService {
 
       const seats = await this.schoolApiService.getSeatMap(
         roomNo,
-        user.schoolSessionId!,
+        user.schoolSessionId,
       );
 
       const roomInfo = await this.schoolApiService.getRoomInfo(
         roomNo,
-        user.schoolSessionId!,
+        user.schoolSessionId,
       );
 
       const occupiedSeats = seats

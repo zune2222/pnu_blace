@@ -140,19 +140,6 @@ export class SeatsController {
     return this.seatsService.reserveSeat(user.studentId, reserveSeatDto);
   }
 
-  /**
-   * 빈자리 예약 (현재 사용 중인 좌석이 비워지면 자동 예약)
-   */
-  @Post('reserve-empty')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async reserveEmptySeat(
-    @Request() req,
-    @Body() reserveSeatDto: ReserveSeatRequestDto,
-  ): Promise<SeatActionResponseDto> {
-    const user = req.user;
-    return this.seatsService.reserveEmptySeat(user.studentId, reserveSeatDto);
-  }
 
   /**
    * 좌석 반납
@@ -196,7 +183,9 @@ export class SeatsController {
    */
   @Get('auto-extension/config')
   @UseGuards(JwtAuthGuard)
-  async getAutoExtensionConfig(@Request() req): Promise<AutoExtensionConfigDto | null> {
+  async getAutoExtensionConfig(
+    @Request() req,
+  ): Promise<AutoExtensionConfigDto | null> {
     const user = req.user;
     return this.seatsService.getAutoExtensionConfig(user.studentId);
   }
@@ -212,7 +201,10 @@ export class SeatsController {
     @Body() configDto: UpdateAutoExtensionConfigDto,
   ): Promise<AutoExtensionConfigDto> {
     const user = req.user;
-    return this.seatsService.updateAutoExtensionConfig(user.studentId, configDto);
+    return this.seatsService.updateAutoExtensionConfig(
+      user.studentId,
+      configDto,
+    );
   }
 
   /**
@@ -226,7 +218,10 @@ export class SeatsController {
     @Body() body: { isEnabled: boolean },
   ): Promise<AutoExtensionConfigDto> {
     const user = req.user;
-    return this.seatsService.toggleAutoExtension(user.studentId, body.isEnabled);
+    return this.seatsService.toggleAutoExtension(
+      user.studentId,
+      body.isEnabled,
+    );
   }
 
   /**
@@ -247,26 +242,12 @@ export class SeatsController {
   @HttpCode(HttpStatus.OK)
   async executeAutoExtension(@Request() req): Promise<SeatActionResponseDto> {
     const user = req.user;
-    return this.seatsService.executeAutoExtension(user.studentId);
+    return this.seatsService.executeAutoExtension();
   }
 
   // ================================
   // 대기열 관련 엔드포인트
   // ================================
-
-  /**
-   * 자동 연장 대기열에 추가
-   */
-  @Post('queue/auto-extension')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async addAutoExtensionToQueue(
-    @Request() req,
-    @Body() queueDto: AddToQueueRequestDto,
-  ): Promise<QueueRequestDto> {
-    const user = req.user;
-    return this.seatsService.addAutoExtensionToQueue(user.studentId, queueDto.scheduledAt);
-  }
 
   /**
    * 좌석 예약 대기열에 추가
@@ -280,7 +261,7 @@ export class SeatsController {
   ): Promise<QueueRequestDto> {
     const user = req.user;
     const { roomNo, seatNo, scheduledAt } = queueDto;
-    
+
     if (!roomNo || !seatNo) {
       throw new BadRequestException('roomNo와 seatNo는 필수입니다.');
     }
@@ -306,21 +287,21 @@ export class SeatsController {
   /**
    * 대기열에서 요청 취소
    */
-  @Post('queue/:requestType/cancel')
+  @Post('queue/reservation/cancel')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async cancelQueueRequest(
-    @Request() req,
-    @Param('requestType') requestType: 'auto-extension' | 'seat-reservation',
-  ): Promise<SeatActionResponseDto> {
+  async cancelQueueRequest(@Request() req): Promise<SeatActionResponseDto> {
     const user = req.user;
-    const mappedType = requestType === 'auto-extension' ? 'AUTO_EXTENSION' : 'SEAT_RESERVATION';
-    
-    const success = await this.seatsService.cancelQueueRequest(user.studentId, mappedType);
-    
+
+    const success = await this.seatsService.cancelQueueRequest(
+      user.studentId,
+    );
+
     return {
       success,
-      message: success ? '대기열 요청이 취소되었습니다.' : '취소할 요청을 찾을 수 없습니다.',
+      message: success
+        ? '빈자리 예약 대기열 요청이 취소되었습니다.'
+        : '취소할 요청을 찾을 수 없습니다.',
     };
   }
 
