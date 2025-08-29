@@ -14,6 +14,11 @@ import {
   SeatActionResponseDto,
   ExtendSeatResponseDto,
   MyUsageStatsDto,
+  AutoExtensionConfigDto,
+  UpdateAutoExtensionConfigDto,
+  QueueRequestDto,
+  AddToQueueRequestDto,
+  QueueStatusDto,
 } from "@pnu-blace/types";
 
 class DashboardApi {
@@ -268,10 +273,15 @@ class DashboardApi {
   // 좌석 예약
   async reserveSeat(
     roomNo: string,
-    seatNo: string
+    seatNo: string,
+    autoExtensionEnabled?: boolean
   ): Promise<SeatActionResponseDto> {
     try {
-      const reserveRequest: ReserveSeatRequestDto = { roomNo, seatNo };
+      const reserveRequest: ReserveSeatRequestDto = { 
+        roomNo, 
+        seatNo,
+        autoExtensionEnabled 
+      };
       return await apiClient.post<SeatActionResponseDto>(
         "/api/v1/seats/reserve",
         reserveRequest
@@ -331,6 +341,137 @@ class DashboardApi {
     }
   }
 
+
+  // ================================
+  // 자동 연장 관련 함수
+  // ================================
+
+  // 자동 연장 설정 조회
+  async getAutoExtensionConfig(): Promise<AutoExtensionConfigDto | null> {
+    try {
+      return await apiClient.get<AutoExtensionConfigDto | null>(
+        "/api/v1/seats/auto-extension/config"
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      throw new Error("자동 연장 설정을 불러올 수 없습니다");
+    }
+  }
+
+  // 자동 연장 설정 업데이트
+  async updateAutoExtensionConfig(
+    config: UpdateAutoExtensionConfigDto
+  ): Promise<AutoExtensionConfigDto> {
+    try {
+      return await apiClient.post<AutoExtensionConfigDto>(
+        "/api/v1/seats/auto-extension/config",
+        config
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        switch (error.status) {
+          case 400:
+            throw new Error("설정 정보가 올바르지 않습니다");
+          default:
+            throw new Error("자동 연장 설정 업데이트에 실패했습니다");
+        }
+      }
+      throw new Error("네트워크 연결을 확인해주세요");
+    }
+  }
+
+  // 자동 연장 토글 (활성화/비활성화)
+  async toggleAutoExtension(isEnabled: boolean): Promise<AutoExtensionConfigDto> {
+    try {
+      return await apiClient.post<AutoExtensionConfigDto>(
+        "/api/v1/seats/auto-extension/toggle",
+        { isEnabled }
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        switch (error.status) {
+          case 404:
+            throw new Error("자동 연장 설정을 찾을 수 없습니다");
+          default:
+            throw new Error("자동 연장 설정 변경에 실패했습니다");
+        }
+      }
+      throw new Error("네트워크 연결을 확인해주세요");
+    }
+  }
+
+  // ================================
+  // 빈자리 예약 대기열 관련 함수
+  // ================================
+
+  // 빈자리 예약 대기열에 추가
+  async addToQueue(
+    roomNo: string,
+    seatNo: string,
+    scheduledAt?: Date
+  ): Promise<QueueRequestDto> {
+    try {
+      const queueRequest: AddToQueueRequestDto = {
+        roomNo,
+        seatNo,
+        scheduledAt,
+      };
+      return await apiClient.post<QueueRequestDto>(
+        "/api/v1/seats/queue/reservation",
+        queueRequest
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        switch (error.status) {
+          case 400:
+            throw new Error("대기열 요청 정보가 올바르지 않습니다");
+          case 409:
+            throw new Error("이미 대기열에 등록된 요청이 있습니다");
+          default:
+            throw new Error("대기열 등록에 실패했습니다");
+        }
+      }
+      throw new Error("네트워크 연결을 확인해주세요");
+    }
+  }
+
+  // 사용자 대기열 상태 조회
+  async getQueueStatus(): Promise<QueueStatusDto> {
+    try {
+      return await apiClient.get<QueueStatusDto>("/api/v1/seats/queue/status");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        switch (error.status) {
+          case 404:
+            throw new Error("대기열 요청을 찾을 수 없습니다");
+          default:
+            throw new Error("대기열 상태 조회에 실패했습니다");
+        }
+      }
+      throw new Error("네트워크 연결을 확인해주세요");
+    }
+  }
+
+  // 대기열 요청 취소
+  async cancelQueueRequest(): Promise<SeatActionResponseDto> {
+    try {
+      return await apiClient.post<SeatActionResponseDto>(
+        "/api/v1/seats/queue/reservation/cancel"
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        switch (error.status) {
+          case 404:
+            throw new Error("취소할 대기열 요청을 찾을 수 없습니다");
+          default:
+            throw new Error("대기열 요청 취소에 실패했습니다");
+        }
+      }
+      throw new Error("네트워크 연결을 확인해주세요");
+    }
+  }
 
   // 즐겨찾기 토글 (로컬 관리)
   async toggleFavorite(roomNo: string, isFavorite: boolean): Promise<void> {

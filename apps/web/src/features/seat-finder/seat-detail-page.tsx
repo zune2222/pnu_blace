@@ -68,7 +68,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     return () => window.removeEventListener("message", handleMessage);
   }, [handleSeatClick]);
 
-  const handleReserveSeat = async (seatNo: string) => {
+  const handleReserveSeat = async (seatNo: string, autoExtensionEnabled?: boolean) => {
     try {
       setIsReserving(true);
       setError(null);
@@ -76,6 +76,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       const reserveRequest: ReserveSeatRequestDto = {
         roomNo,
         seatNo: seatNo,
+        autoExtensionEnabled,
       };
 
       const response = await apiClient.post<SeatActionResponseDto>(
@@ -128,28 +129,24 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       setIsReserving(true);
       setError(null);
 
-      // 빈자리 예약 API 호출 (실제로는 별도 엔드포인트 필요)
-      const reserveRequest: ReserveSeatRequestDto = {
+      // 빈자리 예약 대기열에 추가
+      const queueRequest = {
         roomNo,
         seatNo: seatNo,
       };
 
-      const response = await apiClient.post<SeatActionResponseDto>(
-        "/api/v1/seats/reserve-empty",
-        reserveRequest
+      const response = await apiClient.post<any>(
+        "/api/v1/seats/queue/reservation",
+        queueRequest
       );
 
-      if (response.success) {
-        // 예약 성공 시 좌석 데이터 새로고침
-        const updatedData = await apiClient.get<SeatDetailDto>(
-          `/api/v1/seats/${roomNo}/detail`
-        );
-        setSeatData(updatedData);
+      if (response.queueId) {
+        // 대기열 등록 성공
         setSelectedSeat(null);
 
         // 성공 메시지 표시
         toast.success("빈자리 발권 예약이 완료되었습니다!", {
-          description: "좌석이 비워지면 자동으로 발권됩니다.",
+          description: `대기열 ${response.queuePosition}번으로 등록되었습니다. 좌석이 비워지면 자동으로 발권됩니다.`,
           duration: 4000,
         });
       }

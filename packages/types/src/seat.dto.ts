@@ -38,6 +38,10 @@ export class ReserveSeatRequestDto {
 	@IsString()
 	@IsNotEmpty()
 	seatNo: string;
+
+	@IsOptional()
+	@IsBoolean()
+	autoExtensionEnabled?: boolean;
 }
 
 // Response DTOs

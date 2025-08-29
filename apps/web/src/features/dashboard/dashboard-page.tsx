@@ -2,6 +2,7 @@
 import React from "react";
 import { AuthGuard } from "@/features/auth";
 import { CurrentSeatWidget, FavoriteRoomsSection, QuickInsightsSection } from "./ui";
+import { QueueStatusWidget } from "./ui/queue-status-widget";
 import { useDashboardData } from "./model";
 
 export const DashboardPage: React.FC = () => {
@@ -14,6 +15,13 @@ export const DashboardPage: React.FC = () => {
           {/* 메인 좌석 섹션 - 전체 너비 */}
           <div className="border-b border-border/20">
             <CurrentSeatWidget {...dashboardState} />
+          </div>
+          
+          {/* 대기열 상태 위젯 */}
+          <div className="py-8">
+            <div className="max-w-md mx-auto">
+              <QueueStatusWidget />
+            </div>
           </div>
           
           {/* 하단 섹션들 - 그리드 레이아웃 */}

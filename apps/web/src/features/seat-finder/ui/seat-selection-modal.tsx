@@ -11,7 +11,7 @@ interface SeatSelectionModalProps {
   selectedSeat: string | null;
   roomNo: string;
   seatData: SeatDetailDto | null;
-  onReserveSeat: (seatNo: string) => Promise<void>;
+  onReserveSeat: (seatNo: string, autoExtensionEnabled?: boolean) => Promise<void>;
   onReserveEmptySeat: (seatNo: string) => Promise<void>;
 }
 
@@ -31,6 +31,7 @@ export const SeatSelectionModal = ({
   const [prediction, setPrediction] = useState<SeatPredictionDto | null>(null);
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [autoExtensionEnabled, setAutoExtensionEnabled] = useState(false);
 
   const isSeatOccupied =
     seatData?.occupiedSeats.includes(selectedSeat || "") || false;
@@ -95,7 +96,7 @@ export const SeatSelectionModal = ({
       setActionType(type);
 
       if (type === "reserve") {
-        await onReserveSeat(selectedSeat);
+        await onReserveSeat(selectedSeat, autoExtensionEnabled);
       } else {
         await onReserveEmptySeat(selectedSeat);
       }
@@ -384,6 +385,54 @@ export const SeatSelectionModal = ({
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* 자동 연장 옵션 (이용 가능한 좌석인 경우) */}
+          {isSeatAvailable && (
+            <div
+              className="mb-4 p-3 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 rounded-xl animate-in slide-in-from-top-2 duration-300 delay-150"
+              style={{
+                backgroundColor: document.documentElement.classList.contains(
+                  "dark"
+                )
+                  ? "rgba(88, 28, 135, 0.5)"
+                  : "#faf5ff",
+                borderColor: document.documentElement.classList.contains("dark")
+                  ? "#7c3aed"
+                  : "#d8b4fe",
+              }}
+            >
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoExtensionEnabled}
+                  onChange={(e) => setAutoExtensionEnabled(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-purple-600 bg-white dark:bg-gray-900 border-purple-300 dark:border-purple-700 rounded focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-2"
+                />
+                <div className="flex-1">
+                  <h3
+                    className="text-sm font-medium text-purple-900 dark:text-purple-100"
+                    style={{
+                      color: document.documentElement.classList.contains("dark")
+                        ? "#e9d5ff"
+                        : "#581c87",
+                    }}
+                  >
+                    자동 연장 활성화
+                  </h3>
+                  <p
+                    className="text-sm text-purple-700 dark:text-purple-300 mt-1"
+                    style={{
+                      color: document.documentElement.classList.contains("dark")
+                        ? "#c084fc"
+                        : "#7c2d12",
+                    }}
+                  >
+                    시간이 얼마 남지 않았을 때 자동으로 연장합니다
+                  </p>
+                </div>
+              </label>
             </div>
           )}
 
