@@ -360,13 +360,10 @@ export class SeatQueueService {
       }
 
       // 좌석 예약 시도
-      const result = await this.seatReservationService.reserveSeat(
-        studentId,
-        {
-          roomNo,
-          seatNo,
-        },
-      );
+      const result = await this.seatReservationService.reserveSeat(studentId, {
+        roomNo,
+        seatNo,
+      });
 
       if (result.success && currentSeat && queueRequest.autoReturnCurrent) {
         return {
@@ -511,21 +508,25 @@ export class SeatQueueService {
           request.studentId,
           request.roomNo!,
           request.seatNo!,
-          request
+          request,
         );
 
         // 결과에 따라 상태 업데이트
         if (result.success) {
           request.status = 'COMPLETED';
           successful++;
-          this.logger.log(`Queue processed successfully for ${request.studentId}: ${request.roomNo}/${request.seatNo}`);
+          this.logger.log(
+            `Queue processed successfully for ${request.studentId}: ${request.roomNo}/${request.seatNo}`,
+          );
         } else {
           // 재시도 횟수 확인
           if (request.retryCount >= request.maxRetries) {
             request.status = 'FAILED';
             request.errorMessage = result.message;
             failed++;
-            this.logger.warn(`Queue processing failed permanently for ${request.studentId}: ${result.message}`);
+            this.logger.warn(
+              `Queue processing failed permanently for ${request.studentId}: ${result.message}`,
+            );
           } else {
             // 재시도
             request.status = 'WAITING';
@@ -533,21 +534,25 @@ export class SeatQueueService {
             request.errorMessage = result.message;
             // 1분 후 재시도하도록 스케줄 조정
             request.scheduledAt = new Date(Date.now() + 60 * 1000);
-            this.logger.debug(`Queue processing failed, will retry for ${request.studentId}: ${result.message}`);
+            this.logger.debug(
+              `Queue processing failed, will retry for ${request.studentId}: ${result.message}`,
+            );
           }
         }
 
         request.processedAt = new Date();
         await this.queueRequestRepository.save(request);
-
       } catch (error) {
         failed++;
         request.status = 'FAILED';
-        request.errorMessage = error instanceof Error ? error.message : String(error);
+        request.errorMessage =
+          error instanceof Error ? error.message : String(error);
         request.processedAt = new Date();
         await this.queueRequestRepository.save(request);
-        
-        this.logger.error(`Queue processing error for ${request.studentId}: ${request.errorMessage}`);
+
+        this.logger.error(
+          `Queue processing error for ${request.studentId}: ${request.errorMessage}`,
+        );
       }
     }
 
