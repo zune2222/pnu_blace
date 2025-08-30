@@ -217,66 +217,6 @@ export class SeatReservationService {
     }
   }
 
-  /**
-   * 빈자리 예약 (현재 사용 중인 좌석이 비워지면 자동 예약)
-   */
-  async reserveEmptySeat(
-    studentId: string,
-    reserveSeatDto: ReserveSeatRequestDto,
-  ): Promise<SeatActionResponseDto> {
-    try {
-      const { roomNo, seatNo } = reserveSeatDto;
-
-      const existingReservation = await this.myUsageLogRepository.findOne({
-        where: {
-          studentId,
-          endTime: null as any,
-        },
-      });
-
-      if (existingReservation) {
-        throw new ConflictException('이미 예약한 좌석이 있습니다.');
-      }
-
-      // 현재 좌석이 실제로 사용 중인지 확인하기 위해 직접 좌석 정보를 가져옴
-      const user = await this.getUserWithValidSession(studentId);
-      const seats = await this.schoolApiService.getSeatMap(
-        roomNo,
-        user.schoolSessionId!,
-      );
-      const targetSeat = seats.find((seat) => seat.seatNo === seatNo);
-
-      if (!targetSeat) {
-        throw new BadRequestException('좌석을 찾을 수 없습니다.');
-      }
-
-      if (targetSeat.status !== 'OCCUPIED') {
-        throw new BadRequestException('이 좌석은 현재 사용 중이 아닙니다.');
-      }
-
-      // TODO: 실제로는 NotificationRequest 엔티티에 빈자리 예약 요청을 저장
-      this.logger.debug(
-        `Empty seat reservation requested: ${studentId} - ${roomNo}/${seatNo}`,
-      );
-
-      return {
-        success: true,
-        message:
-          '빈자리 예약이 완료되었습니다. 좌석이 비워지면 자동으로 예약됩니다.',
-      };
-    } catch (error: any) {
-      this.logger.error(`Reserve empty seat error: ${error.message}`);
-
-      if (
-        error instanceof ConflictException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-
-      throw new BadRequestException('빈자리 예약 중 오류가 발생했습니다.');
-    }
-  }
 
   /**
    * 좌석 연장

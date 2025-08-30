@@ -11,7 +11,7 @@ interface SeatSelectionModalProps {
   selectedSeat: string | null;
   roomNo: string;
   seatData: SeatDetailDto | null;
-  onReserveSeat: (seatNo: string) => Promise<void>;
+  onReserveSeat: (seatNo: string, autoExtensionEnabled?: boolean) => Promise<void>;
   onReserveEmptySeat: (seatNo: string) => Promise<void>;
 }
 
@@ -31,6 +31,9 @@ export const SeatSelectionModal = ({
   const [prediction, setPrediction] = useState<SeatPredictionDto | null>(null);
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [autoExtensionEnabled, setAutoExtensionEnabled] = useState(false);
+  const [duplicateReservationError, setDuplicateReservationError] = useState<string | null>(null);
+  const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
   const isSeatOccupied =
     seatData?.occupiedSeats.includes(selectedSeat || "") || false;
@@ -93,23 +96,64 @@ export const SeatSelectionModal = ({
     try {
       setIsLoading(true);
       setActionType(type);
+      setDuplicateReservationError(null);
 
       if (type === "reserve") {
-        await onReserveSeat(selectedSeat);
+        await onReserveSeat(selectedSeat, autoExtensionEnabled);
       } else {
         await onReserveEmptySeat(selectedSeat);
       }
 
       onClose();
     } catch (error: any) {
+      // 중복 예약 에러 처리 (409 또는 관련 메시지)
+      if (error.status === 409 || error.message?.includes('이미') || error.message?.includes('대기')) {
+        setDuplicateReservationError(error.message || '이미 다른 좌석을 예약하거나 대기 중입니다.');
+        return;
+      }
+      
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
       // 예상치 못한 에러만 콘솔에 출력
-      if (error.status !== 409 && error.status !== 400) {
+      if (error.status !== 400) {
         console.error("Unexpected action error:", error);
       }
     } finally {
       setIsLoading(false);
       setActionType(null);
+    }
+  };
+
+  // 기존 예약/대기 취소 후 새 예약
+  const handleCancelAndReserve = async (type: "reserve" | "reserve-empty") => {
+    try {
+      setIsProcessingCancel(true);
+      
+      // 기존 예약이나 대기열 요청 취소
+      try {
+        await apiClient.post("/api/v1/seats/return");
+      } catch (returnError) {
+        // 현재 좌석이 없으면 대기열 취소 시도
+        try {
+          await apiClient.post("/api/v1/seats/queue/reservation/cancel");
+        } catch (queueError) {
+          console.warn("Failed to cancel existing reservation/queue:", queueError);
+        }
+      }
+      
+      // 새로운 예약 시도
+      if (type === "reserve") {
+        await onReserveSeat(selectedSeat!, autoExtensionEnabled);
+      } else {
+        await onReserveEmptySeat(selectedSeat!);
+      }
+      
+      setDuplicateReservationError(null);
+      onClose();
+    } catch (error: any) {
+      console.error("Failed to cancel and reserve:", error);
+      setDuplicateReservationError("예약 변경에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsProcessingCancel(false);
     }
   };
 
@@ -384,6 +428,75 @@ export const SeatSelectionModal = ({
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* 자동 연장 옵션 (이용 가능한 좌석인 경우) */}
+          {isSeatAvailable && (
+            <div
+              className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-xl animate-in slide-in-from-top-2 duration-300 delay-150"
+              style={{
+                backgroundColor: document.documentElement.classList.contains(
+                  "dark"
+                )
+                  ? "rgba(30, 58, 138, 0.5)"
+                  : "#eff6ff",
+                borderColor: document.documentElement.classList.contains("dark")
+                  ? "#1e40af"
+                  : "#bfdbfe",
+              }}
+            >
+              <label className="flex items-start space-x-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={autoExtensionEnabled}
+                    onChange={(e) => setAutoExtensionEnabled(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div
+                    className={`mt-1 w-5 h-5 border-2 rounded-md transition-all duration-200 ease-in-out
+                      ${autoExtensionEnabled 
+                        ? 'bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500 shadow-lg shadow-blue-500/25' 
+                        : 'bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600 group-hover:border-blue-400 dark:group-hover:border-blue-500'
+                      }
+                      peer-focus:ring-2 peer-focus:ring-blue-500/50 peer-focus:ring-offset-1 dark:peer-focus:ring-offset-gray-800
+                      group-hover:scale-110 group-active:scale-95`}
+                  >
+                    {autoExtensionEnabled && (
+                      <svg 
+                        className="w-3 h-3 text-white absolute inset-0 m-auto animate-in zoom-in duration-200" 
+                        fill="currentColor" 
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3
+                    className="text-sm font-medium text-blue-900 dark:text-blue-100"
+                    style={{
+                      color: document.documentElement.classList.contains("dark")
+                        ? "#dbeafe"
+                        : "#1e3a8a",
+                    }}
+                  >
+                    자동 연장 활성화
+                  </h3>
+                  <p
+                    className="text-sm text-blue-700 dark:text-blue-300 mt-1"
+                    style={{
+                      color: document.documentElement.classList.contains("dark")
+                        ? "#93c5fd"
+                        : "#1d4ed8",
+                    }}
+                  >
+                    시간이 얼마 남지 않았을 때 자동으로 연장합니다
+                  </p>
+                </div>
+              </label>
             </div>
           )}
 

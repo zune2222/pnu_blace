@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
 import { AuthGuard } from "@/features/auth";
-import { CurrentSeatWidget, FavoriteRoomsSection, QuickInsightsSection } from "./ui";
+import {
+  CurrentSeatWidget,
+  FavoriteRoomsSection,
+  QuickInsightsSection,
+} from "./ui";
 import { useDashboardData } from "./model";
 
 export const DashboardPage: React.FC = () => {
@@ -15,14 +19,17 @@ export const DashboardPage: React.FC = () => {
           <div className="border-b border-border/20">
             <CurrentSeatWidget {...dashboardState} />
           </div>
-          
+
           {/* 하단 섹션들 - 그리드 레이아웃 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             <div className="border-r-0 lg:border-r border-border/20">
               <FavoriteRoomsSection {...dashboardState} />
             </div>
             <div>
-              <QuickInsightsSection {...dashboardState} />
+              <QuickInsightsSection
+                {...dashboardState}
+                onRefresh={dashboardState.refresh}
+              />
             </div>
           </div>
         </div>

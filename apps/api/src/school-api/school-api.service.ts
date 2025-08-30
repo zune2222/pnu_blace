@@ -141,7 +141,11 @@ export class SchoolApiService {
     sessionID: string | null,
     roomNo: string,
     seatNo: string,
-  ): Promise<{ success: boolean; message?: string; requiresGateEntry?: boolean }> {
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    requiresGateEntry?: boolean;
+  }> {
     try {
       const currentSessionID =
         sessionID || (await this.loginAsSystem()).sessionID;
@@ -220,14 +224,15 @@ export class SchoolApiService {
       // resultCode가 '0'이면 성공, '1'이면 실패
       if (resultCode === '0') {
         const message = resultMsg || '좌석이 성공적으로 발권되었습니다.';
-        
+
         // 출입게이트 통과 안내 메시지 포함 여부 확인
-        const requiresGateEntry = message.includes('출입게이트') || message.includes('15분');
-        
-        return { 
-          success: true, 
+        const requiresGateEntry =
+          message.includes('출입게이트') || message.includes('15분');
+
+        return {
+          success: true,
           message,
-          requiresGateEntry 
+          requiresGateEntry,
         };
       } else {
         return {

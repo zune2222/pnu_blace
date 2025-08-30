@@ -68,14 +68,17 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     return () => window.removeEventListener("message", handleMessage);
   }, [handleSeatClick]);
 
-  const handleReserveSeat = async (seatNo: string) => {
+  const handleReserveSeat = async (
+    seatNo: string,
+    autoExtensionEnabled?: boolean
+  ) => {
     try {
       setIsReserving(true);
-      setError(null);
 
       const reserveRequest: ReserveSeatRequestDto = {
         roomNo,
         seatNo: seatNo,
+        autoExtensionEnabled,
       };
 
       const response = await apiClient.post<SeatActionResponseDto>(
@@ -91,6 +94,23 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSeatData(updatedData);
         setSelectedSeat(null);
 
+        // 자동 연장이 활성화된 경우 백엔드에 설정 요청
+        if (autoExtensionEnabled) {
+          try {
+            await apiClient.post("/api/v1/seats/auto-extension/config", {
+              isEnabled: true,
+              triggerMinutesBefore: 10,
+              maxAutoExtensions: 2,
+              timeRestriction: "ALL_TIMES",
+            });
+
+            // 대시보드 위젯에 설정 업데이트 알림
+            window.dispatchEvent(new CustomEvent("autoExtensionConfigUpdated"));
+          } catch (configError) {
+            console.warn("자동 연장 설정 생성 실패:", configError);
+          }
+        }
+
         // 성공 메시지 표시
         if (response.requiresGateEntry) {
           toast.success("좌석이 성공적으로 발권되었습니다!", {
@@ -98,7 +118,9 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
             duration: 5000,
           });
         } else {
-          toast.success(response.message || "좌석이 성공적으로 발권되었습니다!");
+          toast.success(
+            response.message || "좌석이 성공적으로 발권되었습니다!"
+          );
         }
       }
     } catch (err: any) {
@@ -109,14 +131,19 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         // 백엔드에서 제공하는 상세한 메시지 사용
         errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "발권 정보가 올바르지 않습니다.";
+        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
+        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
         console.error("Unexpected reservation error:", err);
       }
 
-      setError(errorMessage);
+      // 토스트로 에러 메시지 표시
+      toast.error("좌석 발권 실패", {
+        description: errorMessage,
+        duration: 4000,
+      });
       throw err; // 모달에서 에러를 처리할 수 있도록 다시 던짐
     } finally {
       setIsReserving(false);
@@ -126,30 +153,25 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
   const handleReserveEmptySeat = async (seatNo: string) => {
     try {
       setIsReserving(true);
-      setError(null);
 
-      // 빈자리 예약 API 호출 (실제로는 별도 엔드포인트 필요)
-      const reserveRequest: ReserveSeatRequestDto = {
+      // 빈자리 예약 대기열에 추가
+      const queueRequest = {
         roomNo,
         seatNo: seatNo,
       };
 
-      const response = await apiClient.post<SeatActionResponseDto>(
-        "/api/v1/seats/reserve-empty",
-        reserveRequest
+      const response = await apiClient.post<any>(
+        "/api/v1/seats/queue/reservation",
+        queueRequest
       );
 
-      if (response.success) {
-        // 예약 성공 시 좌석 데이터 새로고침
-        const updatedData = await apiClient.get<SeatDetailDto>(
-          `/api/v1/seats/${roomNo}/detail`
-        );
-        setSeatData(updatedData);
+      if (response.queueId) {
+        // 대기열 등록 성공
         setSelectedSeat(null);
 
         // 성공 메시지 표시
         toast.success("빈자리 발권 예약이 완료되었습니다!", {
-          description: "좌석이 비워지면 자동으로 발권됩니다.",
+          description: `대기열 ${response.queuePosition + 1}번으로 등록되었습니다. 좌석이 비워지면 자동으로 발권됩니다.`,
           duration: 4000,
         });
       }
@@ -161,14 +183,19 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         // 백엔드에서 제공하는 상세한 메시지 사용
         errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "발권 정보가 올바르지 않습니다.";
+        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
+        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
         console.error("Unexpected empty seat reservation error:", err);
       }
 
-      setError(errorMessage);
+      // 토스트로 에러 메시지 표시
+      toast.error("빈자리 예약 실패", {
+        description: errorMessage,
+        duration: 4000,
+      });
       throw err;
     } finally {
       setIsReserving(false);
@@ -291,8 +318,8 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
           </div>
         </div>
 
-        {/* 에러 메시지 */}
-        {error && (
+        {/* 에러 메시지 - 좌석 데이터 로딩 실패 시에만 표시 */}
+        {error && !seatData && (
           <div className="py-4">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
