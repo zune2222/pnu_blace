@@ -170,8 +170,7 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
 
         {/* 대기열 상태 위젯 */}
         <QueueStatusWidget />
-
-        {/* 로딩 및 에러 상태 */}
+        {/* 
         {isLoading ? (
           <div className="text-center py-8">
             <div className="text-lg text-muted-foreground font-light">
@@ -183,7 +182,6 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
             <div className="text-lg text-red-600 font-light">{error}</div>
           </div>
         ) : (
-          /* 인사이트 목록 */
           <div className="space-y-6">
             {sortedInsights.map((insight) => (
               <div
@@ -213,26 +211,6 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
                         {insight.title}
                       </h3>
                     </div>
-                    {/* 대기열 인사이트에 대해서만 취소 버튼 표시 */}
-                    {insight.id === "queue-waiting" && (
-                      <button
-                        onClick={handleCancelQueue}
-                        disabled={isCancelling}
-                        className="ml-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center space-x-2"
-                        title="대기열 취소"
-                      >
-                        {isCancelling ? (
-                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <>
-                            <X className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              취소
-                            </span>
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
 
                   <p className="text-base text-muted-foreground/80 font-light leading-relaxed pl-8">
@@ -257,7 +235,6 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
           </div>
         )}
 
-        {/* AI 설명 및 마지막 업데이트 시간 */}
         {!isLoading && !error && quickInsights && (
           <div className="pt-6 flex items-center justify-between">
             <p className="text-sm text-muted-foreground/50 font-light">
@@ -268,7 +245,7 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
               {new Date(quickInsights.lastUpdated).toLocaleString("ko-KR")}
             </p>
           </div>
-        )}
+        )} */}
       </div>
     </section>
   );
