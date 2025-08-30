@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLogin } from "@/features/auth";
 import { validateLoginForm, isValidForm } from "../lib/validation";
+import { SavedCredentials } from "../lib/saved-credentials";
 import type { LoginFormData, LoginFormErrors } from "./types";
 
 export const useLoginForm = () => {
@@ -13,6 +14,18 @@ export const useLoginForm = () => {
     rememberMe: false,
   });
 
+  useEffect(() => {
+    const savedCredentials = SavedCredentials.load();
+    if (savedCredentials) {
+      setFormData(prev => ({
+        ...prev,
+        studentId: savedCredentials.studentId,
+        password: savedCredentials.password,
+        rememberMe: true,
+      }));
+    }
+  }, []);
+
   const [errors, setErrors] = useState<LoginFormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +34,10 @@ export const useLoginForm = () => {
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
 
-    // Clear error when user starts typing
+    if (name === "rememberMe" && !checked) {
+      SavedCredentials.remove();
+    }
+
     if (errors[name as keyof LoginFormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -49,7 +65,11 @@ export const useLoginForm = () => {
         studentId: formData.studentId,
         password: formData.password,
       });
-      // 로그인 성공 - useAuth에서 리다이렉트 처리
+      
+      if (formData.rememberMe) {
+        SavedCredentials.save(formData.studentId, formData.password);
+      }
+      
     } catch (error) {
       console.error("Login failed:", error);
 
