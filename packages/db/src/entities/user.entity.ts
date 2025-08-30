@@ -32,4 +32,7 @@ export class User {
 
 	@OneToMany("QueueRequest", "user")
 	queueRequests!: Relation<any[]>;
+
+	@OneToMany("FavoriteRoom", "user")
+	favoriteRooms!: Relation<any[]>;
 }
