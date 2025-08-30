@@ -77,6 +77,16 @@ export class ApiClient {
       // 에러 처리
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        
+        // 401 에러 시 자동 로그아웃
+        if (response.status === 401) {
+          TokenManager.removeToken();
+          // 로그인 페이지로 리다이렉트
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+        }
+        
         throw new ApiError(
           response.status,
           errorData.message || `HTTP Error: ${response.status}`,
