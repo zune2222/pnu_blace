@@ -1,7 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as Sentry from '@sentry/nestjs';
 
 async function bootstrap() {
+  // Sentry 초기화
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    debug: process.env.NODE_ENV === 'development',
+  });
+
   const app = await NestFactory.create(AppModule);
 
   // CORS 설정
