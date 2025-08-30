@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header, Footer } from "@/widgets";
 import { QueryProvider } from "@/providers";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = localFont({
   src: "../public/GeistVF.woff",
@@ -158,6 +159,7 @@ export default function RootLayout({
             visibleToasts={5}
           />
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   );
