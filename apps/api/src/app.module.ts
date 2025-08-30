@@ -12,6 +12,7 @@ import {
   AcademicCalendar,
   AutoExtensionConfig,
   QueueRequest,
+  FavoriteRoom,
 } from '@pnu-blace/db';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -21,6 +22,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { StatsModule } from './stats/stats.module';
 import { SchoolApiModule } from './school-api/school-api.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -48,6 +50,7 @@ import { RoomsModule } from './rooms/rooms.module';
           AcademicCalendar,
           AutoExtensionConfig,
           QueueRequest,
+          FavoriteRoom,
         ], // 모든 엔티티 클래스 추가
         synchronize: true, // 개발 환경에서는 true로 설정하여 테이블 자동 생성
         logging: true,
@@ -63,6 +66,7 @@ import { RoomsModule } from './rooms/rooms.module';
     NotificationsModule,
     SchedulerModule,
     StatsModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

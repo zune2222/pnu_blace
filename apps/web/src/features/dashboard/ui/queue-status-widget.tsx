@@ -41,7 +41,7 @@ export const QueueStatusWidget: React.FC = () => {
 
   // 대기열 요청 취소
   const handleCancelQueue = async () => {
-    if (!queueStatus?.emptySeatReservation) return;
+    if (!queueStatus?.seatReservation) return;
 
     try {
       setIsCancelling(true);
@@ -103,12 +103,12 @@ export const QueueStatusWidget: React.FC = () => {
   // 대기열 상태 표시
   console.log("QueueStatusWidget 렌더링 - queueStatus:", queueStatus);
   console.log(
-    "QueueStatusWidget 렌더링 - emptySeatReservation:",
-    queueStatus?.emptySeatReservation
+    "QueueStatusWidget 렌더링 - seatReservation:",
+    queueStatus?.seatReservation
   );
 
   // 대기열에 등록된 요청이 없는 경우 - 빈 상태 메시지 표시
-  if (!queueStatus?.emptySeatReservation) {
+  if (!queueStatus?.seatReservation) {
     return (
       <div className="py-6 border-b border-border/10">
         <div className="space-y-3">
@@ -133,7 +133,7 @@ export const QueueStatusWidget: React.FC = () => {
     );
   }
 
-  const request = queueStatus.emptySeatReservation;
+  const request = queueStatus.seatReservation;
 
   return (
     <div className="py-6 border-b border-border/10">

@@ -1,41 +1,57 @@
 "use client";
 import React from "react";
-import { Button } from "@/shared/ui";
 import { ReadingRoomInfo } from "@/entities/dashboard";
-
-type FavoriteRooms = {
-  rooms: ReadingRoomInfo[];
-  lastUpdated: string;
-};
+import { useFavoriteRooms, useToggleFavorite } from "@/entities/favorite";
+import { FavoriteHeart } from "@/shared/ui";
 
 interface FavoriteRoomsSectionProps {
-  favoriteRooms: FavoriteRooms | null;
-  isLoading: boolean;
-  error: string | null;
-  toggleFavorite: (roomId: string, isFavorite: boolean) => Promise<void>;
+  // 의존성 주입을 위한 선택적 props
+  favoriteRooms?: ReadingRoomInfo[] | null;
+  isLoading?: boolean;
+  error?: string | null;
+  toggleFavorite?: (roomId: string, isFavorite: boolean) => Promise<void>;
 }
 
 export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
-  favoriteRooms: favoriteRoomsData,
-  isLoading,
-  error,
-  toggleFavorite: toggleFavoriteProp
+  favoriteRooms: injectedFavoriteRooms,
+  isLoading: injectedIsLoading,
+  error: injectedError,
+  toggleFavorite: injectedToggleFavorite,
 }) => {
+  // 의존성 주입된 데이터가 없으면 내부 훅 사용
+  const {
+    data: hookFavoriteRooms,
+    isLoading: hookIsLoading,
+    error: hookError,
+  } = useFavoriteRooms();
+
+  const toggleFavoriteMutation = useToggleFavorite();
+
+  // 의존성 주입된 값이 있으면 사용, 없으면 훅에서 가져온 값 사용
+  const favoriteRooms = injectedFavoriteRooms || hookFavoriteRooms || [];
+  const isLoading = injectedIsLoading ?? hookIsLoading;
+  const error =
+    injectedError || (hookError instanceof Error ? hookError.message : null);
+
   // 즐겨찾기 토글 핸들러 (roomNo 기반)
-  const handleToggleFavorite = async (roomNo: string, currentFavorite: boolean) => {
+  const handleToggleFavorite = async (
+    roomNo: string,
+    currentFavorite: boolean
+  ) => {
     try {
-      await toggleFavoriteProp(roomNo, !currentFavorite);
+      if (injectedToggleFavorite) {
+        // 의존성 주입된 함수 사용
+        await injectedToggleFavorite(roomNo, !currentFavorite);
+      } else {
+        // 내부 뮤테이션 사용
+        await toggleFavoriteMutation.mutateAsync({
+          roomNo,
+          isFavorite: !currentFavorite,
+        });
+      }
     } catch (err) {
-      console.error('즐겨찾기 토글 실패:', err);
+      console.error("즐겨찾기 토글 실패:", err);
     }
-  };
-
-  const favoriteRooms = favoriteRoomsData?.rooms || [];
-
-  const getOccupancyColor = (rate: number) => {
-    if (rate < 50) return "bg-green-500";
-    if (rate < 75) return "bg-yellow-500";
-    return "bg-red-500";
   };
 
   const getOccupancyText = (rate: number) => {
@@ -60,7 +76,9 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
         {/* 로딩 및 에러 상태 */}
         {isLoading ? (
           <div className="text-center py-8">
-            <div className="text-lg text-muted-foreground font-light">즐겨찾기 열람실을 불러오는 중...</div>
+            <div className="text-lg text-muted-foreground font-light">
+              즐겨찾기 열람실을 불러오는 중...
+            </div>
           </div>
         ) : error ? (
           <div className="text-center py-8">
@@ -69,8 +87,11 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
         ) : (
           /* 열람실 목록 */
           <div className="space-y-8">
-            {favoriteRooms.map((room, index) => (
-              <div key={room.roomNo} className="group cursor-pointer py-4 border-b border-border/10 last:border-b-0">
+            {favoriteRooms.map((room) => (
+              <div
+                key={room.roomNo}
+                className="group cursor-pointer py-4 border-b border-border/10 last:border-b-0"
+              >
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">
                     <h3 className="text-xl font-light text-foreground group-hover:text-muted-foreground transition-colors duration-300">
@@ -78,52 +99,57 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
                     </h3>
                     <div className="flex items-center space-x-4">
                       <span className="text-sm text-muted-foreground/70 font-light">
-                        {room.totalSeats - room.availableSeats}/{room.totalSeats}
+                        {room.totalSeats - room.availableSeats}/
+                        {room.totalSeats}
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium tracking-wide ${
-                        room.occupancyRate < 50 
-                          ? "bg-green-500/10 text-green-600 dark:bg-green-400/10 dark:text-green-400" 
-                          : room.occupancyRate < 75 
-                            ? "bg-amber-500/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400"
-                            : "bg-red-500/10 text-red-600 dark:bg-red-400/10 dark:text-red-400"
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium tracking-wide ${
+                          room.occupancyRate < 50
+                            ? "bg-green-500/10 text-green-600 dark:bg-green-400/10 dark:text-green-400"
+                            : room.occupancyRate < 75
+                              ? "bg-amber-500/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400"
+                              : "bg-red-500/10 text-red-600 dark:bg-red-400/10 dark:text-red-400"
+                        }`}
+                      >
                         {getOccupancyText(room.occupancyRate)}
                       </span>
                       <span className="text-xs text-muted-foreground/60">
-                        {room.isOpen ? '운영중' : '닫음'}
+                        {room.isOpen ? "운영중" : "닫음"}
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="text-right flex items-center space-x-4">
                     <div className="w-16 h-1 bg-muted/50 rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 rounded-full ${
-                          room.occupancyRate < 50 
-                            ? "bg-green-500" 
-                            : room.occupancyRate < 75 
+                          room.occupancyRate < 50
+                            ? "bg-green-500"
+                            : room.occupancyRate < 75
                               ? "bg-amber-500"
                               : "bg-red-500"
                         }`}
                         style={{ width: `${room.occupancyRate}%` }}
                       />
                     </div>
-                    <button
-                      onClick={() => handleToggleFavorite(room.roomNo, room.isFavorite || false)}
-                      className="text-muted-foreground/50 hover:text-foreground transition-colors"
-                      title="즐겨찾기에서 제거"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                      </svg>
-                    </button>
+                    <FavoriteHeart
+                      isFavorite={room.isFavorite || false}
+                      onClick={() =>
+                        handleToggleFavorite(
+                          room.roomNo,
+                          room.isFavorite || false
+                        )
+                      }
+                      size="sm"
+                      className="p-1"
+                    />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-        
+
         {!isLoading && !error && favoriteRooms.length === 0 && (
           <div className="text-center py-12 space-y-6">
             <div className="space-y-4">

@@ -23,7 +23,12 @@ export const DashboardPage: React.FC = () => {
           {/* 하단 섹션들 - 그리드 레이아웃 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             <div className="border-r-0 lg:border-r border-border/20">
-              <FavoriteRoomsSection {...dashboardState} />
+              <FavoriteRoomsSection
+                favoriteRooms={dashboardState.favoriteRooms}
+                isLoading={dashboardState.isLoading}
+                error={dashboardState.error}
+                toggleFavorite={dashboardState.toggleFavorite}
+              />
             </div>
             <div>
               <QuickInsightsSection
