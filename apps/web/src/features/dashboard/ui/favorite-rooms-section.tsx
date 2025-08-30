@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { ReadingRoomInfo } from "@/entities/dashboard";
 import { useFavoriteRooms, useToggleFavorite } from "@/entities/favorite";
 import { FavoriteHeart } from "@/shared/ui";
@@ -18,6 +19,8 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
   error: injectedError,
   toggleFavorite: injectedToggleFavorite,
 }) => {
+  const router = useRouter();
+  
   // 의존성 주입된 데이터가 없으면 내부 훅 사용
   const {
     data: hookFavoriteRooms,
@@ -52,6 +55,10 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
     } catch (err) {
       console.error("즐겨찾기 토글 실패:", err);
     }
+  };
+
+  const handleRoomClick = (roomNo: string) => {
+    router.push(`/seats/${roomNo}`);
   };
 
   const getOccupancyText = (rate: number) => {
@@ -91,6 +98,7 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
               <div
                 key={room.roomNo}
                 className="group cursor-pointer py-4 border-b border-border/10 last:border-b-0"
+                onClick={() => handleRoomClick(room.roomNo)}
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">
@@ -113,9 +121,6 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
                       >
                         {getOccupancyText(room.occupancyRate)}
                       </span>
-                      <span className="text-xs text-muted-foreground/60">
-                        {room.isOpen ? "운영중" : "닫음"}
-                      </span>
                     </div>
                   </div>
 
@@ -134,12 +139,13 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
                     </div>
                     <FavoriteHeart
                       isFavorite={room.isFavorite || false}
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         handleToggleFavorite(
                           room.roomNo,
                           room.isFavorite || false
-                        )
-                      }
+                        );
+                      }}
                       size="sm"
                       className="p-1"
                     />
