@@ -74,7 +74,6 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
   ) => {
     try {
       setIsReserving(true);
-      setError(null);
 
       const reserveRequest: ReserveSeatRequestDto = {
         roomNo,
@@ -140,7 +139,11 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         console.error("Unexpected reservation error:", err);
       }
 
-      setError(errorMessage);
+      // 토스트로 에러 메시지 표시
+      toast.error("좌석 발권 실패", {
+        description: errorMessage,
+        duration: 4000,
+      });
       throw err; // 모달에서 에러를 처리할 수 있도록 다시 던짐
     } finally {
       setIsReserving(false);
@@ -150,7 +153,6 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
   const handleReserveEmptySeat = async (seatNo: string) => {
     try {
       setIsReserving(true);
-      setError(null);
 
       // 빈자리 예약 대기열에 추가
       const queueRequest = {
@@ -189,7 +191,11 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         console.error("Unexpected empty seat reservation error:", err);
       }
 
-      setError(errorMessage);
+      // 토스트로 에러 메시지 표시
+      toast.error("빈자리 예약 실패", {
+        description: errorMessage,
+        duration: 4000,
+      });
       throw err;
     } finally {
       setIsReserving(false);
@@ -312,8 +318,8 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
           </div>
         </div>
 
-        {/* 에러 메시지 */}
-        {error && (
+        {/* 에러 메시지 - 좌석 데이터 로딩 실패 시에만 표시 */}
+        {error && !seatData && (
           <div className="py-4">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
