@@ -28,6 +28,6 @@ import { StatsModule } from '../stats/stats.module';
     SeatAutoExtensionService,
     SeatQueueService,
   ],
-  exports: [SeatsService, SeatQueueService],
+  exports: [SeatsService, SeatQueueService, SeatAutoExtensionService],
 })
 export class SeatsModule {}

@@ -39,7 +39,7 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
         // 설정이 없는 경우 기본값 설정
         const defaultConfig: AutoExtensionConfigDto = {
           isEnabled: false,
-          triggerMinutesBefore: 10,
+          triggerMinutesBefore: 30,
           maxAutoExtensions: 2,
           timeRestriction: "ALL_TIMES",
         };
@@ -152,34 +152,31 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
         <button
           onClick={handleAutoExtensionToggle}
           disabled={isToggling || isLoading}
-          className="group inline-flex items-center space-x-3 text-base text-muted-foreground/50 font-light hover:text-muted-foreground transition-colors duration-300 disabled:text-muted-foreground/30 disabled:cursor-not-allowed"
+          className={`group inline-flex items-center space-x-3 text-base font-light transition-colors duration-300 disabled:cursor-not-allowed ${
+            config?.isEnabled 
+              ? 'text-foreground hover:text-muted-foreground' 
+              : 'text-muted-foreground/50 hover:text-muted-foreground disabled:text-muted-foreground/30'
+          }`}
         >
           <span>자동 연장</span>
-          <div className="flex items-center space-x-2">
+          {!isToggling && !isLoading && (
             <RotateCcw 
-              className={`w-4 h-4 transition-colors duration-300 ${
-                config?.isEnabled ? 'text-foreground' : 'text-muted-foreground/50'
+              className={`w-4 h-4 transition-all duration-300 ${
+                config?.isEnabled 
+                  ? 'text-foreground' 
+                  : 'text-muted-foreground/50 group-hover:rotate-12'
               }`} 
+              style={{
+                ...(config?.isEnabled ? {
+                  animation: 'spin 4s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse',
+                  animationDelay: '0s',
+                } : {}),
+              }}
             />
-            {!isToggling && !isLoading && (
-              <div
-                className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors duration-200 ${
-                  config?.isEnabled
-                    ? 'bg-foreground'
-                    : 'bg-muted-foreground/20'
-                }`}
-              >
-                <span
-                  className={`inline-block h-2.5 w-2.5 transform rounded-full bg-background transition-transform duration-200 ${
-                    config?.isEnabled ? 'translate-x-4' : 'translate-x-0.5'
-                  }`}
-                />
-              </div>
-            )}
-            {(isToggling || isLoading) && (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-            )}
-          </div>
+          )}
+          {(isToggling || isLoading) && (
+            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+          )}
         </button>
       </div>
 

@@ -18,7 +18,7 @@ export const AutoExtensionSettingsModal: React.FC<AutoExtensionSettingsModalProp
   initialConfig,
 }) => {
   const [config, setConfig] = useState<Partial<AutoExtensionConfigDto>>({
-    triggerMinutesBefore: 10,
+    triggerMinutesBefore: 30,
     maxAutoExtensions: 2,
     timeRestriction: "ALL_TIMES",
   });
@@ -98,7 +98,7 @@ export const AutoExtensionSettingsModal: React.FC<AutoExtensionSettingsModalProp
               <span>연장 시점</span>
             </label>
             <select
-              value={config.triggerMinutesBefore || 10}
+              value={config.triggerMinutesBefore || 30}
               onChange={(e) =>
                 setConfig({
                   ...config,
@@ -107,10 +107,9 @@ export const AutoExtensionSettingsModal: React.FC<AutoExtensionSettingsModalProp
               }
               className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background text-foreground focus:ring-1 focus:ring-foreground focus:border-foreground transition-colors duration-200"
             >
-              <option value={5}>5분 전</option>
-              <option value={10}>10분 전</option>
-              <option value={15}>15분 전</option>
-              <option value={20}>20분 전</option>
+              <option value={120}>2시간 전</option>
+              <option value={60}>1시간 전</option>
+              <option value={30}>30분 전</option>
             </select>
             <p className="text-xs text-muted-foreground">
               남은 시간이 이 시간 이하가 되면 자동으로 연장합니다
@@ -136,7 +135,7 @@ export const AutoExtensionSettingsModal: React.FC<AutoExtensionSettingsModalProp
               <option value={1}>1회</option>
               <option value={2}>2회</option>
               <option value={3}>3회</option>
-              <option value={5}>5회</option>
+              <option value={4}>4회</option>
             </select>
             <p className="text-xs text-muted-foreground">
               하루 최대 연장 가능 횟수입니다
@@ -172,7 +171,11 @@ export const AutoExtensionSettingsModal: React.FC<AutoExtensionSettingsModalProp
           <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
             <h4 className="text-sm font-medium text-foreground mb-2">설정 미리보기</h4>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>• 남은 시간이 {config.triggerMinutesBefore || 10}분 이하가 되면 자동으로 연장</p>
+              <p>• 남은 시간이 {
+                config.triggerMinutesBefore === 120 ? '2시간' :
+                config.triggerMinutesBefore === 60 ? '1시간' :
+                (config.triggerMinutesBefore || 30) + '분'
+              } 이하가 되면 자동으로 연장</p>
               <p>• 하루 최대 {config.maxAutoExtensions || 2}회까지 자동 연장</p>
               <p>• {
                 (config.timeRestriction || 'ALL_TIMES') === 'ALL_TIMES' ? '매일 언제나' :
