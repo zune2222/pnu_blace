@@ -36,12 +36,10 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       try {
         setIsLoading(true);
         setError(null);
-        console.log("Fetching seat data for room:", roomNo);
 
         const data = await apiClient.get<SeatDetailDto>(
           `/api/v1/seats/${roomNo}/detail`
         );
-        console.log("Seat data received:", data);
         setSeatData(data);
       } catch (err: any) {
         console.error("Error fetching seat data:", err);
@@ -59,7 +57,6 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === "SEAT_CLICK") {
         const seatNo = event.data.seatNo;
-        console.log("Seat clicked from iframe:", seatNo);
         handleSeatClick(seatNo);
       }
     };
@@ -375,9 +372,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
                     minWidth: "1200px", // 최소 너비 설정
                   }}
                   scrolling="auto"
-                  onLoad={() => {
-                    console.log("Seat layout iframe loaded successfully");
-                  }}
+                  onLoad={() => {}}
                   onError={(e) => {
                     console.error("Seat layout iframe failed to load:", e);
                     console.error(

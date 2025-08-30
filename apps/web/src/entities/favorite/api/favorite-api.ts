@@ -25,13 +25,9 @@ class FavoriteApi {
    */
   async getFavoriteRooms(): Promise<ReadingRoomInfo[]> {
     try {
-      console.log("즐겨찾기 목록 조회 시작");
-
       // 백엔드 API에서 즐겨찾기 목록 조회
       const response =
         await apiClient.get<FavoriteRoomsResponseDto>("/api/v1/favorites");
-
-      console.log("즐겨찾기 API 응답:", response);
 
       if (!response.success) {
         throw new Error(
@@ -43,17 +39,12 @@ class FavoriteApi {
         (room: { roomNo: string }) => room.roomNo
       );
 
-      console.log("즐겨찾기된 열람실 번호들:", favoriteRoomNos);
-
       // 모든 열람실 정보를 가져와서 즐겨찾기된 것만 필터링
       const allRooms = await this.getAllRooms();
-      console.log("모든 열람실 정보:", allRooms);
 
       const favoriteRooms = allRooms.filter((room) =>
         favoriteRoomNos.includes(room.roomNo)
       );
-
-      console.log("필터링된 즐겨찾기 열람실:", favoriteRooms);
 
       return favoriteRooms.map((room) => ({
         ...room,
