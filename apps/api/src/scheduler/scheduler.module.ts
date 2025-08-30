@@ -7,6 +7,7 @@ import { SeatChangeDetectorService } from './detector';
 import { SeatNotificationProcessorService } from './processor';
 import { SeatAutoReservorService } from './reservor';
 import { SeatQueueProcessorService } from './queue/seat-queue-processor.service';
+import { SeatAutoExtensionProcessorService } from './auto-extension/seat-auto-extension-processor.service';
 import { SchoolApiModule } from '../school-api/school-api.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { StatsModule } from '../stats/stats.module';
@@ -27,6 +28,7 @@ import { SeatsModule } from '../seats/seats.module';
     SeatNotificationProcessorService,
     SeatAutoReservorService,
     SeatQueueProcessorService,
+    SeatAutoExtensionProcessorService,
   ],
   exports: [
     SeatMonitorService,
@@ -34,6 +36,8 @@ import { SeatsModule } from '../seats/seats.module';
     SeatChangeDetectorService,
     SeatNotificationProcessorService,
     SeatAutoReservorService,
+    SeatQueueProcessorService,
+    SeatAutoExtensionProcessorService,
   ],
 })
 export class SchedulerModule {}

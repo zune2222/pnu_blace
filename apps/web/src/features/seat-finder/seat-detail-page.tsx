@@ -92,6 +92,23 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSeatData(updatedData);
         setSelectedSeat(null);
 
+        // 자동 연장이 활성화된 경우 백엔드에 설정 요청
+        if (autoExtensionEnabled) {
+          try {
+            await apiClient.post("/api/v1/seats/auto-extension/config", {
+              isEnabled: true,
+              triggerMinutesBefore: 10,
+              maxAutoExtensions: 2,
+              timeRestriction: "ALL_TIMES"
+            });
+            
+            // 대시보드 위젯에 설정 업데이트 알림
+            window.dispatchEvent(new CustomEvent('autoExtensionConfigUpdated'));
+          } catch (configError) {
+            console.warn("자동 연장 설정 생성 실패:", configError);
+          }
+        }
+
         // 성공 메시지 표시
         if (response.requiresGateEntry) {
           toast.success("좌석이 성공적으로 발권되었습니다!", {

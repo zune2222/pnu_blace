@@ -391,42 +391,63 @@ export const SeatSelectionModal = ({
           {/* 자동 연장 옵션 (이용 가능한 좌석인 경우) */}
           {isSeatAvailable && (
             <div
-              className="mb-4 p-3 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 rounded-xl animate-in slide-in-from-top-2 duration-300 delay-150"
+              className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-xl animate-in slide-in-from-top-2 duration-300 delay-150"
               style={{
                 backgroundColor: document.documentElement.classList.contains(
                   "dark"
                 )
-                  ? "rgba(88, 28, 135, 0.5)"
-                  : "#faf5ff",
+                  ? "rgba(30, 58, 138, 0.5)"
+                  : "#eff6ff",
                 borderColor: document.documentElement.classList.contains("dark")
-                  ? "#7c3aed"
-                  : "#d8b4fe",
+                  ? "#1e40af"
+                  : "#bfdbfe",
               }}
             >
-              <label className="flex items-start space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={autoExtensionEnabled}
-                  onChange={(e) => setAutoExtensionEnabled(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-white dark:bg-gray-900 border-purple-300 dark:border-purple-700 rounded focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-2"
-                />
+              <label className="flex items-start space-x-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={autoExtensionEnabled}
+                    onChange={(e) => setAutoExtensionEnabled(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div
+                    className={`mt-1 w-5 h-5 border-2 rounded-md transition-all duration-200 ease-in-out
+                      ${autoExtensionEnabled 
+                        ? 'bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500 shadow-lg shadow-blue-500/25' 
+                        : 'bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600 group-hover:border-blue-400 dark:group-hover:border-blue-500'
+                      }
+                      peer-focus:ring-2 peer-focus:ring-blue-500/50 peer-focus:ring-offset-1 dark:peer-focus:ring-offset-gray-800
+                      group-hover:scale-110 group-active:scale-95`}
+                  >
+                    {autoExtensionEnabled && (
+                      <svg 
+                        className="w-3 h-3 text-white absolute inset-0 m-auto animate-in zoom-in duration-200" 
+                        fill="currentColor" 
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
                 <div className="flex-1">
                   <h3
-                    className="text-sm font-medium text-purple-900 dark:text-purple-100"
+                    className="text-sm font-medium text-blue-900 dark:text-blue-100"
                     style={{
                       color: document.documentElement.classList.contains("dark")
-                        ? "#e9d5ff"
-                        : "#581c87",
+                        ? "#dbeafe"
+                        : "#1e3a8a",
                     }}
                   >
                     자동 연장 활성화
                   </h3>
                   <p
-                    className="text-sm text-purple-700 dark:text-purple-300 mt-1"
+                    className="text-sm text-blue-700 dark:text-blue-300 mt-1"
                     style={{
                       color: document.documentElement.classList.contains("dark")
-                        ? "#c084fc"
-                        : "#7c2d12",
+                        ? "#93c5fd"
+                        : "#1d4ed8",
                     }}
                   >
                     시간이 얼마 남지 않았을 때 자동으로 연장합니다

@@ -7,7 +7,6 @@ import { NoSeatMessage } from "./no-seat-message";
 import { LoadingState } from "./loading-state";
 import { ErrorState } from "./error-state";
 import { getStatusBadge } from "./status-badge";
-import { AutoExtensionWidget } from "./auto-extension-widget";
 import { createSeatCancelHandler, createSeatExtendHandler } from "../lib/seat-handlers";
 import { useRealTimeRemaining } from "../lib/use-real-time-remaining";
 import { toast } from "sonner";
@@ -80,7 +79,6 @@ export const CurrentSeatWidget: React.FC<CurrentSeatWidgetProps> = ({
               isExtendDisabled={isExtendDisabled}
               onExtendDisabledClick={handleExtendDisabledClick}
             />
-            <AutoExtensionWidget isVisible={true} />
           </div>
         ) : (
           <NoSeatMessage />
