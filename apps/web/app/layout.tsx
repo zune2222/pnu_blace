@@ -70,6 +70,26 @@ export const metadata: Metadata = {
   title: "PNU Blace",
   description: "부산대학교 도서관을 더욱 편리하게",
   keywords: ["부산대학교", "도서관", "좌석예약", "자동예약", "PNU", "Blace"],
+  openGraph: {
+    title: "PNU Blace",
+    description: "부산대학교 도서관을 더욱 편리하게",
+    images: [
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "PNU Blace 로고",
+      },
+    ],
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PNU Blace",
+    description: "부산대학교 도서관을 더욱 편리하게",
+    images: ["/android-chrome-512x512.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
