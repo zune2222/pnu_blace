@@ -3,7 +3,11 @@
 import React from "react";
 import { Clock, X, AlertCircle, Users } from "lucide-react";
 import { QueueStatusDto } from "@pnu-blace/types";
-import { formatQueueStatus, getStatusColor, getRoomName } from "../utils/queueHelpers";
+import {
+  formatQueueStatus,
+  getStatusColor,
+  getRoomName,
+} from "../utils/queueHelpers";
 
 interface QueueActiveStateProps {
   queueStatus: QueueStatusDto;
@@ -42,7 +46,8 @@ export const QueueActiveState: React.FC<QueueActiveStateProps> = ({
             </div>
 
             <h3 className="text-lg font-light text-foreground">
-              빈자리 예약 대기열 - {getRoomName(request.roomNo)} {request.seatNo}번
+              빈자리 예약 대기열 - {getRoomName(request.roomNo)}{" "}
+              {request.seatNo}번
             </h3>
           </div>
 
@@ -84,18 +89,18 @@ export const QueueActiveState: React.FC<QueueActiveStateProps> = ({
           )}
 
           {request.status === "WAITING" && (
-            <div className="flex items-start space-x-2 mt-3 p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg">
-              <Clock className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-light">
+            <div className="flex items-start space-x-2 mt-3 p-3 rounded-lg">
+              <Clock className="w-4 h-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-blue-700 dark:text-blue-200 font-light">
                 좌석이 비워지면 자동으로 발권됩니다.
               </p>
             </div>
           )}
 
           {request.status === "FAILED" && (
-            <div className="flex items-start space-x-2 mt-3 p-3 bg-red-50/50 dark:bg-red-950/20 rounded-lg">
-              <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-700 dark:text-red-300 font-light">
+            <div className="flex items-start space-x-2 mt-3 p-3 rounded-lg">
+              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-700 dark:text-red-200 font-light">
                 빈자리 예약에 실패했습니다. 다시 시도해 주세요.
               </p>
             </div>
