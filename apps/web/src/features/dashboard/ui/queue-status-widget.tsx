@@ -1,58 +1,60 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Clock, X, AlertCircle, Users } from "lucide-react";
 import { QueueStatusDto } from "@pnu-blace/types";
 import { dashboardApi } from "@/entities/dashboard/api";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const QueueStatusWidget: React.FC = () => {
-  const [queueStatus, setQueueStatus] = useState<QueueStatusDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCancelling, setIsCancelling] = useState(false);
+  const queryClient = useQueryClient();
 
-  // 대기열 상태 로드
-  const loadQueueStatus = async () => {
-    try {
-      setIsLoading(true);
-      const status = await dashboardApi.getQueueStatus();
-      console.log("대기열 상태 로드 성공:", status);
-      setQueueStatus(status);
-    } catch (error: any) {
-      console.log("대기열 상태 로드 에러:", error);
-      // 404는 대기열 요청이 없는 경우이므로 정상
-      if (error.message?.includes("찾을 수 없습니다")) {
-        setQueueStatus(null);
-      } else {
-        console.warn("대기열 상태 로드 실패:", error);
+  // React Query로 대기열 상태 조회 (10초마다 자동 폴링)
+  const {
+    data: queueStatus,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["queueStatus"],
+    queryFn: async (): Promise<QueueStatusDto | null> => {
+      try {
+        const status = await dashboardApi.getQueueStatus();
+        console.log("대기열 상태 로드 성공:", status);
+        return status;
+      } catch (error: any) {
+        console.log("대기열 상태 로드 에러:", error);
+        // 404는 대기열 요청이 없는 경우이므로 정상
+        if (error.message?.includes("찾을 수 없습니다")) {
+          return null;
+        } else {
+          console.warn("대기열 상태 로드 실패:", error);
+          throw error;
+        }
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    refetchInterval: 10000, // 10초마다 자동 폴링
+    retry: false, // 404 에러는 재시도하지 않음
+  });
 
-  useEffect(() => {
-    loadQueueStatus();
-
-    // 10초마다 상태 업데이트
-    const interval = setInterval(loadQueueStatus, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  // 대기열 요청 취소 뮤테이션
+  const cancelQueueMutation = useMutation({
+    mutationFn: async () => {
+      await dashboardApi.cancelQueueRequest();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["queueStatus"] });
+      toast.success("빈자리 예약 대기열에서 취소되었습니다");
+    },
+    onError: (error: any) => {
+      toast.error("취소 요청에 실패했습니다: " + error.message);
+    },
+  });
 
   // 대기열 요청 취소
   const handleCancelQueue = async () => {
     if (!queueStatus?.seatReservation) return;
-
-    try {
-      setIsCancelling(true);
-      await dashboardApi.cancelQueueRequest();
-      setQueueStatus(null);
-      toast.success("빈자리 예약 대기열에서 취소되었습니다");
-    } catch (error: any) {
-      toast.error("취소 요청에 실패했습니다: " + error.message);
-    } finally {
-      setIsCancelling(false);
-    }
+    cancelQueueMutation.mutate();
   };
 
   const formatQueueStatus = (status: string) => {
@@ -163,11 +165,11 @@ export const QueueStatusWidget: React.FC = () => {
           {request.status === "WAITING" && (
             <button
               onClick={handleCancelQueue}
-              disabled={isCancelling}
+              disabled={cancelQueueMutation.isPending}
               className="ml-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center space-x-2"
               title="대기열 취소"
             >
-              {isCancelling ? (
+              {cancelQueueMutation.isPending ? (
                 <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
