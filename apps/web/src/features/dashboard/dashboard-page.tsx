@@ -30,7 +30,7 @@ export const DashboardPage: React.FC = () => {
               <FavoriteRoomsSection {...dashboardState} />
             </div>
             <div>
-              <QuickInsightsSection {...dashboardState} />
+              <QuickInsightsSection {...dashboardState} onRefresh={dashboardState.refresh} />
             </div>
           </div>
         </div>

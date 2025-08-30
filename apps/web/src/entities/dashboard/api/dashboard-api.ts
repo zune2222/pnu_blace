@@ -39,22 +39,22 @@ class DashboardApi {
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       // 시간 문자열이 "HH:MM" 형식인 경우 오늘 날짜와 결합
       const today = new Date();
-      const endTime = mySeat.endTime.includes(':')
+      const endTime = mySeat.endTime.includes(":")
         ? new Date(`${today.toDateString()} ${mySeat.endTime}`)
         : new Date(mySeat.endTime);
       const now = new Date();
-      
+
       // 남은 시간 계산: remainingTime 문자열을 우선 사용, 없으면 endTime으로 계산
       let remainingMinutes = 0;
-      
-      if (mySeat.remainingTime && mySeat.remainingTime !== '') {
+
+      if (mySeat.remainingTime && mySeat.remainingTime !== "") {
         // "0시간 01분 남음" 형식의 remainingTime을 분으로 변환
         const timeStr = mySeat.remainingTime;
         const hoursMatch = timeStr.match(/(\d+)시간/);
         const minutesMatch = timeStr.match(/(\d+)분/);
-        
-        const hours = hoursMatch ? parseInt(hoursMatch[1] || '0', 10) : 0;
-        const minutes = minutesMatch ? parseInt(minutesMatch[1] || '0', 10) : 0;
+
+        const hours = hoursMatch ? parseInt(hoursMatch[1] || "0", 10) : 0;
+        const minutes = minutesMatch ? parseInt(minutesMatch[1] || "0", 10) : 0;
         remainingMinutes = hours * 60 + minutes;
       } else if (mySeat.endTime) {
         // endTime으로 남은 시간 계산
@@ -63,7 +63,6 @@ class DashboardApi {
           Math.floor((endTime.getTime() - now.getTime()) / (1000 * 60))
         );
       }
-
 
       return {
         roomNo: mySeat.roomNo,
@@ -220,7 +219,35 @@ class DashboardApi {
         console.warn("개인 통계 기반 인사이트 생성 실패:", error);
       }
 
-      // 3. 일반적인 팁
+      // 3. 대기열 상태 확인
+      try {
+        const queueStatus = await this.getQueueStatus();
+        if (
+          queueStatus?.seatReservation &&
+          queueStatus.seatReservation.status === "WAITING"
+        ) {
+          const request = queueStatus.seatReservation;
+          insights.push({
+            id: "queue-waiting",
+            type: "statistic",
+            title: "좌석 예약 대기 중",
+            content: `${request.roomNo} ${request.seatNo}번 좌석을 ${request.queuePosition + 1}번째로 대기하고 있습니다. ${queueStatus.totalWaiting > 1 ? `총 ${queueStatus.totalWaiting}명이 대기 중입니다.` : "곧 발권될 예정입니다."}`,
+            priority: "high",
+            createdAt: new Date().toISOString(),
+            isNew: true,
+          });
+        }
+      } catch (error) {
+        // 404는 대기열 요청이 없는 경우이므로 무시
+        if (
+          error instanceof Error &&
+          !error.message?.includes("찾을 수 없습니다")
+        ) {
+          console.warn("대기열 상태 기반 인사이트 생성 실패:", error);
+        }
+      }
+
+      // 4. 일반적인 팁
       const currentHour = new Date().getHours();
       if (currentHour >= 13 && currentHour <= 15) {
         insights.push({
@@ -277,10 +304,10 @@ class DashboardApi {
     autoExtensionEnabled?: boolean
   ): Promise<SeatActionResponseDto> {
     try {
-      const reserveRequest: ReserveSeatRequestDto = { 
-        roomNo, 
+      const reserveRequest: ReserveSeatRequestDto = {
+        roomNo,
         seatNo,
-        autoExtensionEnabled 
+        autoExtensionEnabled,
       };
       return await apiClient.post<SeatActionResponseDto>(
         "/api/v1/seats/reserve",
@@ -341,7 +368,6 @@ class DashboardApi {
     }
   }
 
-
   // ================================
   // 자동 연장 관련 함수
   // ================================
@@ -383,7 +409,9 @@ class DashboardApi {
   }
 
   // 자동 연장 토글 (활성화/비활성화)
-  async toggleAutoExtension(isEnabled: boolean): Promise<AutoExtensionConfigDto> {
+  async toggleAutoExtension(
+    isEnabled: boolean
+  ): Promise<AutoExtensionConfigDto> {
     try {
       return await apiClient.post<AutoExtensionConfigDto>(
         "/api/v1/seats/auto-extension/toggle",
@@ -426,11 +454,16 @@ class DashboardApi {
       if (error instanceof ApiError) {
         switch (error.status) {
           case 400:
-            throw new Error("대기열 요청 정보가 올바르지 않습니다");
+            // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
+            throw new Error(
+              error.message || "대기열 요청 정보가 올바르지 않습니다"
+            );
           case 409:
-            throw new Error("이미 대기열에 등록된 요청이 있습니다");
+            throw new Error(
+              error.message || "이미 대기열에 등록된 요청이 있습니다"
+            );
           default:
-            throw new Error("대기열 등록에 실패했습니다");
+            throw new Error(error.message || "대기열 등록에 실패했습니다");
         }
       }
       throw new Error("네트워크 연결을 확인해주세요");

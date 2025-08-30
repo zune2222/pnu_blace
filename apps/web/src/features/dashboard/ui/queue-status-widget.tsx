@@ -152,7 +152,7 @@ export const QueueStatusWidget: React.FC = () => {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">대기 순서</span>
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              {request.queuePosition}번째
+              {request.queuePosition + 1}번째
             </span>
           </div>
         )}

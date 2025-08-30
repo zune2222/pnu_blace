@@ -32,6 +32,8 @@ export const SeatSelectionModal = ({
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [autoExtensionEnabled, setAutoExtensionEnabled] = useState(false);
+  const [duplicateReservationError, setDuplicateReservationError] = useState<string | null>(null);
+  const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
   const isSeatOccupied =
     seatData?.occupiedSeats.includes(selectedSeat || "") || false;
@@ -94,6 +96,7 @@ export const SeatSelectionModal = ({
     try {
       setIsLoading(true);
       setActionType(type);
+      setDuplicateReservationError(null);
 
       if (type === "reserve") {
         await onReserveSeat(selectedSeat, autoExtensionEnabled);
@@ -103,14 +106,54 @@ export const SeatSelectionModal = ({
 
       onClose();
     } catch (error: any) {
+      // 중복 예약 에러 처리 (409 또는 관련 메시지)
+      if (error.status === 409 || error.message?.includes('이미') || error.message?.includes('대기')) {
+        setDuplicateReservationError(error.message || '이미 다른 좌석을 예약하거나 대기 중입니다.');
+        return;
+      }
+      
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
       // 예상치 못한 에러만 콘솔에 출력
-      if (error.status !== 409 && error.status !== 400) {
+      if (error.status !== 400) {
         console.error("Unexpected action error:", error);
       }
     } finally {
       setIsLoading(false);
       setActionType(null);
+    }
+  };
+
+  // 기존 예약/대기 취소 후 새 예약
+  const handleCancelAndReserve = async (type: "reserve" | "reserve-empty") => {
+    try {
+      setIsProcessingCancel(true);
+      
+      // 기존 예약이나 대기열 요청 취소
+      try {
+        await apiClient.post("/api/v1/seats/return");
+      } catch (returnError) {
+        // 현재 좌석이 없으면 대기열 취소 시도
+        try {
+          await apiClient.post("/api/v1/seats/queue/reservation/cancel");
+        } catch (queueError) {
+          console.warn("Failed to cancel existing reservation/queue:", queueError);
+        }
+      }
+      
+      // 새로운 예약 시도
+      if (type === "reserve") {
+        await onReserveSeat(selectedSeat!, autoExtensionEnabled);
+      } else {
+        await onReserveEmptySeat(selectedSeat!);
+      }
+      
+      setDuplicateReservationError(null);
+      onClose();
+    } catch (error: any) {
+      console.error("Failed to cancel and reserve:", error);
+      setDuplicateReservationError("예약 변경에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsProcessingCancel(false);
     }
   };
 

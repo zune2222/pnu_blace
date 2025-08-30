@@ -1,6 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { InsightItem } from "@/entities/dashboard";
+import { dashboardApi } from "@/entities/dashboard/api";
+import { toast } from "sonner";
+import { X } from "lucide-react";
 
 type InsightType = "prediction" | "tip" | "statistic" | "usage" | "recommendation";
 type QuickInsights = {
@@ -56,14 +59,31 @@ interface QuickInsightsSectionProps {
   quickInsights: QuickInsights | null;
   isLoading: boolean;
   error: string | null;
+  onRefresh?: () => void;
 }
 
 export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
   quickInsights,
   isLoading,
-  error
+  error,
+  onRefresh
 }) => {
   const insights = quickInsights?.items || [];
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  // 대기열 요청 취소
+  const handleCancelQueue = async () => {
+    try {
+      setIsCancelling(true);
+      await dashboardApi.cancelQueueRequest();
+      toast.success("빈자리 예약 대기열에서 취소되었습니다");
+      onRefresh?.(); // 데이터 새로고침
+    } catch (error: any) {
+      toast.error("취소 요청에 실패했습니다: " + error.message);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   // 우선순위별 정렬
   const sortedInsights = insights.sort((a, b) => {
@@ -119,6 +139,24 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = ({
                         {insight.title}
                       </h3>
                     </div>
+                    {/* 대기열 인사이트에 대해서만 취소 버튼 표시 */}
+                    {insight.id === 'queue-waiting' && (
+                      <button
+                        onClick={handleCancelQueue}
+                        disabled={isCancelling}
+                        className="ml-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                        title="대기열 취소"
+                      >
+                        {isCancelling ? (
+                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <>
+                            <X className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">취소</span>
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                   
                   <p className="text-base text-muted-foreground/80 font-light leading-relaxed pl-8">

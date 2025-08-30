@@ -68,7 +68,10 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     return () => window.removeEventListener("message", handleMessage);
   }, [handleSeatClick]);
 
-  const handleReserveSeat = async (seatNo: string, autoExtensionEnabled?: boolean) => {
+  const handleReserveSeat = async (
+    seatNo: string,
+    autoExtensionEnabled?: boolean
+  ) => {
     try {
       setIsReserving(true);
       setError(null);
@@ -99,11 +102,11 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
               isEnabled: true,
               triggerMinutesBefore: 10,
               maxAutoExtensions: 2,
-              timeRestriction: "ALL_TIMES"
+              timeRestriction: "ALL_TIMES",
             });
-            
+
             // 대시보드 위젯에 설정 업데이트 알림
-            window.dispatchEvent(new CustomEvent('autoExtensionConfigUpdated'));
+            window.dispatchEvent(new CustomEvent("autoExtensionConfigUpdated"));
           } catch (configError) {
             console.warn("자동 연장 설정 생성 실패:", configError);
           }
@@ -116,7 +119,9 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
             duration: 5000,
           });
         } else {
-          toast.success(response.message || "좌석이 성공적으로 발권되었습니다!");
+          toast.success(
+            response.message || "좌석이 성공적으로 발권되었습니다!"
+          );
         }
       }
     } catch (err: any) {
@@ -127,7 +132,8 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         // 백엔드에서 제공하는 상세한 메시지 사용
         errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "발권 정보가 올바르지 않습니다.";
+        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
+        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
@@ -163,7 +169,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
 
         // 성공 메시지 표시
         toast.success("빈자리 발권 예약이 완료되었습니다!", {
-          description: `대기열 ${response.queuePosition}번으로 등록되었습니다. 좌석이 비워지면 자동으로 발권됩니다.`,
+          description: `대기열 ${response.queuePosition + 1}번으로 등록되었습니다. 좌석이 비워지면 자동으로 발권됩니다.`,
           duration: 4000,
         });
       }
@@ -175,7 +181,8 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         // 백엔드에서 제공하는 상세한 메시지 사용
         errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
       } else if (err.status === 400) {
-        errorMessage = "발권 정보가 올바르지 않습니다.";
+        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
+        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
