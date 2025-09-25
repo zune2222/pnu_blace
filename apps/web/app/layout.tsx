@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Header, Footer } from "@/widgets";
+import { AnnouncementProvider } from "@/widgets/announcement";
 import { QueryProvider } from "@/providers";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
@@ -167,17 +168,19 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>
-          <div className="min-h-screen bg-background text-foreground flex flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster 
-            richColors 
-            position="bottom-right" 
-            expand={true}
-            visibleToasts={5}
-          />
+          <AnnouncementProvider>
+            <div className="min-h-screen bg-background text-foreground flex flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster 
+              richColors 
+              position="bottom-right" 
+              expand={true}
+              visibleToasts={5}
+            />
+          </AnnouncementProvider>
         </QueryProvider>
         <Analytics />
       </body>
