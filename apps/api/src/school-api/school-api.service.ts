@@ -1032,4 +1032,158 @@ export class SchoolApiService {
 
     return backgroundMap[roomNo] || '/PUSAN_MOBILE/images/1f_reading_zone.jpg';
   }
+
+  /**
+   * 내 자리 이용 내역 조회 (모든 페이지)
+   */
+  async getMySeatHistory(userID: string, sessionID: string) {
+    try {
+      this.logger.debug(`Getting seat history for user: ${userID}`);
+
+      let allRecords: any[] = [];
+      let currentPage = 1;
+      let totalCount = 0;
+      const rowsPerPage = 100;
+
+      do {
+        this.logger.debug(`Fetching page ${currentPage} for user: ${userID}`);
+
+        const response = await this.httpClient.post(
+          '/mySeatHist.do',
+          `rows=${rowsPerPage}&userID=${userID}&roomGB=R&page=${currentPage}`,
+          {
+            headers: {
+              Cookie: `JSESSIONID=${sessionID}`,
+            },
+          },
+        );
+
+        if (response.status === 200 && response.data) {
+          const xmlData = response.data as string;
+          const pageData = this.parseSeatHistoryXml(xmlData);
+          
+          // 첫 번째 페이지에서 총 개수 파악
+          if (currentPage === 1) {
+            totalCount = this.extractTotalCount(xmlData);
+            this.logger.debug(`Total records available: ${totalCount}`);
+          }
+
+          if (pageData.records) {
+            allRecords = allRecords.concat(pageData.records);
+          }
+
+          // 더 이상 가져올 데이터가 없으면 중단
+          if (pageData.records.length < rowsPerPage || allRecords.length >= totalCount) {
+            break;
+          }
+
+          currentPage++;
+        } else {
+          break;
+        }
+      } while (currentPage <= 50); // 안전장치: 최대 50페이지까지만
+
+      this.logger.debug(`Fetched total ${allRecords.length} records for user: ${userID}`);
+      return allRecords;
+    } catch (error: any) {
+      this.logger.error(`Get seat history error: ${error.message}`);
+      return [];
+    }
+  }
+
+  /**
+   * 총 개수 추출
+   */
+  private extractTotalCount(xmlData: string): number {
+    try {
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const totCnt = extractCDATA('totCnt');
+      return parseInt(totCnt) || 0;
+    } catch (error) {
+      this.logger.warn(`Failed to extract total count: ${this.getErrorMessage(error)}`);
+      return 0;
+    }
+  }
+
+  /**
+   * 자리 이용 내역 XML 파싱
+   */
+  private parseSeatHistoryXml(xmlData: string) {
+    try {
+      this.logger.debug(`Parsing seat history XML: ${xmlData.substring(0, 200)}...`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      // resultCode 확인
+      const resultCode = extractCDATA('resultCode');
+      if (resultCode !== '0') {
+        this.logger.warn(`Seat history request failed with code: ${resultCode}`);
+        return { records: [], totalCount: 0 };
+      }
+
+      const seatHistory: any[] = [];
+
+      // 모든 item 태그 추출
+      const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+      let match: RegExpExecArray | null;
+
+      while ((match = itemRegex.exec(xmlData)) !== null) {
+        const itemXml = match[1];
+
+        // 각 item에서 필드 추출
+        const extractFromItem = (tagName: string): string => {
+          const regex = new RegExp(
+            `<${tagName}>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tagName}>`,
+            'i',
+          );
+          const match = itemXml.match(regex);
+          return match ? match[1].trim() : '';
+        };
+
+        const seatRecord = {
+          useDt: extractFromItem('useDt'),
+          roomNo: extractFromItem('roomNo'),
+          roomNm: extractFromItem('roomNm'),
+          seatNo: extractFromItem('seatNo'),
+          startTm: extractFromItem('startTm'),
+          endTm: extractFromItem('endTm'),
+          sRoomStat: extractFromItem('sRoomStat'),
+          sRoomStatNm: extractFromItem('sRoomStatNm'),
+          sRoomMainChkj: extractFromItem('sRoomMainChkj'),
+          sRoomRerveNoj: extractFromItem('sRoomRerveNoj'),
+        };
+
+        // 빈 레코드 필터링
+        if (seatRecord.useDt && seatRecord.roomNm) {
+          seatHistory.push(seatRecord);
+        }
+      }
+
+      const totalCount = this.extractTotalCount(xmlData);
+
+      this.logger.debug(`Parsed ${seatHistory.length} seat history records from page`);
+      return { records: seatHistory, totalCount };
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse seat history XML: ${this.getErrorMessage(error)}`,
+      );
+      return { records: [], totalCount: 0 };
+    }
+  }
 }

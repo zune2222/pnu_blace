@@ -8,6 +8,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { CalendarService } from './calendar.service';
@@ -34,6 +35,106 @@ export class StatsController {
   async getMyStats(@Request() req): Promise<MyUsageStatsDto> {
     const user = req.user;
     return this.statsService.getMyUsageStats(user.studentId);
+  }
+
+  /**
+   * 자리 이용 내역 조회 (학교 API)
+   */
+  @Get('seat-history')
+  @UseGuards(JwtAuthGuard)
+  async getMySeatHistory(@Request() req) {
+    const user = req.user;
+    return this.statsService.getMySeatHistory(user.studentId, user.sessionID);
+  }
+
+  /**
+   * 전체 랭킹 조회
+   */
+  @Get('rankings/all-time')
+  async getAllTimeRankings(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20',
+  ) {
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 20, 100); // 최대 100개
+    return this.statsService.getAllTimeRankings(limitNum, pageNum);
+  }
+
+  /**
+   * 이번주 랭킹 조회
+   */
+  @Get('rankings/weekly')
+  async getWeeklyRankings(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20',
+  ) {
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 20, 100); // 최대 100개
+    return this.statsService.getWeeklyRankings(limitNum, pageNum);
+  }
+
+  /**
+   * 내 랭킹 정보 조회
+   */
+  @Get('my-rank')
+  @UseGuards(JwtAuthGuard)
+  async getMyRankInfo(@Request() req) {
+    const user = req.user;
+    return this.statsService.getUserRankInfo(user.studentId);
+  }
+
+  /**
+   * 랭킹 공개 설정 업데이트
+   */
+  @Post('ranking-privacy')
+  @UseGuards(JwtAuthGuard)
+  async updateRankingPrivacy(
+    @Request() req,
+    @Body() body: { isPublic: boolean; nickname?: string },
+  ) {
+    const user = req.user;
+    return this.statsService.updateRankingPrivacy(
+      user.studentId,
+      body.isPublic,
+      body.nickname,
+    );
+  }
+
+  /**
+   * 랭킹 공개 설정 조회
+   */
+  @Get('privacy-settings')
+  @UseGuards(JwtAuthGuard)
+  async getPrivacySettings(@Request() req) {
+    const user = req.user;
+    return this.statsService.getRankingPrivacySettings(user.studentId);
+  }
+
+  /**
+   * 랭킹 공개 설정 업데이트
+   */
+  @Post('privacy-settings')
+  @UseGuards(JwtAuthGuard)
+  async updatePrivacySettings(
+    @Request() req,
+    @Body() body: { isPublicRanking: boolean; publicNickname?: string },
+  ) {
+    const user = req.user;
+    return this.statsService.updateRankingPrivacy(
+      user.studentId,
+      body.isPublicRanking,
+      body.publicNickname,
+    );
+  }
+
+  /**
+   * 공개 랭킹에서 내 순위 조회
+   */
+  @Get('my-public-rank')
+  @UseGuards(JwtAuthGuard)
+  async getMyPublicRank(@Request() req) {
+    const user = req.user;
+    return this.statsService.getPublicRankPosition(user.studentId);
   }
 
   /**

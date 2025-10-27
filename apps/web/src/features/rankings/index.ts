@@ -1,0 +1,1 @@
+export { RankingsPage } from "./rankings-page";
