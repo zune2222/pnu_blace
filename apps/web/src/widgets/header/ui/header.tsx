@@ -115,6 +115,18 @@ export const Header: React.FC = () => {
               >
                 좌석 찾기
               </Link>
+              <Link
+                href="/stats"
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              >
+                내 통계
+              </Link>
+              <Link
+                href="/rankings"
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              >
+                랭킹
+              </Link>
             </div>
           )}
 
@@ -254,6 +266,20 @@ export const Header: React.FC = () => {
                   className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
                 >
                   좌석 찾기
+                </Link>
+                <Link
+                  href="/stats"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                >
+                  내 통계
+                </Link>
+                <Link
+                  href="/rankings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                >
+                  랭킹
                 </Link>
               </div>
             )}

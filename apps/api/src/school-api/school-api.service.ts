@@ -28,8 +28,7 @@ export class SchoolApiService {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent':
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
+        'User-Agent': 'PNUPlace/2 CFNetwork/3860.200.71 Darwin/2',
         Accept: 'application/json, text/plain, */*',
       },
     });
@@ -87,7 +86,9 @@ export class SchoolApiService {
         throw new UnauthorizedException('유저 키 요청 실패');
       }
 
-      const userKey = userKeyResponse.data as string;
+      // XML 응답에서 secKey 추출
+      const userKeyXml = userKeyResponse.data as string;
+      const userKey = this.parseUserKeyXml(userKeyXml);
       if (!userKey) {
         throw new UnauthorizedException('유저 키 획득 실패');
       }
@@ -106,16 +107,29 @@ export class SchoolApiService {
         },
       );
 
-      // 로그인 결과 검증
-      if (
-        loginResponse.status === 200 &&
-        loginResponse.data?.success !== false
-      ) {
-        return {
-          success: true,
-          userID: studentId,
-          sessionID: jsessionId,
-        };
+      this.logger.debug(
+        `Login response: ${JSON.stringify(loginResponse.data)}`,
+      );
+
+      // XML 응답 파싱하여 로그인 결과 검증
+      if (loginResponse.status === 200 && loginResponse.data) {
+        const xmlData = loginResponse.data as string;
+        const loginResult = this.parseLoginXml(xmlData);
+
+        if (loginResult.success) {
+          return {
+            success: true,
+            userID: studentId,
+            sessionID: jsessionId,
+          };
+        } else {
+          return {
+            success: false,
+            errorMessage:
+              loginResult.errorMessage ||
+              '학번 또는 비밀번호가 올바르지 않습니다.',
+          };
+        }
       } else {
         return {
           success: false,
@@ -190,6 +204,93 @@ export class SchoolApiService {
         );
       }
       return { success: false, message: '좌석 발권 중 오류가 발생했습니다.' };
+    }
+  }
+
+  /**
+   * 유저 키 XML 응답 파싱
+   */
+  private parseUserKeyXml(xmlData: string): string {
+    try {
+      this.logger.debug(`Parsing user key XML: ${xmlData}`);
+
+      // CDATA 섹션에서 secKey 추출
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const resultCode = extractCDATA('resultCode');
+      const secKey = extractCDATA('secKey');
+
+      this.logger.debug(
+        `UserKey result - code: ${resultCode}, secKey: ${secKey}`,
+      );
+
+      // resultCode가 '0'이면 성공
+      if (resultCode === '0' && secKey) {
+        return secKey;
+      } else {
+        throw new Error(`Invalid response code: ${resultCode}`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse user key XML: ${this.getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * 로그인 XML 응답 파싱
+   */
+  private parseLoginXml(xmlData: string): {
+    success: boolean;
+    errorMessage?: string;
+  } {
+    try {
+      this.logger.debug(`Parsing login XML: ${xmlData}`);
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const resultCode = extractCDATA('resultCode');
+      const resultMsg = extractCDATA('resultMsg');
+
+      this.logger.debug(
+        `Login result - code: ${resultCode}, message: ${resultMsg}`,
+      );
+
+      // resultCode가 '0'이면 성공, '1'이면 실패
+      if (resultCode === '0') {
+        return {
+          success: true,
+        };
+      } else {
+        return {
+          success: false,
+          errorMessage: resultMsg || '로그인에 실패했습니다.',
+        };
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse login XML: ${this.getErrorMessage(error)}`,
+      );
+      return {
+        success: false,
+        errorMessage: '응답 처리 중 오류가 발생했습니다.',
+      };
     }
   }
 
@@ -716,7 +817,11 @@ export class SchoolApiService {
       // URL 인코딩 적용
       const urlEncodedPassword = encodeURIComponent(base64EncryptedPassword);
 
-      this.logger.debug(`Password encrypted successfully`);
+      this.logger.debug(
+        `Password encrypted successfully`,
+        `base64EncryptedPassword: ${base64EncryptedPassword}`,
+        `urlEncodedPassword: ${urlEncodedPassword}`,
+      );
       return urlEncodedPassword;
     } catch (error: any) {
       this.logger.error(`Password encryption failed: ${error.message}`);
@@ -1031,5 +1136,172 @@ export class SchoolApiService {
     };
 
     return backgroundMap[roomNo] || '/PUSAN_MOBILE/images/1f_reading_zone.jpg';
+  }
+
+  /**
+   * 내 자리 이용 내역 조회 (모든 페이지)
+   */
+  async getMySeatHistory(userID: string, sessionID: string) {
+    try {
+      this.logger.debug(`Getting seat history for user: ${userID}`);
+
+      let allRecords: any[] = [];
+      let currentPage = 1;
+      let totalCount = 0;
+      const rowsPerPage = 100;
+
+      do {
+        this.logger.debug(`Fetching page ${currentPage} for user: ${userID}`);
+
+        const response = await this.httpClient.post(
+          '/mySeatHist.do',
+          `rows=${rowsPerPage}&userID=${userID}&roomGB=R&page=${currentPage}`,
+          {
+            headers: {
+              Cookie: `JSESSIONID=${sessionID}`,
+            },
+          },
+        );
+
+        if (response.status === 200 && response.data) {
+          const xmlData = response.data as string;
+          const pageData = this.parseSeatHistoryXml(xmlData);
+
+          // 첫 번째 페이지에서 총 개수 파악
+          if (currentPage === 1) {
+            totalCount = this.extractTotalCount(xmlData);
+            this.logger.debug(`Total records available: ${totalCount}`);
+          }
+
+          if (pageData.records) {
+            allRecords = allRecords.concat(pageData.records);
+          }
+
+          // 더 이상 가져올 데이터가 없으면 중단
+          if (
+            pageData.records.length < rowsPerPage ||
+            allRecords.length >= totalCount
+          ) {
+            break;
+          }
+
+          currentPage++;
+        } else {
+          break;
+        }
+      } while (currentPage <= 50); // 안전장치: 최대 50페이지까지만
+
+      this.logger.debug(
+        `Fetched total ${allRecords.length} records for user: ${userID}`,
+      );
+      return allRecords;
+    } catch (error: any) {
+      this.logger.error(`Get seat history error: ${error.message}`);
+      return [];
+    }
+  }
+
+  /**
+   * 총 개수 추출
+   */
+  private extractTotalCount(xmlData: string): number {
+    try {
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      const totCnt = extractCDATA('totCnt');
+      return parseInt(totCnt) || 0;
+    } catch (error) {
+      this.logger.warn(
+        `Failed to extract total count: ${this.getErrorMessage(error)}`,
+      );
+      return 0;
+    }
+  }
+
+  /**
+   * 자리 이용 내역 XML 파싱
+   */
+  private parseSeatHistoryXml(xmlData: string) {
+    try {
+      this.logger.debug(
+        `Parsing seat history XML: ${xmlData.substring(0, 200)}...`,
+      );
+
+      // CDATA 섹션에서 값 추출하는 정규식
+      const extractCDATA = (tagName: string): string => {
+        const regex = new RegExp(
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          'i',
+        );
+        const match = xmlData.match(regex);
+        return match ? match[1].trim() : '';
+      };
+
+      // resultCode 확인
+      const resultCode = extractCDATA('resultCode');
+      if (resultCode !== '0') {
+        this.logger.warn(
+          `Seat history request failed with code: ${resultCode}`,
+        );
+        return { records: [], totalCount: 0 };
+      }
+
+      const seatHistory: any[] = [];
+
+      // 모든 item 태그 추출
+      const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+      let match: RegExpExecArray | null;
+
+      while ((match = itemRegex.exec(xmlData)) !== null) {
+        const itemXml = match[1];
+
+        // 각 item에서 필드 추출
+        const extractFromItem = (tagName: string): string => {
+          const regex = new RegExp(
+            `<${tagName}>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tagName}>`,
+            'i',
+          );
+          const match = itemXml.match(regex);
+          return match ? match[1].trim() : '';
+        };
+
+        const seatRecord = {
+          useDt: extractFromItem('useDt'),
+          roomNo: extractFromItem('roomNo'),
+          roomNm: extractFromItem('roomNm'),
+          seatNo: extractFromItem('seatNo'),
+          startTm: extractFromItem('startTm'),
+          endTm: extractFromItem('endTm'),
+          sRoomStat: extractFromItem('sRoomStat'),
+          sRoomStatNm: extractFromItem('sRoomStatNm'),
+          sRoomMainChkj: extractFromItem('sRoomMainChkj'),
+          sRoomRerveNoj: extractFromItem('sRoomRerveNoj'),
+        };
+
+        // 빈 레코드 필터링
+        if (seatRecord.useDt && seatRecord.roomNm) {
+          seatHistory.push(seatRecord);
+        }
+      }
+
+      const totalCount = this.extractTotalCount(xmlData);
+
+      this.logger.debug(
+        `Parsed ${seatHistory.length} seat history records from page`,
+      );
+      return { records: seatHistory, totalCount };
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse seat history XML: ${this.getErrorMessage(error)}`,
+      );
+      return { records: [], totalCount: 0 };
+    }
   }
 }
