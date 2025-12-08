@@ -9,3 +9,4 @@ export * from "./scheduler.dto";
 export * from "./room.dto";
 export * from "./dashboard.dto";
 export * from "./favorite.dto";
+export * from "./study.dto";
