@@ -6,9 +6,15 @@ import {
 } from "@/features/seat-finder/ui";
 import { useIsFavorite, useToggleFavorite } from "@/entities/favorite";
 import { FavoriteHeart } from "@/shared/ui";
+import { useAuth } from "@/entities/auth";
 
 export const RoomCard = ({ room, onSelect }: RoomCardProps) => {
-  const { data: isFavorite = false } = useIsFavorite(room.roomNo);
+  const { isAuthenticated } = useAuth();
+  // 로그인 시에만 즐겨찾기 상태 조회
+  const { data: isFavorite = false } = useIsFavorite(
+    room.roomNo,
+    isAuthenticated
+  );
   const toggleFavoriteMutation = useToggleFavorite();
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -44,11 +50,14 @@ export const RoomCard = ({ room, onSelect }: RoomCardProps) => {
             utilizationRate={room.useRate}
             remainingSeats={room.remainSeat}
           />
-          <FavoriteHeart
-            isFavorite={isFavorite}
-            onClick={handleToggleFavorite}
-            size="md"
-          />
+          {/* 로그인한 경우에만 즐겨찾기 버튼 표시 */}
+          {isAuthenticated && (
+            <FavoriteHeart
+              isFavorite={isFavorite}
+              onClick={handleToggleFavorite}
+              size="md"
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/entities/auth";
 import { RankingTabs } from "./ui/ranking-tabs";
 import { AllTimeRankings } from "./ui/all-time-rankings";
 import { WeeklyRankings } from "./ui/weekly-rankings";
@@ -10,6 +12,7 @@ type TabType = "all-time" | "weekly";
 
 export const RankingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("all-time");
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,25 +30,41 @@ export const RankingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 내 랭킹 정보 */}
+          {/* 내 랭킹 정보 - 로그인 시에만 */}
           <div className="mb-16">
-            <MyRankingCard />
+            {isAuthenticated ? (
+              <MyRankingCard />
+            ) : (
+              <div className="space-y-8">
+                <h2 className="text-2xl font-light text-foreground">내 랭킹</h2>
+                <div className="border border-border/20 rounded-lg p-8 text-center space-y-4">
+                  <p className="text-muted-foreground/70 font-light">
+                    로그인하면 나의 랭킹을 확인할 수 있어요
+                  </p>
+                  <Link
+                    href="/login"
+                    className="inline-block px-6 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+                  >
+                    로그인하기
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* 랭킹 공개 설정 */}
-          <div className="mb-16">
-            <RankingPrivacySettings />
-          </div>
+          {/* 랭킹 닉네임 설정 - 로그인 시에만 */}
+          {isAuthenticated && (
+            <div className="mb-16">
+              <RankingPrivacySettings />
+            </div>
+          )}
 
           {/* 탭 네비게이션 */}
           <div className="mb-16">
-            <RankingTabs 
-              activeTab={activeTab} 
-              onTabChange={setActiveTab} 
-            />
+            <RankingTabs activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
-          {/* 랭킹 콘텐츠 */}
+          {/* 랭킹 콘텐츠 - 항상 표시 */}
           <div>
             {activeTab === "all-time" ? (
               <AllTimeRankings />

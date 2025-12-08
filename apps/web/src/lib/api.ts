@@ -45,11 +45,11 @@ export class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit & { skipAuth?: boolean } = {}
+    options: RequestInit & { skipAuth?: boolean; noRedirect?: boolean } = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const token = TokenManager.getToken();
-    const { skipAuth, ...fetchOptions } = options;
+    const { skipAuth, noRedirect, ...fetchOptions } = options;
 
     // 기본 헤더 설정
     const headers = new Headers({
@@ -79,8 +79,8 @@ export class ApiClient {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
 
-        // 401 에러 시 자동 로그아웃 및 리다이렉트 (인증 필요 API에서만)
-        if (response.status === 401 && !skipAuth) {
+        // 401 에러 시 자동 로그아웃 및 리다이렉트 (인증 필요 API에서만, noRedirect가 아닐 때)
+        if (response.status === 401 && !skipAuth && !noRedirect) {
           TokenManager.removeToken();
           if (typeof window !== "undefined") {
             window.location.href = "/login";
@@ -112,7 +112,10 @@ export class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, options?: { skipAuth?: boolean; noRedirect?: boolean }): Promise<T> {
+  async get<T>(
+    endpoint: string,
+    options?: { skipAuth?: boolean; noRedirect?: boolean }
+  ): Promise<T> {
     return this.request<T>(endpoint, { method: "GET", ...options });
   }
 

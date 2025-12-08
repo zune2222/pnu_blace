@@ -10,6 +10,77 @@ import {
   UsagePattern,
 } from '@pnu-blace/types';
 
+// 랜덤 닉네임 생성용 단어 목록
+const ADJECTIVES = [
+  '심심한',
+  '열정적인',
+  '졸린',
+  '배고픈',
+  '행복한',
+  '씩씩한',
+  '용감한',
+  '차분한',
+  '활기찬',
+  '부지런한',
+  '느긋한',
+  '신나는',
+  '똑똑한',
+  '귀여운',
+  '멋진',
+  '빛나는',
+  '꾸준한',
+  '의젓한',
+  '반짝이는',
+  '열심인',
+  '즐거운',
+  '평화로운',
+  '당당한',
+  '성실한',
+  '든든한',
+  '따뜻한',
+  '시원한',
+  '상냥한',
+  '다정한',
+  '유쾌한',
+  '명랑한',
+  '씩씩한',
+];
+
+const ANIMALS = [
+  '거북이',
+  '토끼',
+  '호랑이',
+  '사자',
+  '팬더',
+  '코알라',
+  '펭귄',
+  '고양이',
+  '강아지',
+  '여우',
+  '늑대',
+  '곰',
+  '다람쥐',
+  '햄스터',
+  '수달',
+  '부엉이',
+  '독수리',
+  '참새',
+  '비둘기',
+  '앵무새',
+  '돌고래',
+  '고래',
+  '상어',
+  '문어',
+  '해파리',
+  '나비',
+  '벌',
+  '무당벌레',
+  '반딧불이',
+  '용',
+  '유니콘',
+  '봉황',
+];
+
 @Injectable()
 export class StatsService {
   private readonly logger = new Logger(StatsService.name);
@@ -647,7 +718,7 @@ export class StatsService {
         where: { studentId },
       });
 
-      const statsToSave = {
+      const statsToSave: any = {
         studentId,
         totalUsageHours: statsData.totalUsageHours,
         totalSessions: statsData.totalSessions,
@@ -665,10 +736,16 @@ export class StatsService {
       };
 
       if (userStats) {
-        // 업데이트
+        // 기존 사용자 - 닉네임이 없으면 자동 생성
+        if (!userStats.publicNickname) {
+          statsToSave.publicNickname = await this.generateUniqueNickname();
+          statsToSave.isPublicRanking = true;
+        }
         await this.userStatsRepository.update({ studentId }, statsToSave);
       } else {
-        // 새로 생성
+        // 새 사용자 - 랜덤 닉네임 자동 생성
+        statsToSave.publicNickname = await this.generateUniqueNickname();
+        statsToSave.isPublicRanking = true;
         await this.userStatsRepository.save(statsToSave);
       }
 
@@ -692,6 +769,40 @@ export class StatsService {
     if (totalHours < 3000) return 'Master';
     if (totalHours < 5000) return 'Legend';
     return 'Myth';
+  }
+
+  /**
+   * 랜덤 닉네임 생성 (형용사 + 동물)
+   */
+  private generateRandomNickname(): string {
+    const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+    const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+    return `${adjective} ${animal}`;
+  }
+
+  /**
+   * 고유한 랜덤 닉네임 생성 (중복 체크)
+   */
+  private async generateUniqueNickname(): Promise<string> {
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    while (attempts < maxAttempts) {
+      const nickname = this.generateRandomNickname();
+      const existing = await this.userStatsRepository.findOne({
+        where: { publicNickname: nickname },
+      });
+
+      if (!existing) {
+        return nickname;
+      }
+      attempts++;
+    }
+
+    // 50번 시도 후에도 중복이면 숫자 추가
+    const baseNickname = this.generateRandomNickname();
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `${baseNickname}${randomNum}`;
   }
 
   /**
@@ -779,12 +890,12 @@ export class StatsService {
   }
 
   /**
-   * 공개 랭킹 조회 (닉네임으로 공개 설정한 사용자만)
+   * 공개 랭킹 조회 (모든 사용자 자동 참여)
    */
   async getLeaderboards(limit: number = 100) {
     try {
       const [hoursRanking, sessionsRanking, daysRanking] = await Promise.all([
-        // 이용시간 랭킹 (공개 설정한 사용자만)
+        // 이용시간 랭킹
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select([
@@ -793,13 +904,12 @@ export class StatsService {
             'stats.tier',
             'stats.updatedAt',
           ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
+          .where('stats.publicNickname IS NOT NULL')
           .orderBy('stats.totalUsageHours', 'DESC')
           .limit(limit)
           .getRawMany(),
 
-        // 방문횟수 랭킹 (공개 설정한 사용자만)
+        // 방문횟수 랭킹
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select([
@@ -808,13 +918,12 @@ export class StatsService {
             'stats.tier',
             'stats.updatedAt',
           ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
+          .where('stats.publicNickname IS NOT NULL')
           .orderBy('stats.totalSessions', 'DESC')
           .limit(limit)
           .getRawMany(),
 
-        // 이용일수 랭킹 (공개 설정한 사용자만)
+        // 이용일수 랭킹
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select([
@@ -823,8 +932,7 @@ export class StatsService {
             'stats.tier',
             'stats.updatedAt',
           ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
+          .where('stats.publicNickname IS NOT NULL')
           .orderBy('stats.totalDays', 'DESC')
           .limit(limit)
           .getRawMany(),
@@ -842,13 +950,13 @@ export class StatsService {
   }
 
   /**
-   * 이번주 공개 랭킹 조회
+   * 이번주 공개 랭킹 조회 (모든 사용자 자동 참여)
    */
   async getWeeklyLeaderboards(limit: number = 100) {
     try {
       const [weeklyHoursRanking, weeklySessionsRanking, weeklyDaysRanking] =
         await Promise.all([
-          // 이번주 이용시간 랭킹 (공개 설정한 사용자만)
+          // 이번주 이용시간 랭킹
           this.userStatsRepository
             .createQueryBuilder('stats')
             .select([
@@ -857,14 +965,13 @@ export class StatsService {
               'stats.tier',
               'stats.updatedAt',
             ])
-            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-            .andWhere('stats.publicNickname IS NOT NULL')
+            .where('stats.publicNickname IS NOT NULL')
             .andWhere('stats.weeklyUsageHours > 0')
             .orderBy('stats.weeklyUsageHours', 'DESC')
             .limit(limit)
             .getRawMany(),
 
-          // 이번주 방문횟수 랭킹 (공개 설정한 사용자만)
+          // 이번주 방문횟수 랭킹
           this.userStatsRepository
             .createQueryBuilder('stats')
             .select([
@@ -873,14 +980,13 @@ export class StatsService {
               'stats.tier',
               'stats.updatedAt',
             ])
-            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-            .andWhere('stats.publicNickname IS NOT NULL')
+            .where('stats.publicNickname IS NOT NULL')
             .andWhere('stats.weeklySessions > 0')
             .orderBy('stats.weeklySessions', 'DESC')
             .limit(limit)
             .getRawMany(),
 
-          // 이번주 이용일수 랭킹 (공개 설정한 사용자만)
+          // 이번주 이용일수 랭킹
           this.userStatsRepository
             .createQueryBuilder('stats')
             .select([
@@ -889,8 +995,7 @@ export class StatsService {
               'stats.tier',
               'stats.updatedAt',
             ])
-            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-            .andWhere('stats.publicNickname IS NOT NULL')
+            .where('stats.publicNickname IS NOT NULL')
             .andWhere('stats.weeklyDays > 0')
             .orderBy('stats.weeklyDays', 'DESC')
             .limit(limit)
@@ -973,7 +1078,7 @@ export class StatsService {
   }
 
   /**
-   * 랭킹 공개 설정 업데이트
+   * 랭킹 닉네임 업데이트 (모든 사용자 자동 참여, 닉네임만 변경 가능)
    */
   async updateRankingPrivacy(
     studentId: string,
@@ -990,10 +1095,10 @@ export class StatsService {
         throw new NotFoundException('사용자 통계를 찾을 수 없습니다.');
       }
 
-      // 공개 설정하는 경우 닉네임 유효성 검사
-      if (isPublic) {
-        if (!nickname || nickname.trim().length === 0) {
-          throw new Error('랭킹 공개 시 닉네임은 필수입니다.');
+      // 닉네임 변경 시 유효성 검사
+      if (nickname) {
+        if (nickname.trim().length === 0) {
+          throw new Error('닉네임을 입력해주세요.');
         }
 
         if (nickname.length > 20) {
@@ -1011,29 +1116,41 @@ export class StatsService {
         if (existingNickname) {
           throw new Error('이미 사용 중인 닉네임입니다.');
         }
+
+        // 닉네임 업데이트
+        await this.userStatsRepository.update(
+          { studentId },
+          {
+            publicNickname: nickname.trim(),
+          },
+        );
+
+        this.logger.debug(
+          `Updated ranking nickname for user ${studentId}: nickname=${nickname}`,
+        );
+
+        return {
+          success: true,
+          message: '닉네임이 변경되었습니다.',
+        };
       }
 
-      // 업데이트
+      // 닉네임이 없으면 랜덤 닉네임 재생성
+      const newNickname = await this.generateUniqueNickname();
       await this.userStatsRepository.update(
         { studentId },
         {
-          isPublicRanking: isPublic,
-          publicNickname: isPublic ? nickname?.trim() : undefined,
+          publicNickname: newNickname,
         },
-      );
-
-      this.logger.debug(
-        `Updated ranking privacy for user ${studentId}: public=${isPublic}, nickname=${nickname}`,
       );
 
       return {
         success: true,
-        message: isPublic
-          ? '랭킹이 공개되었습니다.'
-          : '랭킹이 비공개로 설정되었습니다.',
+        message: '새로운 랜덤 닉네임이 생성되었습니다.',
+        nickname: newNickname,
       };
     } catch (error: any) {
-      this.logger.error(`Failed to update ranking privacy: ${error.message}`);
+      this.logger.error(`Failed to update ranking nickname: ${error.message}`);
 
       if (error instanceof NotFoundException) {
         throw error;
@@ -1075,7 +1192,7 @@ export class StatsService {
   }
 
   /**
-   * 공개 랭킹에서 사용자의 순위 조회
+   * 랭킹에서 사용자의 순위 조회 (모든 사용자 자동 참여)
    */
   async getPublicRankPosition(studentId: string) {
     try {
@@ -1083,36 +1200,36 @@ export class StatsService {
         where: { studentId },
       });
 
-      if (!userStats || !userStats.isPublicRanking) {
+      if (!userStats) {
         return null;
       }
 
       const [hoursRank, sessionsRank, daysRank] = await Promise.all([
-        // 이용시간 기준 공개 랭킹에서의 순위
+        // 이용시간 기준 랭킹에서의 순위
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select('COUNT(*) + 1', 'rank')
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+          .where('stats.publicNickname IS NOT NULL')
           .andWhere('stats.totalUsageHours > :hours', {
             hours: userStats.totalUsageHours,
           })
           .getRawOne(),
 
-        // 방문횟수 기준 공개 랭킹에서의 순위
+        // 방문횟수 기준 랭킹에서의 순위
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select('COUNT(*) + 1', 'rank')
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+          .where('stats.publicNickname IS NOT NULL')
           .andWhere('stats.totalSessions > :sessions', {
             sessions: userStats.totalSessions,
           })
           .getRawOne(),
 
-        // 이용일수 기준 공개 랭킹에서의 순위
+        // 이용일수 기준 랭킹에서의 순위
         this.userStatsRepository
           .createQueryBuilder('stats')
           .select('COUNT(*) + 1', 'rank')
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+          .where('stats.publicNickname IS NOT NULL')
           .andWhere('stats.totalDays > :days', { days: userStats.totalDays })
           .getRawOne(),
       ]);
@@ -1143,7 +1260,7 @@ export class StatsService {
 
       const skip = (page - 1) * limit;
 
-      // 총 개수와 랭킹 데이터를 동시에 가져오기
+      // 총 개수와 랭킹 데이터를 동시에 가져오기 (모든 사용자 자동 참여)
       const [
         hoursTotal,
         hoursUsers,
@@ -1156,7 +1273,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             totalUsageHours: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1164,7 +1280,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             totalUsageHours: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { totalUsageHours: 'DESC' },
@@ -1175,7 +1290,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             totalSessions: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1183,7 +1297,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             totalSessions: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { totalSessions: 'DESC' },
@@ -1194,7 +1307,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             totalDays: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1202,7 +1314,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             totalDays: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { totalDays: 'DESC' },
@@ -1276,7 +1387,7 @@ export class StatsService {
 
       const skip = (page - 1) * limit;
 
-      // 총 개수와 랭킹 데이터를 동시에 가져오기
+      // 총 개수와 랭킹 데이터를 동시에 가져오기 (모든 사용자 자동 참여)
       const [
         hoursTotal,
         hoursUsers,
@@ -1289,7 +1400,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             weeklyUsageHours: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1297,7 +1407,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             weeklyUsageHours: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { weeklyUsageHours: 'DESC' },
@@ -1308,7 +1417,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             weeklySessions: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1316,7 +1424,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             weeklySessions: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { weeklySessions: 'DESC' },
@@ -1327,7 +1434,6 @@ export class StatsService {
         this.userStatsRepository.count({
           where: {
             weeklyDays: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
         }),
@@ -1335,7 +1441,6 @@ export class StatsService {
         this.userStatsRepository.find({
           where: {
             weeklyDays: MoreThan(0),
-            isPublicRanking: true,
             publicNickname: Not(IsNull()),
           },
           order: { weeklyDays: 'DESC' },
@@ -1395,6 +1500,45 @@ export class StatsService {
     } catch (error: any) {
       this.logger.error(`Failed to get weekly rankings: ${error.message}`);
       throw new Error('주간 랭킹 조회 중 오류가 발생했습니다.');
+    }
+  }
+
+  /**
+   * 기존 사용자에게 랜덤 닉네임 부여 (마이그레이션)
+   */
+  async migrateNicknames() {
+    try {
+      // 닉네임이 없는 모든 사용자 조회
+      const usersWithoutNickname = await this.userStatsRepository.find({
+        where: { publicNickname: IsNull() },
+      });
+
+      this.logger.log(
+        `Found ${usersWithoutNickname.length} users without nickname`,
+      );
+
+      let updated = 0;
+      for (const user of usersWithoutNickname) {
+        const nickname = await this.generateUniqueNickname();
+        await this.userStatsRepository.update(
+          { studentId: user.studentId },
+          {
+            publicNickname: nickname,
+            isPublicRanking: true,
+          },
+        );
+        updated++;
+      }
+
+      this.logger.log(`Migrated ${updated} users with random nicknames`);
+
+      return {
+        success: true,
+        migratedCount: updated,
+      };
+    } catch (error: any) {
+      this.logger.error(`Failed to migrate nicknames: ${error.message}`);
+      throw new Error('닉네임 마이그레이션 중 오류가 발생했습니다.');
     }
   }
 }

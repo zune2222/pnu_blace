@@ -102,41 +102,37 @@ export const Header: React.FC = () => {
 
           {/* 데스크톱 네비게이션 */}
           <div className="hidden md:flex items-center space-x-8">
-          {isAuthenticated && (
-              <>
-              <Link
-                href="/dashboard"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                대시보드
-              </Link>
-              <Link
-                href="/seats"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                좌석 찾기
-              </Link>
-              <Link
-                href="/stats"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                내 통계
-              </Link>
-              <Link
-                href="/rankings"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                랭킹
-                </Link>
-              </>
-            )}
+            <Link
+              href="/dashboard"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              대시보드
+            </Link>
+            <Link
+              href="/seats"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              좌석 찾기
+            </Link>
+            <Link
+              href="/stats"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              내 통계
+            </Link>
+            <Link
+              href="/rankings"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              랭킹
+            </Link>
             <Link
               href="/study"
               className="text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               스터디
-              </Link>
-            </div>
+            </Link>
+          </div>
 
           {/* 데스크톱 액션 버튼 */}
           <div className="hidden md:flex items-center space-x-3">
@@ -256,50 +252,46 @@ export const Header: React.FC = () => {
         >
           <div className="px-2 pt-2 pb-3 space-y-1 bg-background/80 backdrop-blur-sm border-t border-border/40">
             {/* 모바일 네비게이션 */}
-              <div
-                className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-                style={{ transitionDelay: "50ms" }}
+            <div
+              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              style={{ transitionDelay: "50ms" }}
+            >
+              <Link
+                href="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
               >
-              {isAuthenticated && (
-                <>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                >
-                  대시보드
-                </Link>
-                <Link
-                  href="/seats"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                >
-                  좌석 찾기
-                </Link>
-                <Link
-                  href="/stats"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                >
-                  내 통계
-                </Link>
-                <Link
-                  href="/rankings"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
-                >
-                  랭킹
-                  </Link>
-                </>
-              )}
+                대시보드
+              </Link>
+              <Link
+                href="/seats"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+              >
+                좌석 찾기
+              </Link>
+              <Link
+                href="/stats"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+              >
+                내 통계
+              </Link>
+              <Link
+                href="/rankings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+              >
+                랭킹
+              </Link>
               <Link
                 href="/study"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
               >
                 스터디
-                </Link>
-              </div>
+              </Link>
+            </div>
 
             {/* 모바일 테마 토글 */}
             <div

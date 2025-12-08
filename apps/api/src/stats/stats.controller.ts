@@ -84,24 +84,24 @@ export class StatsController {
   }
 
   /**
-   * 랭킹 공개 설정 업데이트
+   * 랭킹 닉네임 변경
    */
   @Post('ranking-privacy')
   @UseGuards(JwtAuthGuard)
-  async updateRankingPrivacy(
+  async updateRankingNickname(
     @Request() req,
-    @Body() body: { isPublic: boolean; nickname?: string },
+    @Body() body: { nickname?: string },
   ) {
     const user = req.user;
     return this.statsService.updateRankingPrivacy(
       user.studentId,
-      body.isPublic,
+      true, // 항상 공개 (자동 참여)
       body.nickname,
     );
   }
 
   /**
-   * 랭킹 공개 설정 조회
+   * 랭킹 설정 조회 (닉네임)
    */
   @Get('privacy-settings')
   @UseGuards(JwtAuthGuard)
@@ -111,20 +111,29 @@ export class StatsController {
   }
 
   /**
-   * 랭킹 공개 설정 업데이트
+   * 랭킹 닉네임 변경
    */
   @Post('privacy-settings')
   @UseGuards(JwtAuthGuard)
   async updatePrivacySettings(
     @Request() req,
-    @Body() body: { isPublicRanking: boolean; publicNickname?: string },
+    @Body() body: { publicNickname?: string },
   ) {
     const user = req.user;
     return this.statsService.updateRankingPrivacy(
       user.studentId,
-      body.isPublicRanking,
+      true, // 항상 공개 (자동 참여)
       body.publicNickname,
     );
+  }
+
+  /**
+   * 닉네임 마이그레이션 (관리자용)
+   */
+  @Post('migrate-nicknames')
+  @UseGuards(JwtAuthGuard)
+  async migrateNicknames() {
+    return this.statsService.migrateNicknames();
   }
 
   /**
