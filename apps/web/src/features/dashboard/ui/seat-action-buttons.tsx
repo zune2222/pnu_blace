@@ -76,7 +76,9 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
   };
 
   // 설정 모달에서 활성화
-  const handleConfigSave = async (newConfig: Partial<AutoExtensionConfigDto>) => {
+  const handleConfigSave = async (
+    newConfig: Partial<AutoExtensionConfigDto>
+  ) => {
     try {
       const updatedConfig = await dashboardApi.updateAutoExtensionConfig({
         ...newConfig,
@@ -97,9 +99,9 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
           onClick={isExtendDisabled ? onExtendDisabledClick : onExtend}
           disabled={isExtending}
           className={`group inline-flex items-center space-x-3 text-lg font-light transition-colors duration-300 disabled:cursor-not-allowed ${
-            isExtendDisabled 
-              ? 'text-muted-foreground/50 cursor-not-allowed' 
-              : 'text-foreground hover:text-muted-foreground disabled:text-muted-foreground/50'
+            isExtendDisabled
+              ? "text-muted-foreground/50 cursor-not-allowed"
+              : "text-foreground hover:text-muted-foreground disabled:text-muted-foreground/50"
           }`}
         >
           <span>{isExtending ? "연장 중..." : "시간 연장"}</span>
@@ -149,43 +151,24 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
           )}
         </button>
 
-        <button
+        {/* 자동 연장 버튼 - 일시 비활성화 */}
+        {/* <button
           onClick={handleAutoExtensionToggle}
           disabled={isToggling || isLoading}
-          className={`group inline-flex items-center space-x-3 text-base font-light transition-colors duration-300 disabled:cursor-not-allowed ${
-            config?.isEnabled 
-              ? 'text-foreground hover:text-muted-foreground' 
-              : 'text-muted-foreground/50 hover:text-muted-foreground disabled:text-muted-foreground/30'
-          }`}
+          className="group inline-flex items-center space-x-3 text-base font-light transition-colors duration-300"
         >
           <span>자동 연장</span>
-          {!isToggling && !isLoading && (
-            <RotateCcw 
-              className={`w-4 h-4 transition-all duration-300 ${
-                config?.isEnabled 
-                  ? 'text-foreground' 
-                  : 'text-muted-foreground/50 group-hover:rotate-12'
-              }`} 
-              style={{
-                ...(config?.isEnabled ? {
-                  animation: 'spin 4s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse',
-                  animationDelay: '0s',
-                } : {}),
-              }}
-            />
-          )}
-          {(isToggling || isLoading) && (
-            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-          )}
-        </button>
+          <RotateCcw className="w-4 h-4" />
+        </button> */}
       </div>
 
-      <AutoExtensionSettingsModal
+      {/* 자동 연장 설정 모달 - 일시 비활성화 */}
+      {/* <AutoExtensionSettingsModal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
         onSave={handleConfigSave}
         initialConfig={config}
-      />
+      /> */}
     </>
   );
 };

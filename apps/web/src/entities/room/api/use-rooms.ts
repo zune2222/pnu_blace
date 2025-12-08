@@ -6,7 +6,8 @@ export const useRooms = () => {
   return useQuery({
     queryKey: ["rooms"],
     queryFn: async (): Promise<RoomInfo[]> => {
-      return apiClient.getRooms();
+      // 공개 API - 비로그인 상태에서도 조회 가능
+      return apiClient.publicGet<RoomInfo[]>("/api/v1/rooms");
     },
     staleTime: 1000 * 60 * 5, // 5분간 fresh 상태 유지
     refetchInterval: 1000 * 60 * 2, // 2분마다 자동 refetch

@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/api";
 import { SeatSelectionModal } from "./ui";
 import React from "react"; // Added for React.Fragment
 import { toast } from "sonner";
+import { useAuth } from "@/entities/auth";
 
 interface SeatDetailPageProps {
   roomNo: string;
@@ -19,6 +20,7 @@ interface SeatDetailPageProps {
 
 export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,12 +33,22 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     setIsModalOpen(true);
   }, []);
 
+  // 비로그인 시 상세 페이지 접근 시도 시 로그인으로 이동
   useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchSeatData = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
+        // 인증 필요한 API: 미인증 시 ApiClient가 로그인으로 리다이렉트
         const data = await apiClient.get<SeatDetailDto>(
           `/api/v1/seats/${roomNo}/detail`
         );
@@ -50,7 +62,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     };
 
     fetchSeatData();
-  }, [roomNo]);
+  }, [roomNo, isAuthenticated]);
 
   // iframe으로부터 메시지 받기
   useEffect(() => {
@@ -249,6 +261,10 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         </div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   if (error || !seatData) {

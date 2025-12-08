@@ -11,7 +11,10 @@ interface SeatSelectionModalProps {
   selectedSeat: string | null;
   roomNo: string;
   seatData: SeatDetailDto | null;
-  onReserveSeat: (seatNo: string, autoExtensionEnabled?: boolean) => Promise<void>;
+  onReserveSeat: (
+    seatNo: string,
+    autoExtensionEnabled?: boolean
+  ) => Promise<void>;
   onReserveEmptySeat: (seatNo: string) => Promise<void>;
 }
 
@@ -32,7 +35,9 @@ export const SeatSelectionModal = ({
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [autoExtensionEnabled, setAutoExtensionEnabled] = useState(false);
-  const [duplicateReservationError, setDuplicateReservationError] = useState<string | null>(null);
+  const [duplicateReservationError, setDuplicateReservationError] = useState<
+    string | null
+  >(null);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
   const isSeatOccupied =
@@ -107,11 +112,17 @@ export const SeatSelectionModal = ({
       onClose();
     } catch (error: any) {
       // 중복 예약 에러 처리 (409 또는 관련 메시지)
-      if (error.status === 409 || error.message?.includes('이미') || error.message?.includes('대기')) {
-        setDuplicateReservationError(error.message || '이미 다른 좌석을 예약하거나 대기 중입니다.');
+      if (
+        error.status === 409 ||
+        error.message?.includes("이미") ||
+        error.message?.includes("대기")
+      ) {
+        setDuplicateReservationError(
+          error.message || "이미 다른 좌석을 예약하거나 대기 중입니다."
+        );
         return;
       }
-      
+
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
       // 예상치 못한 에러만 콘솔에 출력
       if (error.status !== 400) {
@@ -127,7 +138,7 @@ export const SeatSelectionModal = ({
   const handleCancelAndReserve = async (type: "reserve" | "reserve-empty") => {
     try {
       setIsProcessingCancel(true);
-      
+
       // 기존 예약이나 대기열 요청 취소
       try {
         await apiClient.post("/api/v1/seats/return");
@@ -136,22 +147,27 @@ export const SeatSelectionModal = ({
         try {
           await apiClient.post("/api/v1/seats/queue/reservation/cancel");
         } catch (queueError) {
-          console.warn("Failed to cancel existing reservation/queue:", queueError);
+          console.warn(
+            "Failed to cancel existing reservation/queue:",
+            queueError
+          );
         }
       }
-      
+
       // 새로운 예약 시도
       if (type === "reserve") {
         await onReserveSeat(selectedSeat!, autoExtensionEnabled);
       } else {
         await onReserveEmptySeat(selectedSeat!);
       }
-      
+
       setDuplicateReservationError(null);
       onClose();
     } catch (error: any) {
       console.error("Failed to cancel and reserve:", error);
-      setDuplicateReservationError("예약 변경에 실패했습니다. 다시 시도해 주세요.");
+      setDuplicateReservationError(
+        "예약 변경에 실패했습니다. 다시 시도해 주세요."
+      );
     } finally {
       setIsProcessingCancel(false);
     }
@@ -431,74 +447,12 @@ export const SeatSelectionModal = ({
             </div>
           )}
 
-          {/* 자동 연장 옵션 (이용 가능한 좌석인 경우) */}
-          {isSeatAvailable && (
-            <div
-              className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-xl animate-in slide-in-from-top-2 duration-300 delay-150"
-              style={{
-                backgroundColor: document.documentElement.classList.contains(
-                  "dark"
-                )
-                  ? "rgba(30, 58, 138, 0.5)"
-                  : "#eff6ff",
-                borderColor: document.documentElement.classList.contains("dark")
-                  ? "#1e40af"
-                  : "#bfdbfe",
-              }}
-            >
-              <label className="flex items-start space-x-3 cursor-pointer group">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    checked={autoExtensionEnabled}
-                    onChange={(e) => setAutoExtensionEnabled(e.target.checked)}
-                    className="peer sr-only"
-                  />
-                  <div
-                    className={`mt-1 w-5 h-5 border-2 rounded-md transition-all duration-200 ease-in-out
-                      ${autoExtensionEnabled 
-                        ? 'bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500 shadow-lg shadow-blue-500/25' 
-                        : 'bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600 group-hover:border-blue-400 dark:group-hover:border-blue-500'
-                      }
-                      peer-focus:ring-2 peer-focus:ring-blue-500/50 peer-focus:ring-offset-1 dark:peer-focus:ring-offset-gray-800
-                      group-hover:scale-110 group-active:scale-95`}
-                  >
-                    {autoExtensionEnabled && (
-                      <svg 
-                        className="w-3 h-3 text-white absolute inset-0 m-auto animate-in zoom-in duration-200" 
-                        fill="currentColor" 
-                        viewBox="0 0 20 20"
-                      >
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3
-                    className="text-sm font-medium text-blue-900 dark:text-blue-100"
-                    style={{
-                      color: document.documentElement.classList.contains("dark")
-                        ? "#dbeafe"
-                        : "#1e3a8a",
-                    }}
-                  >
-                    자동 연장 활성화
-                  </h3>
-                  <p
-                    className="text-sm text-blue-700 dark:text-blue-300 mt-1"
-                    style={{
-                      color: document.documentElement.classList.contains("dark")
-                        ? "#93c5fd"
-                        : "#1d4ed8",
-                    }}
-                  >
-                    시간이 얼마 남지 않았을 때 자동으로 연장합니다
-                  </p>
-                </div>
-              </label>
+          {/* 자동 연장 옵션 - 임시 비활성화 */}
+          {/* {isSeatAvailable && (
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-xl">
+              자동 연장 옵션 (일시 중단)
             </div>
-          )}
+          )} */}
 
           {/* 액션 버튼들 */}
           <div className="space-y-3 animate-in slide-in-from-bottom-2 duration-300 delay-200">
@@ -518,20 +472,48 @@ export const SeatSelectionModal = ({
               </button>
             )}
 
+            {/* 빈자리 예약 기능 일시 중단 */}
             {isSeatOccupied && (
-              <button
-                onClick={() => handleAction("reserve-empty")}
-                disabled={isLoading}
-                className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
-                  isLoading && actionType === "reserve-empty"
-                    ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    : "bg-green-500 dark:bg-green-600 text-white hover:bg-green-600 dark:hover:bg-green-700 shadow-lg hover:shadow-xl dark:shadow-green-500/25"
-                }`}
+              <div
+                className="p-4 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl"
+                style={{
+                  backgroundColor: document.documentElement.classList.contains(
+                    "dark"
+                  )
+                    ? "rgba(120, 53, 15, 0.3)"
+                    : "#fffbeb",
+                  borderColor: document.documentElement.classList.contains(
+                    "dark"
+                  )
+                    ? "#92400e"
+                    : "#fcd34d",
+                }}
               >
-                {isLoading && actionType === "reserve-empty"
-                  ? "예약 중..."
-                  : "빈자리 발권 예약하기"}
-              </button>
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <p
+                    className="text-sm font-medium text-amber-800 dark:text-amber-200"
+                    style={{
+                      color: document.documentElement.classList.contains("dark")
+                        ? "#fcd34d"
+                        : "#92400e",
+                    }}
+                  >
+                    빈자리 예약 기능 일시 중단
+                  </p>
+                </div>
+                <p
+                  className="text-xs mt-2 text-amber-700 dark:text-amber-300"
+                  style={{
+                    color: document.documentElement.classList.contains("dark")
+                      ? "#fbbf24"
+                      : "#b45309",
+                  }}
+                >
+                  빈자리 예약 기능은 점검 중입니다. 좌석이 비면 직접
+                  발권해주세요.
+                </p>
+              </div>
             )}
 
             {isSeatUnavailable && (

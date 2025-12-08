@@ -45,19 +45,20 @@ export class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { skipAuth?: boolean; noRedirect?: boolean } = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const token = TokenManager.getToken();
+    const { skipAuth, noRedirect, ...fetchOptions } = options;
 
     // 기본 헤더 설정
     const headers = new Headers({
       "Content-Type": "application/json",
-      ...options.headers,
+      ...fetchOptions.headers,
     });
 
-    // 인증 토큰 추가
-    if (token) {
+    // 인증 토큰 추가 (skipAuth가 아닐 때만)
+    if (token && !skipAuth) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
@@ -67,7 +68,7 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, {
-        ...options,
+        ...fetchOptions,
         headers,
         signal: controller.signal,
       });
@@ -77,16 +78,15 @@ export class ApiClient {
       // 에러 처리
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        // 401 에러 시 자동 로그아웃
-        if (response.status === 401) {
+
+        // 401 에러 시 자동 로그아웃 및 리다이렉트 (인증 필요 API에서만, noRedirect가 아닐 때)
+        if (response.status === 401 && !skipAuth && !noRedirect) {
           TokenManager.removeToken();
-          // 로그인 페이지로 리다이렉트
           if (typeof window !== "undefined") {
             window.location.href = "/login";
           }
         }
-        
+
         throw new ApiError(
           response.status,
           errorData.message || `HTTP Error: ${response.status}`,
@@ -112,8 +112,21 @@ export class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "GET" });
+  async get<T>(
+    endpoint: string,
+    options?: { skipAuth?: boolean; noRedirect?: boolean }
+  ): Promise<T> {
+    return this.request<T>(endpoint, { method: "GET", ...options });
+  }
+
+  // Public API용 (토큰 없이 호출)
+  async publicGet<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, { method: "GET", skipAuth: true });
+  }
+
+  // 인증 체크용 (401시 리다이렉트 안함)
+  async authCheck<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, { method: "GET", noRedirect: true });
   }
 
   async post<T>(endpoint: string, data?: any): Promise<T> {

@@ -14,6 +14,11 @@ import {
   QueueRequest,
   FavoriteRoom,
   UserStats,
+  StudyGroup,
+  StudyMember,
+  JoinRequest,
+  AttendanceRecord,
+  VacationRequest,
 } from '@pnu-blace/db';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -24,6 +29,7 @@ import { StatsModule } from './stats/stats.module';
 import { SchoolApiModule } from './school-api/school-api.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { StudyModule } from './study/study.module';
 
 @Module({
   imports: [
@@ -53,9 +59,17 @@ import { FavoritesModule } from './favorites/favorites.module';
           QueueRequest,
           FavoriteRoom,
           UserStats,
+          StudyGroup,
+          StudyMember,
+          JoinRequest,
+          AttendanceRecord,
+          VacationRequest,
         ], // 모든 엔티티 클래스 추가
         synchronize: true, // 개발 환경에서는 true로 설정하여 테이블 자동 생성
-        logging: true,
+        logging:
+          configService.get('NODE_ENV') === 'development'
+            ? ['error', 'warn', 'schema']
+            : ['error'],
       }),
     }),
 
@@ -69,6 +83,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     SchedulerModule,
     StatsModule,
     FavoritesModule,
+    StudyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

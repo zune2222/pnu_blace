@@ -28,12 +28,15 @@ export const useFavoriteRooms = () => {
 
 /**
  * 특정 열람실의 즐겨찾기 상태 확인 훅
+ * @param roomNo 열람실 번호
+ * @param enabled 쿼리 활성화 여부 (기본값: true)
  */
-export const useIsFavorite = (roomNo: string) => {
+export const useIsFavorite = (roomNo: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: favoriteKeys.isFavorite(roomNo),
     queryFn: async () => await favoriteApi.isFavorite(roomNo),
     staleTime: 1000 * 60 * 5, // 5분
+    enabled, // 비로그인 시 API 호출 방지
   });
 };
 

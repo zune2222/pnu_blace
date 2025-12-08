@@ -217,7 +217,6 @@ export class SeatReservationService {
     }
   }
 
-
   /**
    * 좌석 연장
    */

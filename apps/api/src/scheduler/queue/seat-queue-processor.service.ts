@@ -15,17 +15,17 @@ export class SeatQueueProcessorService {
   async processQueue() {
     try {
       this.logger.debug('Processing seat reservation queue...');
-      
+
       const result = await this.seatQueueService.processQueue();
-      
+
       if (result.processed > 0) {
         this.logger.log(
-          `Queue processed: ${result.successful} successful, ${result.failed} failed`
+          `Queue processed: ${result.successful} successful, ${result.failed} failed`,
         );
       }
     } catch (error) {
       this.logger.error(
-        `Queue processing failed: ${error instanceof Error ? error.message : String(error)}`
+        `Queue processing failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -37,15 +37,15 @@ export class SeatQueueProcessorService {
   async cleanupOldQueue() {
     try {
       this.logger.debug('Cleaning up old queue requests...');
-      
+
       const result = await this.seatQueueService.cleanupOldRequests();
-      
+
       if (result.cleaned > 0) {
         this.logger.log(`Cleaned up ${result.cleaned} old queue requests`);
       }
     } catch (error) {
       this.logger.error(
-        `Queue cleanup failed: ${error instanceof Error ? error.message : String(error)}`
+        `Queue cleanup failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
