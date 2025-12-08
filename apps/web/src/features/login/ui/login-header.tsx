@@ -1,25 +1,34 @@
 "use client";
 import React from "react";
-import Link from "next/link";
+import Image from "next/image";
 
 export const LoginHeader: React.FC = () => {
   return (
-    <div className="text-center mb-16">
-      <Link href="/" className="inline-block mb-12 group">
-        <h1 className="text-6xl md:text-7xl font-black text-foreground dynamic-weight cursor-pointer">
+    <div className="text-center mb-10">
+      {/* 로고 영역 */}
+      <div className="mb-6">
+        <Image
+          src="/pnu_logo_trans.png"
+          alt="PNU Blace 로고"
+          width={100}
+          height={100}
+          className="mx-auto mb-4"
+        />
+        <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
           PNU Blace
         </h1>
-      </Link>
-      <div className="space-y-6">
-        <h2 className="text-4xl md:text-5xl font-light text-foreground variable-weight-hover cursor-default">
-          로그인
-        </h2>
-        <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-md mx-auto">
-          부산대학교 도서관 좌석 시스템에
-          <br />
-          로그인하여 시작하세요
+        <p className="text-white/90 text-lg mt-1">
+          부산대학교 도서관
+        </p>
+        <p className="text-white/90 text-lg">
+          좌석배정앱
         </p>
       </div>
+
+      {/* 안내 문구 */}
+      <p className="text-white/70 text-sm">
+        아이디와 비밀번호는 부산대학교 홈페이지와 동일합니다
+      </p>
     </div>
   );
 };

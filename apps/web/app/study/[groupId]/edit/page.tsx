@@ -9,3 +9,5 @@ export default function StudyEditRoute() {
 
   return <StudyEditPage groupId={groupId} />;
 }
+
+
