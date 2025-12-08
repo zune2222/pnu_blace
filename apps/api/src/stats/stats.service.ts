@@ -1502,43 +1502,4 @@ export class StatsService {
       throw new Error('주간 랭킹 조회 중 오류가 발생했습니다.');
     }
   }
-
-  /**
-   * 기존 사용자에게 랜덤 닉네임 부여 (마이그레이션)
-   */
-  async migrateNicknames() {
-    try {
-      // 닉네임이 없는 모든 사용자 조회
-      const usersWithoutNickname = await this.userStatsRepository.find({
-        where: { publicNickname: IsNull() },
-      });
-
-      this.logger.log(
-        `Found ${usersWithoutNickname.length} users without nickname`,
-      );
-
-      let updated = 0;
-      for (const user of usersWithoutNickname) {
-        const nickname = await this.generateUniqueNickname();
-        await this.userStatsRepository.update(
-          { studentId: user.studentId },
-          {
-            publicNickname: nickname,
-            isPublicRanking: true,
-          },
-        );
-        updated++;
-      }
-
-      this.logger.log(`Migrated ${updated} users with random nicknames`);
-
-      return {
-        success: true,
-        migratedCount: updated,
-      };
-    } catch (error: any) {
-      this.logger.error(`Failed to migrate nicknames: ${error.message}`);
-      throw new Error('닉네임 마이그레이션 중 오류가 발생했습니다.');
-    }
-  }
 }

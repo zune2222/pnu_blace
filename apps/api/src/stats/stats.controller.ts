@@ -128,15 +128,6 @@ export class StatsController {
   }
 
   /**
-   * 닉네임 마이그레이션 (관리자용)
-   */
-  @Post('migrate-nicknames')
-  @UseGuards(JwtAuthGuard)
-  async migrateNicknames() {
-    return this.statsService.migrateNicknames();
-  }
-
-  /**
    * 공개 랭킹에서 내 순위 조회
    */
   @Get('my-public-rank')
