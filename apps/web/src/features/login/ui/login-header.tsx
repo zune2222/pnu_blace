@@ -17,12 +17,7 @@ export const LoginHeader: React.FC = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
           PNU Blace
         </h1>
-        <p className="text-white/90 text-lg mt-1">
-          부산대학교 도서관
-        </p>
-        <p className="text-white/90 text-lg">
-          좌석배정앱
-        </p>
+        <p className="text-white/90 text-lg mt-1">부산대학교 도서관</p>
       </div>
 
       {/* 안내 문구 */}
