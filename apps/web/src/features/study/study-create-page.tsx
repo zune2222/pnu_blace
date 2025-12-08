@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
 import { useCreateStudyGroup, StudyVisibility } from "@/entities/study";
 
@@ -57,17 +58,17 @@ export const StudyCreatePage: React.FC = () => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
-      alert("스터디 이름을 입력해주세요.");
+      toast.error("스터디 이름을 입력해주세요.");
       return;
     }
 
     if (formData.visibility === "PASSWORD" && !formData.password) {
-      alert("비밀번호를 입력해주세요.");
+      toast.error("비밀번호를 입력해주세요.");
       return;
     }
 
     if (formData.operatingDays.length === 0) {
-      alert("운영 요일을 선택해주세요.");
+      toast.error("운영 요일을 선택해주세요.");
       return;
     }
 
@@ -95,10 +96,10 @@ export const StudyCreatePage: React.FC = () => {
         displayName: formData.displayName.trim() || undefined,
       });
 
-      alert("스터디가 생성되었습니다!");
+      toast.success("스터디가 생성되었습니다!");
       router.push(`/study/${result.groupId}`);
     } catch (error: any) {
-      alert(error.message || "스터디 생성에 실패했습니다.");
+      toast.error(error.message || "스터디 생성에 실패했습니다.");
     }
   };
 

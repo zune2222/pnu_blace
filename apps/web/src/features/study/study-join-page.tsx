@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
 import { useJoinWithInviteCode } from "@/entities/study";
 
@@ -17,12 +18,12 @@ export const StudyJoinPage: React.FC = () => {
     e.preventDefault();
 
     if (!inviteCode.trim()) {
-      alert("초대 코드를 입력해주세요.");
+      toast.error("초대 코드를 입력해주세요.");
       return;
     }
 
     if (!displayName.trim()) {
-      alert("닉네임을 입력해주세요.");
+      toast.error("닉네임을 입력해주세요.");
       return;
     }
 
@@ -32,10 +33,10 @@ export const StudyJoinPage: React.FC = () => {
         displayName: displayName.trim(),
       });
 
-      alert("스터디에 가입되었습니다!");
+      toast.success("스터디에 가입되었습니다!");
       router.push(`/study/${result.data?.groupId || ""}`);
     } catch (error: any) {
-      alert(error.message || "가입에 실패했습니다.");
+      toast.error(error.message || "가입에 실패했습니다.");
     }
   };
 

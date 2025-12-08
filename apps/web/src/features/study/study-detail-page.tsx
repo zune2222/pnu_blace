@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   useStudyGroupDetail,
   useTodayAttendance,
@@ -78,15 +79,17 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
         dto: { message: joinMessage },
       });
       setShowJoinModal(false);
-      alert("참가 신청이 완료되었습니다. 스터디장의 승인을 기다려주세요.");
+      toast.success(
+        "참가 신청이 완료되었습니다. 스터디장의 승인을 기다려주세요."
+      );
     } catch (error: any) {
-      alert(error.message || "참가 신청에 실패했습니다.");
+      toast.error(error.message || "참가 신청에 실패했습니다.");
     }
   };
 
   const handleJoinWithPassword = async () => {
     if (!password || !displayName) {
-      alert("비밀번호와 닉네임을 입력해주세요.");
+      toast.error("비밀번호와 닉네임을 입력해주세요.");
       return;
     }
 
@@ -96,10 +99,10 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
         dto: { password, displayName },
       });
       setShowPasswordModal(false);
-      alert("스터디에 가입되었습니다!");
+      toast.success("스터디에 가입되었습니다!");
       router.push(`/study/${groupId}`);
     } catch (error: any) {
-      alert(error.message || "가입에 실패했습니다.");
+      toast.error(error.message || "가입에 실패했습니다.");
     }
   };
 

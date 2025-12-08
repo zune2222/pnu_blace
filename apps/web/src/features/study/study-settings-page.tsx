@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
 import {
   useStudyGroupDetail,
@@ -54,10 +55,10 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
             groupId,
             newOwnerId: member.studentId,
           });
-          alert("스터디장이 위임되었습니다.");
+          toast.success("스터디장이 위임되었습니다.");
           refetchMembers();
         } catch (error: any) {
-          alert(error.message || "위임에 실패했습니다.");
+          toast.error(error.message || "위임에 실패했습니다.");
         }
       }
     } else {
@@ -67,10 +68,10 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
           memberId,
           role: newRole,
         });
-        alert("역할이 변경되었습니다.");
+        toast.success("역할이 변경되었습니다.");
         refetchMembers();
       } catch (error: any) {
-        alert(error.message || "역할 변경에 실패했습니다.");
+        toast.error(error.message || "역할 변경에 실패했습니다.");
       }
     }
   };
@@ -79,10 +80,10 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
     if (!confirm(`정말로 ${displayName}님을 내보내시겠습니까?`)) return;
     try {
       await kickMutation.mutateAsync({ groupId, memberId });
-      alert("멤버가 내보내졌습니다.");
+      toast.success("멤버가 내보내졌습니다.");
       refetchMembers();
     } catch (error: any) {
-      alert(error.message || "멤버 내보내기에 실패했습니다.");
+      toast.error(error.message || "멤버 내보내기에 실패했습니다.");
     }
   };
 
@@ -97,11 +98,11 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
         status: "APPROVED",
         displayName,
       });
-      alert("참가 신청이 승인되었습니다.");
+      toast.success("참가 신청이 승인되었습니다.");
       refetchRequests();
       refetchMembers();
     } catch (error: any) {
-      alert(error.message || "승인에 실패했습니다.");
+      toast.error(error.message || "승인에 실패했습니다.");
     }
   };
 
@@ -114,10 +115,10 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
         status: "REJECTED",
         rejectionReason: reason || undefined,
       });
-      alert("참가 신청이 거절되었습니다.");
+      toast.success("참가 신청이 거절되었습니다.");
       refetchRequests();
     } catch (error: any) {
-      alert(error.message || "거절에 실패했습니다.");
+      toast.error(error.message || "거절에 실패했습니다.");
     }
   };
 
@@ -131,10 +132,10 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
 
     try {
       await deleteMutation.mutateAsync(groupId);
-      alert("스터디가 삭제되었습니다.");
+      toast.success("스터디가 삭제되었습니다.");
       router.push("/study");
     } catch (error: any) {
-      alert(error.message || "삭제에 실패했습니다.");
+      toast.error(error.message || "삭제에 실패했습니다.");
     }
   };
 
@@ -143,7 +144,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
       const result = await studyApi.getInviteCode(groupId);
       setInviteCode(result.inviteCode);
     } catch (error: any) {
-      alert(error.message || "초대 코드 조회에 실패했습니다.");
+      toast.error(error.message || "초대 코드 조회에 실패했습니다.");
     }
   };
 

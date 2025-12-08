@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
 import {
   useStudyGroupDetail,
@@ -84,12 +85,12 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
-      alert("스터디 이름을 입력해주세요.");
+      toast.error("스터디 이름을 입력해주세요.");
       return;
     }
 
     if (formData.operatingDays.length === 0) {
-      alert("운영 요일을 선택해주세요.");
+      toast.error("운영 요일을 선택해주세요.");
       return;
     }
 
@@ -118,10 +119,10 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
         },
       });
 
-      alert("스터디 정보가 수정되었습니다!");
+      toast.success("스터디 정보가 수정되었습니다!");
       router.push(`/study/${groupId}/settings`);
     } catch (error: any) {
-      alert(error.message || "스터디 수정에 실패했습니다.");
+      toast.error(error.message || "스터디 수정에 실패했습니다.");
     }
   };
 
