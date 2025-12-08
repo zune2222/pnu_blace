@@ -52,12 +52,12 @@ export const StudyListPage: React.FC = () => {
         {/* 헤더 섹션 */}
         <div className="py-16 md:py-24 border-b border-border/20">
           <div className="space-y-8">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-extralight text-foreground leading-tight mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight text-foreground leading-tight mb-3 md:mb-4">
                   스터디
                 </h1>
-                <p className="text-lg text-muted-foreground/70 font-light">
+                <p className="text-base md:text-lg text-muted-foreground/70 font-light">
                   함께 공부하고, 서로의 출퇴근을 확인하세요
                 </p>
               </div>
@@ -65,7 +65,7 @@ export const StudyListPage: React.FC = () => {
               {isAuthenticated && (
                 <Link
                   href="/study/create"
-                  className="px-6 py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
                 >
                   스터디 만들기
                 </Link>
@@ -73,19 +73,22 @@ export const StudyListPage: React.FC = () => {
             </div>
 
             {/* 검색 */}
-            <form onSubmit={handleSearch} className="flex gap-4">
+            <form
+              onSubmit={handleSearch}
+              className="flex flex-col sm:flex-row gap-2 sm:gap-4"
+            >
               <div className="flex-1 relative">
                 <input
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="스터디 이름으로 검색..."
-                  className="w-full px-4 py-3 bg-muted-foreground/5 border border-border/20 rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-border/40 font-light"
+                  className="w-full px-4 py-2 md:py-3 bg-muted-foreground/5 border border-border/20 rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-border/40 font-light text-sm md:text-base"
                 />
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                className="px-4 md:px-6 py-2 md:py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors whitespace-nowrap"
               >
                 검색
               </button>

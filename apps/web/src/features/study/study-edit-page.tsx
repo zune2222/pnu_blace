@@ -226,7 +226,7 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
                 공개 설정
               </h2>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { value: "PUBLIC", icon: "🌍", label: "공개" },
                   { value: "PASSWORD", icon: "🔐", label: "비밀번호" },
@@ -316,7 +316,7 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
                 <label className="block text-sm text-muted-foreground/70 font-light mb-3">
                   운영 요일 <span className="text-red-400">*</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {DAYS.map((day) => {
                     const isSelected = formData.operatingDays.includes(
                       day.value
@@ -339,7 +339,7 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-muted-foreground/70 font-light mb-2">
                     출근 시작
@@ -366,7 +366,7 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-muted-foreground/70 font-light mb-2">
                     최소 퇴근 시간
@@ -402,17 +402,17 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
             </section>
 
             {/* 제출 버튼 */}
-            <div className="flex gap-3 pt-6 border-t border-border/20">
+            <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-border/20">
               <Link
                 href={`/study/${groupId}/settings`}
-                className="flex-1 px-6 py-3.5 bg-transparent border border-border/30 text-muted-foreground/70 rounded-xl text-sm font-light hover:bg-foreground/5 hover:text-foreground transition-all text-center"
+                className="flex-1 px-4 md:px-6 py-3 md:py-3.5 bg-transparent border border-border/30 text-muted-foreground/70 rounded-xl text-sm font-light hover:bg-foreground/5 hover:text-foreground transition-all text-center"
               >
                 취소
               </Link>
               <button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="flex-1 px-6 py-3.5 bg-foreground text-background rounded-xl text-sm font-light hover:bg-foreground/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 md:px-6 py-3 md:py-3.5 bg-foreground text-background rounded-xl text-sm font-light hover:bg-foreground/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updateMutation.isPending ? "저장 중..." : "저장"}
               </button>
@@ -423,5 +423,3 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
     </AuthGuard>
   );
 };
-
-

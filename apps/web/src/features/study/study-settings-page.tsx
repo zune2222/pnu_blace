@@ -88,15 +88,11 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
   };
 
   const handleApprove = async (requestId: string) => {
-    const displayName = prompt("멤버의 스터디 내 닉네임을 입력하세요:");
-    if (!displayName) return;
-
     try {
       await processRequestMutation.mutateAsync({
         groupId,
         requestId,
         status: "APPROVED",
-        displayName,
       });
       toast.success("참가 신청이 승인되었습니다.");
       refetchRequests();
@@ -179,7 +175,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
           </h1>
 
           {/* 탭 */}
-          <div className="flex gap-4 border-b border-border/20 mb-8">
+          <div className="flex gap-2 md:gap-4 border-b border-border/20 mb-6 md:mb-8 overflow-x-auto">
             {[
               { id: "members", label: "멤버 관리" },
               { id: "requests", label: `참가 신청 (${requests?.length || 0})` },
@@ -188,7 +184,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 px-2 text-sm font-light transition-colors ${
+                className={`pb-3 px-2 md:px-4 text-xs md:text-sm font-light transition-colors whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
                     ? "text-foreground border-b-2 border-foreground"
                     : "text-muted-foreground/60 hover:text-foreground"
@@ -202,13 +198,13 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
           {/* 멤버 관리 탭 */}
           {activeTab === "members" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-light text-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <h2 className="text-base md:text-lg font-light text-foreground">
                   멤버 ({members?.length || 0}명)
                 </h2>
                 <button
                   onClick={handleShowInviteCode}
-                  className="px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                  className="px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors whitespace-nowrap self-start sm:self-auto"
                 >
                   초대 코드 보기
                 </button>
@@ -228,14 +224,14 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
               {members?.map((member) => (
                 <div
                   key={member.memberId}
-                  className="flex items-center justify-between p-4 bg-background border border-border/20 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-background border border-border/20 rounded-lg"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-muted-foreground/10 flex items-center justify-center text-lg font-light text-muted-foreground/60">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-muted-foreground/10 flex items-center justify-center text-lg font-light text-muted-foreground/60 shrink-0">
                       {member.displayName.charAt(0)}
                     </div>
-                    <div>
-                      <p className="text-sm font-light text-foreground">
+                    <div className="min-w-0">
+                      <p className="text-sm font-light text-foreground truncate">
                         {member.displayName}
                       </p>
                       <p className="text-xs text-muted-foreground/50 font-light">
@@ -249,7 +245,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                   </div>
 
                   {member.role !== "OWNER" && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
                       <select
                         value={member.role}
                         onChange={(e) =>
@@ -258,7 +254,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                             e.target.value as StudyMemberRole
                           )
                         }
-                        className="px-3 py-1.5 bg-muted-foreground/5 border border-border/20 rounded text-sm font-light"
+                        className="px-3 py-1.5 bg-muted-foreground/5 border border-border/20 rounded text-sm font-light w-full sm:w-auto"
                       >
                         <option value="MEMBER">멤버</option>
                         <option value="ADMIN">부스터디장</option>
@@ -268,7 +264,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                         onClick={() =>
                           handleKick(member.memberId, member.displayName)
                         }
-                        className="px-3 py-1.5 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors"
+                        className="px-3 py-1.5 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors whitespace-nowrap"
                       >
                         내보내기
                       </button>
@@ -298,30 +294,35 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                     key={request.requestId}
                     className="p-4 bg-background border border-border/20 rounded-lg"
                   >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-light text-foreground">
-                          {request.studentName}
-                        </p>
-                        <p className="text-xs text-muted-foreground/50 font-light">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-light text-foreground break-words">
+                            {request.studentName}
+                          </p>
+                          <p className="text-xs text-muted-foreground/60 font-light">
+                            닉네임: {request.displayName}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground/50 font-light mt-1">
                           {new Date(request.createdAt).toLocaleString("ko-KR")}
                         </p>
                         {request.message && (
-                          <p className="text-sm text-muted-foreground/70 font-light mt-2 p-2 bg-muted-foreground/5 rounded">
+                          <p className="text-sm text-muted-foreground/70 font-light mt-2 p-2 bg-muted-foreground/5 rounded break-words">
                             "{request.message}"
                           </p>
                         )}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 shrink-0">
                         <button
                           onClick={() => handleApprove(request.requestId)}
-                          className="px-4 py-2 bg-green-500/10 text-green-500 rounded text-sm font-light hover:bg-green-500/20 transition-colors"
+                          className="flex-1 sm:flex-none px-4 py-2 bg-green-500/10 text-green-500 rounded text-sm font-light hover:bg-green-500/20 transition-colors whitespace-nowrap"
                         >
                           승인
                         </button>
                         <button
                           onClick={() => handleReject(request.requestId)}
-                          className="px-4 py-2 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors"
+                          className="flex-1 sm:flex-none px-4 py-2 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors whitespace-nowrap"
                         >
                           거절
                         </button>

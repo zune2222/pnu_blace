@@ -305,22 +305,14 @@ export const useProcessJoinRequest = () => {
       groupId,
       requestId,
       status,
-      displayName,
       rejectionReason,
     }: {
       groupId: string;
       requestId: string;
       status: "APPROVED" | "REJECTED";
-      displayName?: string;
       rejectionReason?: string;
     }) =>
-      studyApi.processJoinRequest(
-        groupId,
-        requestId,
-        status,
-        displayName,
-        rejectionReason
-      ),
+      studyApi.processJoinRequest(groupId, requestId, status, rejectionReason),
     onSuccess: (_, { groupId }) => {
       queryClient.invalidateQueries({
         queryKey: studyQueryKeys.detail(groupId),

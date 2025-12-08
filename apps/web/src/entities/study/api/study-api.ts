@@ -233,12 +233,11 @@ class StudyApi {
     groupId: string,
     requestId: string,
     status: "APPROVED" | "REJECTED",
-    displayName?: string,
     rejectionReason?: string
   ): Promise<StudyActionResponse> {
     return apiClient.put<StudyActionResponse>(
       `/api/v1/study-groups/${groupId}/requests/${requestId}`,
-      { status, displayName, rejectionReason }
+      { status, rejectionReason }
     );
   }
 }

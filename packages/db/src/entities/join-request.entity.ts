@@ -29,6 +29,10 @@ export class JoinRequest {
 	@Column({ type: "text", nullable: true })
 	message?: string;
 
+	// 신청자가 입력한 스터디 내 닉네임
+	@Column({ type: "text", nullable: true })
+	displayName?: string;
+
 	// 상태
 	@Column({ type: "varchar", length: 20, default: "PENDING" })
 	status!: JoinRequestStatus;

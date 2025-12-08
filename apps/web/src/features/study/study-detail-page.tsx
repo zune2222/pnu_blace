@@ -43,6 +43,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState("");
+  const [joinDisplayName, setJoinDisplayName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [joinMessage, setJoinMessage] = useState("");
 
@@ -73,12 +74,19 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   };
 
   const handleRequestJoin = async () => {
+    if (!joinDisplayName.trim()) {
+      toast.error("스터디에서 사용할 닉네임을 입력해주세요.");
+      return;
+    }
+
     try {
       await requestJoinMutation.mutateAsync({
         groupId,
-        dto: { message: joinMessage },
+        dto: { displayName: joinDisplayName.trim(), message: joinMessage },
       });
       setShowJoinModal(false);
+      setJoinDisplayName("");
+      setJoinMessage("");
       toast.success(
         "참가 신청이 완료되었습니다. 스터디장의 승인을 기다려주세요."
       );
@@ -155,23 +163,25 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             ← 스터디 목록
           </Link>
 
-          <div className="flex items-start justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div className="space-y-4 flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3">
                 <VisibilityBadge visibility={study.visibility} />
-                <span className="text-sm text-muted-foreground/40">•</span>
+                <span className="text-sm text-muted-foreground/40 hidden md:inline">
+                  •
+                </span>
                 <span className="text-sm text-muted-foreground/60 font-light">
                   👥 {study.memberCount}
                   {study.maxMembers && `/${study.maxMembers}`}명
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-extralight text-foreground">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-extralight text-foreground break-words">
                 {study.name}
               </h1>
 
               {study.description && (
-                <p className="text-lg text-muted-foreground/70 font-light">
+                <p className="text-base md:text-lg text-muted-foreground/70 font-light break-words">
                   {study.description}
                 </p>
               )}
@@ -192,11 +202,11 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             </div>
 
             {/* 참가/관리 버튼 */}
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 shrink-0">
               {isAdmin && (
                 <Link
                   href={`/study/${groupId}/settings`}
-                  className="px-6 py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors text-center"
                 >
                   ⚙️ 관리
                 </Link>
@@ -204,7 +214,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
               {!myMembership && study.visibility !== "PRIVATE" && (
                 <button
                   onClick={handleJoinClick}
-                  className="px-6 py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors whitespace-nowrap"
                 >
                   {study.visibility === "PASSWORD"
                     ? "비밀번호로 가입"
@@ -220,7 +230,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
           <h2 className="text-lg font-light text-foreground mb-4">
             출퇴근 규칙
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div>
               <p className="text-xs text-muted-foreground/50 font-light uppercase mb-1">
                 운영 요일
@@ -260,9 +270,9 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
 
         {/* 오늘의 출퇴근 현황 */}
         <div className="py-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
-              <h2 className="text-lg font-light text-foreground">
+              <h2 className="text-base md:text-lg font-light text-foreground">
                 오늘의 출퇴근 현황
               </h2>
               <p className="text-xs text-muted-foreground/50 font-light">
@@ -276,7 +286,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             </div>
 
             {attendance && attendance.length > 0 && (
-              <div className="text-sm text-muted-foreground/60 font-light">
+              <div className="text-sm text-muted-foreground/60 font-light shrink-0">
                 출석{" "}
                 {
                   attendance.filter(
@@ -301,7 +311,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
           <h2 className="text-lg font-light text-foreground mb-4">
             멤버 ({study.members.length}명)
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {study.members.map((member) => (
               <div
                 key={member.memberId}
@@ -330,14 +340,28 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
 
       {/* 참가 신청 모달 */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background/95 rounded-lg p-4 md:p-6 max-w-md w-full border border-border/30 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-light text-foreground mb-4">
               참가 신청
             </h3>
             <p className="text-sm text-muted-foreground/60 font-light mb-4">
               스터디장이 신청을 승인하면 가입됩니다.
             </p>
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-sm text-muted-foreground/60 font-light mb-2">
+                  스터디 닉네임
+                </label>
+                <input
+                  type="text"
+                  value={joinDisplayName}
+                  onChange={(e) => setJoinDisplayName(e.target.value)}
+                  placeholder="스터디에서 사용할 닉네임을 입력하세요"
+                  className="w-full px-4 py-3 bg-muted-foreground/5 border border-border/20 rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-border/40 font-light"
+                />
+              </div>
+            </div>
             <textarea
               value={joinMessage}
               onChange={(e) => setJoinMessage(e.target.value)}
@@ -365,8 +389,8 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
 
       {/* 비밀번호 가입 모달 */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background/95 rounded-lg p-4 md:p-6 max-w-md w-full border border-border/30 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-light text-foreground mb-4">
               비밀번호로 가입
             </h3>

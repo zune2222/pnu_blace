@@ -162,6 +162,7 @@ export class StudyController {
     const result = await this.studyService.requestJoin(
       groupId,
       req.user.studentId,
+      dto.displayName,
       dto.message,
     );
 

@@ -120,6 +120,7 @@ export interface UpdateMemberRoleDto {
 
 // 참가 신청 요청
 export interface JoinStudyRequestDto {
+	displayName: string; // 스터디 내에서 사용할 닉네임 (신청자가 입력)
 	message?: string;
 }
 
@@ -140,6 +141,7 @@ export interface JoinRequestInfo {
 	requestId: string;
 	studentId: string;
 	studentName: string;
+	displayName: string; // 신청자가 요청한 스터디 내 닉네임
 	message?: string;
 	status: JoinRequestStatus;
 	createdAt: string;

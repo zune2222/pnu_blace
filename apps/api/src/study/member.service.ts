@@ -250,6 +250,7 @@ export class MemberService {
         requestId: request.requestId,
         studentId: request.studentId,
         studentName: user?.name || '알 수 없음',
+        displayName: request.displayName || user?.name || '멤버',
         message: request.message,
         status: request.status,
         createdAt: request.createdAt.toISOString(),
@@ -316,7 +317,11 @@ export class MemberService {
         groupId,
         studentId: request.studentId,
         role: 'MEMBER',
-        displayName: dto.displayName || user?.name || '멤버',
+        displayName:
+          request.displayName ||
+          dto.displayName || // 기존 호환성
+          user?.name ||
+          '멤버',
       });
 
       await this.studyMemberRepository.save(member);

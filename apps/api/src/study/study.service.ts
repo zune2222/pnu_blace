@@ -402,6 +402,7 @@ export class StudyService {
   async requestJoin(
     groupId: string,
     studentId: string,
+    displayName: string,
     message?: string,
   ): Promise<JoinRequestInfo> {
     const group = await this.studyGroupRepository.findOne({
@@ -444,6 +445,7 @@ export class StudyService {
     const request = this.joinRequestRepository.create({
       groupId,
       studentId,
+      displayName,
       message,
       status: 'PENDING',
     });
@@ -454,6 +456,7 @@ export class StudyService {
       requestId: savedRequest.requestId,
       studentId: savedRequest.studentId,
       studentName: user?.name || '알 수 없음',
+      displayName: savedRequest.displayName || user?.name || '멤버',
       message: savedRequest.message,
       status: savedRequest.status,
       createdAt: savedRequest.createdAt.toISOString(),
