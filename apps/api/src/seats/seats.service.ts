@@ -97,15 +97,14 @@ export class SeatsService {
    */
   async returnSeat(studentId: string): Promise<SeatActionResponseDto> {
     const result = await this.seatReservationService.returnSeat(studentId);
-    
+
     // 좌석 반납 시 자동 연장 비활성화
     if (result.success) {
       await this.seatAutoExtensionService.toggleAutoExtension(studentId, false);
     }
-    
+
     return result;
   }
-
 
   /**
    * 좌석 연장
@@ -231,9 +230,7 @@ export class SeatsService {
   /**
    * 대기열에서 요청 취소
    */
-  async cancelQueueRequest(
-    studentId: string,
-  ): Promise<boolean> {
+  async cancelQueueRequest(studentId: string): Promise<boolean> {
     return this.seatQueueService.cancelQueueRequest(
       studentId,
       'EMPTY_SEAT_RESERVATION',

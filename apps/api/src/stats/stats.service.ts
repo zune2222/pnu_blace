@@ -401,10 +401,15 @@ export class StatsService {
       const totalHours = totalUsageMinutes / 60;
       const totalSessions = seatHistory.length;
       const totalDays = uniqueDates.size;
-      const averageSessionHours = totalSessions > 0 ? totalHours / totalSessions : 0;
+      const averageSessionHours =
+        totalSessions > 0 ? totalHours / totalSessions : 0;
 
       // 가장 자주 이용한 방 찾기
-      let favoriteRoom: { name: string; count: number; totalHours: number } | null = null;
+      let favoriteRoom: {
+        name: string;
+        count: number;
+        totalHours: number;
+      } | null = null;
       let maxCount = 0;
       for (const [roomName, stats] of roomUsage.entries()) {
         if (stats.count > maxCount) {
@@ -508,9 +513,9 @@ export class StatsService {
   private calculateWeeklyStats(seatHistory: any[]) {
     const now = new Date();
     const weekStart = this.getWeekStart(now);
-    
+
     // 이번주 데이터만 필터링
-    const thisWeekRecords = seatHistory.filter(record => {
+    const thisWeekRecords = seatHistory.filter((record) => {
       const recordDate = this.parseDate(record.useDt);
       return recordDate >= weekStart;
     });
@@ -637,7 +642,7 @@ export class StatsService {
   private async saveUserStats(studentId: string, statsData: any) {
     try {
       const tier = this.calculateTier(statsData.totalUsageHours);
-      
+
       const userStats = await this.userStatsRepository.findOne({
         where: { studentId },
       });
@@ -841,55 +846,56 @@ export class StatsService {
    */
   async getWeeklyLeaderboards(limit: number = 100) {
     try {
-      const [weeklyHoursRanking, weeklySessionsRanking, weeklyDaysRanking] = await Promise.all([
-        // 이번주 이용시간 랭킹 (공개 설정한 사용자만)
-        this.userStatsRepository
-          .createQueryBuilder('stats')
-          .select([
-            'stats.publicNickname as nickname',
-            'stats.weeklyUsageHours',
-            'stats.tier',
-            'stats.updatedAt',
-          ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
-          .andWhere('stats.weeklyUsageHours > 0')
-          .orderBy('stats.weeklyUsageHours', 'DESC')
-          .limit(limit)
-          .getRawMany(),
+      const [weeklyHoursRanking, weeklySessionsRanking, weeklyDaysRanking] =
+        await Promise.all([
+          // 이번주 이용시간 랭킹 (공개 설정한 사용자만)
+          this.userStatsRepository
+            .createQueryBuilder('stats')
+            .select([
+              'stats.publicNickname as nickname',
+              'stats.weeklyUsageHours',
+              'stats.tier',
+              'stats.updatedAt',
+            ])
+            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+            .andWhere('stats.publicNickname IS NOT NULL')
+            .andWhere('stats.weeklyUsageHours > 0')
+            .orderBy('stats.weeklyUsageHours', 'DESC')
+            .limit(limit)
+            .getRawMany(),
 
-        // 이번주 방문횟수 랭킹 (공개 설정한 사용자만)
-        this.userStatsRepository
-          .createQueryBuilder('stats')
-          .select([
-            'stats.publicNickname as nickname',
-            'stats.weeklySessions',
-            'stats.tier',
-            'stats.updatedAt',
-          ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
-          .andWhere('stats.weeklySessions > 0')
-          .orderBy('stats.weeklySessions', 'DESC')
-          .limit(limit)
-          .getRawMany(),
+          // 이번주 방문횟수 랭킹 (공개 설정한 사용자만)
+          this.userStatsRepository
+            .createQueryBuilder('stats')
+            .select([
+              'stats.publicNickname as nickname',
+              'stats.weeklySessions',
+              'stats.tier',
+              'stats.updatedAt',
+            ])
+            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+            .andWhere('stats.publicNickname IS NOT NULL')
+            .andWhere('stats.weeklySessions > 0')
+            .orderBy('stats.weeklySessions', 'DESC')
+            .limit(limit)
+            .getRawMany(),
 
-        // 이번주 이용일수 랭킹 (공개 설정한 사용자만)
-        this.userStatsRepository
-          .createQueryBuilder('stats')
-          .select([
-            'stats.publicNickname as nickname',
-            'stats.weeklyDays',
-            'stats.tier',
-            'stats.updatedAt',
-          ])
-          .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.publicNickname IS NOT NULL')
-          .andWhere('stats.weeklyDays > 0')
-          .orderBy('stats.weeklyDays', 'DESC')
-          .limit(limit)
-          .getRawMany(),
-      ]);
+          // 이번주 이용일수 랭킹 (공개 설정한 사용자만)
+          this.userStatsRepository
+            .createQueryBuilder('stats')
+            .select([
+              'stats.publicNickname as nickname',
+              'stats.weeklyDays',
+              'stats.tier',
+              'stats.updatedAt',
+            ])
+            .where('stats.isPublicRanking = :isPublic', { isPublic: true })
+            .andWhere('stats.publicNickname IS NOT NULL')
+            .andWhere('stats.weeklyDays > 0')
+            .orderBy('stats.weeklyDays', 'DESC')
+            .limit(limit)
+            .getRawMany(),
+        ]);
 
       return {
         weeklyHoursRanking,
@@ -916,38 +922,49 @@ export class StatsService {
       }
 
       // 실시간으로 랭킹 계산
-      const [hoursRank, sessionsRank, daysRank, totalUsers] = await Promise.all([
-        // 이용시간 랭킹
-        this.userStatsRepository.count({
-          where: { totalUsageHours: MoreThan(userStats.totalUsageHours) }
-        }).then(count => count + 1),
-        
-        // 방문횟수 랭킹  
-        this.userStatsRepository.count({
-          where: { totalSessions: MoreThan(userStats.totalSessions) }
-        }).then(count => count + 1),
-        
-        // 이용일수 랭킹
-        this.userStatsRepository.count({
-          where: { totalDays: MoreThan(userStats.totalDays) }
-        }).then(count => count + 1),
+      const [hoursRank, sessionsRank, daysRank, totalUsers] = await Promise.all(
+        [
+          // 이용시간 랭킹
+          this.userStatsRepository
+            .count({
+              where: { totalUsageHours: MoreThan(userStats.totalUsageHours) },
+            })
+            .then((count) => count + 1),
 
-        // 전체 사용자 수
-        this.userStatsRepository.count()
-      ]);
+          // 방문횟수 랭킹
+          this.userStatsRepository
+            .count({
+              where: { totalSessions: MoreThan(userStats.totalSessions) },
+            })
+            .then((count) => count + 1),
+
+          // 이용일수 랭킹
+          this.userStatsRepository
+            .count({
+              where: { totalDays: MoreThan(userStats.totalDays) },
+            })
+            .then((count) => count + 1),
+
+          // 전체 사용자 수
+          this.userStatsRepository.count(),
+        ],
+      );
 
       return {
         ...userStats,
         totalUsers,
         hoursRank,
-        sessionsRank, 
+        sessionsRank,
         daysRank,
-        hoursPercentile: hoursRank ? 
-          Math.round((1 - hoursRank / totalUsers) * 100) : null,
-        sessionsPercentile: sessionsRank ? 
-          Math.round((1 - sessionsRank / totalUsers) * 100) : null,
-        daysPercentile: daysRank ? 
-          Math.round((1 - daysRank / totalUsers) * 100) : null,
+        hoursPercentile: hoursRank
+          ? Math.round((1 - hoursRank / totalUsers) * 100)
+          : null,
+        sessionsPercentile: sessionsRank
+          ? Math.round((1 - sessionsRank / totalUsers) * 100)
+          : null,
+        daysPercentile: daysRank
+          ? Math.round((1 - daysRank / totalUsers) * 100)
+          : null,
       };
     } catch (error: any) {
       this.logger.error(`Failed to get user rank info: ${error.message}`);
@@ -1017,12 +1034,14 @@ export class StatsService {
       };
     } catch (error: any) {
       this.logger.error(`Failed to update ranking privacy: ${error.message}`);
-      
+
       if (error instanceof NotFoundException) {
         throw error;
       }
 
-      throw new Error(error.message || '랭킹 설정 업데이트 중 오류가 발생했습니다.');
+      throw new Error(
+        error.message || '랭킹 설정 업데이트 중 오류가 발생했습니다.',
+      );
     }
   }
 
@@ -1048,7 +1067,9 @@ export class StatsService {
         publicNickname: userStats.publicNickname,
       };
     } catch (error: any) {
-      this.logger.error(`Failed to get ranking privacy settings: ${error.message}`);
+      this.logger.error(
+        `Failed to get ranking privacy settings: ${error.message}`,
+      );
       throw new Error('랭킹 설정 조회 중 오류가 발생했습니다.');
     }
   }
@@ -1072,7 +1093,9 @@ export class StatsService {
           .createQueryBuilder('stats')
           .select('COUNT(*) + 1', 'rank')
           .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.totalUsageHours > :hours', { hours: userStats.totalUsageHours })
+          .andWhere('stats.totalUsageHours > :hours', {
+            hours: userStats.totalUsageHours,
+          })
           .getRawOne(),
 
         // 방문횟수 기준 공개 랭킹에서의 순위
@@ -1080,7 +1103,9 @@ export class StatsService {
           .createQueryBuilder('stats')
           .select('COUNT(*) + 1', 'rank')
           .where('stats.isPublicRanking = :isPublic', { isPublic: true })
-          .andWhere('stats.totalSessions > :sessions', { sessions: userStats.totalSessions })
+          .andWhere('stats.totalSessions > :sessions', {
+            sessions: userStats.totalSessions,
+          })
           .getRawOne(),
 
         // 이용일수 기준 공개 랭킹에서의 순위
@@ -1122,25 +1147,25 @@ export class StatsService {
       const [
         hoursTotal,
         hoursUsers,
-        sessionsTotal, 
+        sessionsTotal,
         sessionsUsers,
         daysTotal,
-        daysUsers
+        daysUsers,
       ] = await Promise.all([
         // 이용시간 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             totalUsageHours: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 이용시간 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             totalUsageHours: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { totalUsageHours: 'DESC' },
           skip,
@@ -1148,18 +1173,18 @@ export class StatsService {
         }),
         // 방문횟수 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             totalSessions: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 방문횟수 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             totalSessions: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { totalSessions: 'DESC' },
           skip,
@@ -1167,18 +1192,18 @@ export class StatsService {
         }),
         // 이용일수 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             totalDays: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 이용일수 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             totalDays: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { totalDays: 'DESC' },
           skip,
@@ -1255,25 +1280,25 @@ export class StatsService {
       const [
         hoursTotal,
         hoursUsers,
-        sessionsTotal, 
+        sessionsTotal,
         sessionsUsers,
         daysTotal,
-        daysUsers
+        daysUsers,
       ] = await Promise.all([
         // 주간 이용시간 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             weeklyUsageHours: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 주간 이용시간 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             weeklyUsageHours: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { weeklyUsageHours: 'DESC' },
           skip,
@@ -1281,18 +1306,18 @@ export class StatsService {
         }),
         // 주간 방문횟수 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             weeklySessions: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 주간 방문횟수 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             weeklySessions: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { weeklySessions: 'DESC' },
           skip,
@@ -1300,18 +1325,18 @@ export class StatsService {
         }),
         // 주간 이용일수 총 개수
         this.userStatsRepository.count({
-          where: { 
+          where: {
             weeklyDays: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
-          }
+            publicNickname: Not(IsNull()),
+          },
         }),
         // 주간 이용일수 랭킹 데이터
         this.userStatsRepository.find({
-          where: { 
+          where: {
             weeklyDays: MoreThan(0),
             isPublicRanking: true,
-            publicNickname: Not(IsNull())
+            publicNickname: Not(IsNull()),
           },
           order: { weeklyDays: 'DESC' },
           skip,

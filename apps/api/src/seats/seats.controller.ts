@@ -140,7 +140,6 @@ export class SeatsController {
     return this.seatsService.reserveSeat(user.studentId, reserveSeatDto);
   }
 
-
   /**
    * 좌석 반납
    */
@@ -293,9 +292,7 @@ export class SeatsController {
   async cancelQueueRequest(@Request() req): Promise<SeatActionResponseDto> {
     const user = req.user;
 
-    const success = await this.seatsService.cancelQueueRequest(
-      user.studentId,
-    );
+    const success = await this.seatsService.cancelQueueRequest(user.studentId);
 
     return {
       success,
