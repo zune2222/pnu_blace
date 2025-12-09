@@ -14,6 +14,39 @@ export class MyUsageStatsDto {
 		hour: number;
 		count: number;
 	}[];
+	tier: string; // 사용자의 티어 정보 (Explorer, Student, Scholar, Master, Legend, Myth)
+}
+
+// GET /stats/my-rank
+export class MyRankInfoDto {
+	// UserStats 기본 정보
+	studentId: string;
+	totalUsageHours: number;
+	totalSessions: number;
+	totalDays: number;
+	averageSessionHours: number;
+	favoriteRoomName?: string;
+	favoriteRoomVisits: number;
+	favoriteRoomHours: number;
+	weeklyUsageHours: number;
+	weeklySessions: number;
+	weeklyDays: number;
+	weekStartDate?: Date;
+	tier: string;
+	isPublicRanking: boolean;
+	publicNickname?: string;
+	createdAt: Date;
+	updatedAt: Date;
+	lastDataSyncAt?: Date;
+	
+	// 계산된 랭킹 정보
+	totalUsers: number;
+	hoursRank: number;
+	sessionsRank: number;
+	daysRank: number;
+	hoursPercentile?: number;
+	sessionsPercentile?: number;
+	daysPercentile?: number;
 }
 
 // GET /stats/prediction/:roomNo/:seatNo

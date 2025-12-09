@@ -6,6 +6,7 @@ import { CalendarService, PeriodType } from './calendar.service';
 import { SchoolApiService } from '../school-api/school-api.service';
 import {
   MyUsageStatsDto,
+  MyRankInfoDto,
   SeatPredictionDto,
   UsagePattern,
 } from '@pnu-blace/types';
@@ -222,6 +223,9 @@ export class StatsService {
         '17': '4f 3열람실-D (대학원생)',
       };
 
+      // 티어 계산
+      const tier = this.calculateTier(totalUsageHours);
+
       return {
         totalUsageHours: Math.round(totalUsageHours * 100) / 100,
         totalSessions: completedLogs.length,
@@ -232,6 +236,7 @@ export class StatsService {
         thisWeekHours: Math.round(thisWeekHours * 100) / 100,
         thisMonthHours: Math.round(thisMonthHours * 100) / 100,
         favoriteTimeSlots,
+        tier,
       };
     } catch (error: any) {
       this.logger.error(`Get usage stats error: ${error.message}`);
@@ -316,6 +321,7 @@ export class StatsService {
       thisWeekHours: 0,
       thisMonthHours: 0,
       favoriteTimeSlots: [],
+      tier: 'Explorer', // 기본 티어
     };
   }
 
@@ -1016,7 +1022,7 @@ export class StatsService {
   /**
    * 사용자의 랭킹 정보 조회
    */
-  async getUserRankInfo(studentId: string) {
+  async getUserRankInfo(studentId: string): Promise<MyRankInfoDto | null> {
     try {
       const userStats = await this.userStatsRepository.findOne({
         where: { studentId },
@@ -1063,13 +1069,13 @@ export class StatsService {
         daysRank,
         hoursPercentile: hoursRank
           ? Math.round((1 - hoursRank / totalUsers) * 100)
-          : null,
+          : undefined,
         sessionsPercentile: sessionsRank
           ? Math.round((1 - sessionsRank / totalUsers) * 100)
-          : null,
+          : undefined,
         daysPercentile: daysRank
           ? Math.round((1 - daysRank / totalUsers) * 100)
-          : null,
+          : undefined,
       };
     } catch (error: any) {
       this.logger.error(`Failed to get user rank info: ${error.message}`);

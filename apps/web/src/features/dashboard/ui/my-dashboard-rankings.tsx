@@ -4,51 +4,78 @@ import { apiClient } from "@/lib/api";
 
 type RankingPeriod = "weekly" | "all-time";
 
+// API response interfaces that match the actual backend structure
 interface MyStatsData {
-  weeklyStats: {
-    weeklyUsageHours: number;
-    weeklySessions: number;
-    weeklyDays: number;
-    weekStartDate: string;
-  };
-  allTimeStats: {
-    totalUsageHours: number;
-    totalSessions: number;
-    totalDays: number;
-    tier: string;
-  };
+  totalUsageHours: number;
+  totalSessions: number;
+  averageSessionHours: number;
+  mostUsedRoom: string;
+  mostUsedRoomName: string;
+  thisWeekHours: number;
+  thisMonthHours: number;
+  favoriteTimeSlots: Array<{
+    hour: number;
+    count: number;
+  }>;
+  tier: string;
 }
 
-interface AllTimeRankingData {
+interface MyRankData {
+  studentId: string;
+  totalUsageHours: number;
+  totalSessions: number;
+  totalDays: number;
+  averageSessionHours: number;
+  favoriteRoomName?: string;
+  favoriteRoomVisits: number;
+  favoriteRoomHours: number;
+  weeklyUsageHours: number;
+  weeklySessions: number;
+  weeklyDays: number;
+  weekStartDate?: string;
+  tier: string;
+  isPublicRanking: boolean;
+  publicNickname?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastDataSyncAt?: string;
   totalUsers: number;
-  hoursRank?: number;
-  sessionsRank?: number;
-  daysRank?: number;
+  hoursRank: number;
+  sessionsRank: number;
+  daysRank: number;
   hoursPercentile?: number;
   sessionsPercentile?: number;
   daysPercentile?: number;
-  tier: string;
 }
 
 export const MyDashboardRankings: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState<RankingPeriod>("weekly");
   const [myStats, setMyStats] = useState<MyStatsData | null>(null);
-  const [allTimeData, setAllTimeData] = useState<AllTimeRankingData | null>(null);
+  const [myRankData, setMyRankData] = useState<MyRankData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 데이터 존재 여부를 더 정확하게 체크
+  const hasWeeklyData = myRankData && 
+    (myRankData.weeklyUsageHours > 0 || 
+     myRankData.weeklySessions > 0 || 
+     myRankData.weeklyDays > 0);
+
+  const hasAllTimeData = myRankData && 
+    (myRankData.hoursRank || myRankData.sessionsRank || myRankData.daysRank);
 
   useEffect(() => {
     const fetchRankings = async () => {
       try {
         setIsLoading(true);
         
-        // 내 통계와 전체 랭킹을 병렬로 가져오기
-        const [myStatsResponse, allTimeResponse] = await Promise.all([
+        // 내 통계와 랭킹 정보를 병렬로 가져오기
+        const [myStatsResponse, myRankResponse] = await Promise.all([
           apiClient.get<MyStatsData>("/api/v1/stats/me"),
-          apiClient.get<AllTimeRankingData>("/api/v1/stats/my-rank")
+          apiClient.get<MyRankData>("/api/v1/stats/my-rank")
         ]);
 
         setMyStats(myStatsResponse);
-        setAllTimeData(allTimeResponse);
+        setMyRankData(myRankResponse);
       } catch (error) {
         console.error("랭킹 데이터 조회 실패:", error);
       } finally {
@@ -58,6 +85,13 @@ export const MyDashboardRankings: React.FC = () => {
 
     fetchRankings();
   }, []);
+
+  // 이번주 데이터가 없고 전체 데이터가 있으면 전체 탭으로 자동 전환
+  useEffect(() => {
+    if (!isLoading && !hasWeeklyData && hasAllTimeData && activePeriod === "weekly") {
+      setActivePeriod("all-time");
+    }
+  }, [hasWeeklyData, hasAllTimeData, activePeriod, isLoading]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -97,9 +131,8 @@ export const MyDashboardRankings: React.FC = () => {
     );
   }
 
-  const hasData = activePeriod === "weekly" ? myStats?.weeklyStats : allTimeData;
-
-  if (!hasData) {
+  // 진짜로 아무 데이터도 없을 때만 "데이터 없음" 표시
+  if (!hasWeeklyData && !hasAllTimeData) {
     return (
       <section className="py-16 md:py-20">
         <div className="space-y-8">
@@ -136,31 +169,40 @@ export const MyDashboardRankings: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => setActivePeriod("weekly")}
+            disabled={!hasWeeklyData}
             className={`px-4 sm:px-6 py-3 min-h-[44px] rounded-lg font-light transition-all active:scale-95 ${
               activePeriod === "weekly"
                 ? "bg-foreground text-background"
-                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
+                : hasWeeklyData 
+                  ? "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
+                  : "bg-muted-foreground/5 text-muted-foreground/40 cursor-not-allowed"
             }`}
           >
             이번주
+            {!hasWeeklyData && (
+              <span className="text-xs ml-2 opacity-60">(데이터 없음)</span>
+            )}
           </button>
           <button
             onClick={() => setActivePeriod("all-time")}
+            disabled={!hasAllTimeData}
             className={`px-4 sm:px-6 py-3 min-h-[44px] rounded-lg font-light transition-all active:scale-95 ${
               activePeriod === "all-time"
                 ? "bg-foreground text-background"
-                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
+                : hasAllTimeData
+                  ? "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
+                  : "bg-muted-foreground/5 text-muted-foreground/40 cursor-not-allowed"
             }`}
           >
             전체
           </button>
         </div>
 
-        {/* 주간 정보 표시 */}
-        {activePeriod === "weekly" && myStats?.weeklyStats && (
+        {/* 상태 안내 메시지 */}
+        {activePeriod === "weekly" && hasWeeklyData && myRankData?.weekStartDate && (
           <div className="text-center py-4 border border-border/20 rounded-lg bg-muted-foreground/5">
             <p className="text-sm font-light text-foreground">
-              {formatDate(myStats.weeklyStats.weekStartDate)} - {formatDate(new Date().toISOString())}
+              {formatDate(myRankData.weekStartDate)} - {formatDate(new Date().toISOString())}
             </p>
             <p className="text-xs text-muted-foreground/60 font-light mt-1">
               이번 주 이용 현황
@@ -168,9 +210,20 @@ export const MyDashboardRankings: React.FC = () => {
           </div>
         )}
 
+        {activePeriod === "all-time" && hasAllTimeData && !hasWeeklyData && (
+          <div className="text-center py-4 border border-amber-200/20 rounded-lg bg-amber-500/5">
+            <p className="text-sm font-light text-foreground">
+              이번 주 데이터는 아직 없어서 전체 랭킹을 보여드려요
+            </p>
+            <p className="text-xs text-muted-foreground/60 font-light mt-1">
+              도서관을 이용하면 이번 주 데이터가 집계됩니다
+            </p>
+          </div>
+        )}
+
         {/* 랭킹 그리드 */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-          {activePeriod === "weekly" ? (
+          {activePeriod === "weekly" && hasWeeklyData ? (
             // 이번주 통계
             <>
               <div className="text-center space-y-4">
@@ -179,7 +232,7 @@ export const MyDashboardRankings: React.FC = () => {
                     Hours
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    {myStats?.weeklyStats.weeklyUsageHours || 0}h
+                    {myRankData?.weeklyUsageHours || 0}h
                   </div>
                   <p className="text-sm text-muted-foreground/60 font-light">
                     이용시간
@@ -193,7 +246,7 @@ export const MyDashboardRankings: React.FC = () => {
                     Visits
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    {myStats?.weeklyStats.weeklySessions || 0}
+                    {myRankData?.weeklySessions || 0}
                   </div>
                   <p className="text-sm text-muted-foreground/60 font-light">
                     방문횟수
@@ -207,7 +260,7 @@ export const MyDashboardRankings: React.FC = () => {
                     Days
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    {myStats?.weeklyStats.weeklyDays || 0}
+                    {myRankData?.weeklyDays || 0}
                   </div>
                   <p className="text-sm text-muted-foreground/60 font-light">
                     이용일수
@@ -215,7 +268,7 @@ export const MyDashboardRankings: React.FC = () => {
                 </div>
               </div>
             </>
-          ) : (
+          ) : activePeriod === "all-time" && hasAllTimeData ? (
             // 전체 랭킹
             <>
               <div className="text-center space-y-4">
@@ -224,11 +277,11 @@ export const MyDashboardRankings: React.FC = () => {
                     Hours Rank
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    #{allTimeData?.hoursRank || "—"}
+                    #{myRankData?.hoursRank || "—"}
                   </div>
-                  {allTimeData?.hoursPercentile != null && (
+                  {myRankData?.hoursPercentile != null && (
                     <p className="text-sm text-muted-foreground/60 font-light">
-                      상위 {Math.max(0, 100 - allTimeData.hoursPercentile)}%
+                      상위 {Math.max(0, 100 - myRankData.hoursPercentile)}%
                     </p>
                   )}
                 </div>
@@ -240,11 +293,11 @@ export const MyDashboardRankings: React.FC = () => {
                     Visits Rank
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    #{allTimeData?.sessionsRank || "—"}
+                    #{myRankData?.sessionsRank || "—"}
                   </div>
-                  {allTimeData?.sessionsPercentile != null && (
+                  {myRankData?.sessionsPercentile != null && (
                     <p className="text-sm text-muted-foreground/60 font-light">
-                      상위 {Math.max(0, 100 - allTimeData.sessionsPercentile)}%
+                      상위 {Math.max(0, 100 - myRankData.sessionsPercentile)}%
                     </p>
                   )}
                 </div>
@@ -256,27 +309,34 @@ export const MyDashboardRankings: React.FC = () => {
                     Days Rank
                   </p>
                   <div className="font-mono text-3xl font-extralight text-foreground">
-                    #{allTimeData?.daysRank || "—"}
+                    #{myRankData?.daysRank || "—"}
                   </div>
-                  {allTimeData?.daysPercentile != null && (
+                  {myRankData?.daysPercentile != null && (
                     <p className="text-sm text-muted-foreground/60 font-light">
-                      상위 {Math.max(0, 100 - allTimeData.daysPercentile)}%
+                      상위 {Math.max(0, 100 - myRankData.daysPercentile)}%
                     </p>
                   )}
                 </div>
               </div>
             </>
+          ) : (
+            // 선택된 탭에 데이터가 없을 때
+            <div className="col-span-3 text-center py-8">
+              <p className="text-muted-foreground/60 font-light break-keep">
+                {activePeriod === "weekly" ? "이번 주 데이터가 아직 없습니다." : "전체 랭킹 데이터가 없습니다."}
+              </p>
+            </div>
           )}
         </div>
 
         {/* 티어 정보 */}
         <div className="text-center pt-6 border-t border-border/20 space-y-2">
           <div className="text-lg font-light">
-            {getTierDisplay(activePeriod === "weekly" ? myStats?.allTimeStats.tier || "Student" : allTimeData?.tier || "Student")}
+            {getTierDisplay(activePeriod === "weekly" ? myStats?.tier || "Student" : myRankData?.tier || "Student")}
           </div>
-          {activePeriod === "all-time" && allTimeData?.totalUsers && (
+          {activePeriod === "all-time" && myRankData?.totalUsers && (
             <p className="text-sm text-muted-foreground/60 font-light">
-              전체 {allTimeData.totalUsers}명 중
+              전체 {myRankData.totalUsers}명 중
             </p>
           )}
         </div>

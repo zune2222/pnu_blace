@@ -15,6 +15,7 @@ import { CalendarService } from './calendar.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   MyUsageStatsDto,
+  MyRankInfoDto,
   SeatPredictionDto,
   CreateAcademicCalendarDto,
   CalendarActionResponseDto,
@@ -78,7 +79,7 @@ export class StatsController {
    */
   @Get('my-rank')
   @UseGuards(JwtAuthGuard)
-  async getMyRankInfo(@Request() req) {
+  async getMyRankInfo(@Request() req): Promise<MyRankInfoDto | null> {
     const user = req.user;
     return this.statsService.getUserRankInfo(user.studentId);
   }
