@@ -290,38 +290,21 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       <div className="max-w-7xl mx-auto px-6">
         {/* 헤더 */}
         <div className="border-b border-border/20">
-          <div className="py-6">
+          <div className="py-4 sm:py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 group"
-                  style={{
-                    backgroundColor:
-                      document.documentElement.classList.contains("dark")
-                        ? "transparent"
-                        : "transparent",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (document.documentElement.classList.contains("dark")) {
-                      e.currentTarget.style.backgroundColor =
-                        "rgba(31, 41, 55, 0.8)";
-                    } else {
-                      e.currentTarget.style.backgroundColor =
-                        "rgba(243, 244, 246, 0.8)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
+                  className="p-2 sm:p-3 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 group hover:bg-muted/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="뒤로 가기"
                 >
-                  <ArrowLeft className="w-5 h-5 text-foreground transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                  <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                 </button>
-                <div>
-                  <h1 className="text-2xl font-light text-foreground">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-light text-foreground truncate">
                     {seatData.roomName}
                   </h1>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     총 {seatData.totalSeats}석 • 사용 중{" "}
                     {seatData.occupiedSeats.length}석
                   </p>
@@ -345,26 +328,26 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
           <h3 className="text-sm font-light text-foreground mb-6 tracking-wide uppercase">
             좌석 상태
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center space-x-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="flex items-center space-x-3 p-2 rounded-md min-h-[44px]">
               <div className="w-4 h-4 rounded-lg bg-green-50 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-500"></div>
               <span className="text-sm text-foreground font-light">
                 이용 가능
               </span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 p-2 rounded-md min-h-[44px]">
               <div className="w-4 h-4 rounded-lg bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-500"></div>
               <span className="text-sm text-foreground font-light">
                 사용 중
               </span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 p-2 rounded-md min-h-[44px]">
               <div className="w-4 h-4 rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600"></div>
               <span className="text-sm text-foreground font-light">
                 사용 불가
               </span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 p-2 rounded-md min-h-[44px]">
               <div className="w-4 h-4 rounded-lg bg-blue-500 dark:bg-blue-600 border-2 border-blue-600 dark:border-blue-400"></div>
               <span className="text-sm text-foreground font-light">선택됨</span>
             </div>
@@ -373,52 +356,34 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
 
         {/* 좌석 배치도 - 부산대학교 실제 구조 반영 */}
         <div className="py-6">
-          <div className="bg-white dark:bg-gray-900 border border-border/20 rounded-lg p-8 overflow-auto shadow-sm dark:shadow-gray-900/20">
-            <div className="relative min-h-[900px] flex justify-center">
-              {/* 좌석 배치도 */}
-              <div className="relative z-10 w-full">
-                {/* 백엔드에서 제공하는 HTML을 iframe으로 표시 (배경 이미지 포함) */}
-                <iframe
-                  src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/seats/${roomNo}/html`}
-                  title={`${seatData?.roomName || "열람실"} 좌석 배치도`}
-                  className="w-full border-0 rounded-lg shadow-lg"
-                  style={{
-                    height: "2000px", // 더 큰 높이로 설정
-                    minHeight: "1500px",
-                    minWidth: "1200px", // 최소 너비 설정
-                  }}
-                  scrolling="auto"
-                  onLoad={() => {}}
-                  onError={(e) => {
-                    console.error("Seat layout iframe failed to load:", e);
-                    console.error(
-                      "Failed URL:",
-                      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/seats/${roomNo}/html`
-                    );
-                    console.error("Error details:", e);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 안내 메시지 */}
-        <div className="py-6">
-          <div className="flex items-start space-x-4">
-            <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-            <div className="space-y-3">
-              <h3 className="text-lg font-light text-foreground">
-                좌석 예약 안내
-              </h3>
-              <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-                <p>
-                  원하는 좌석을 클릭하여 선택한 후 예약하기 버튼을 눌러주세요.
-                </p>
-                <p>
-                  예약은 실시간으로 처리되며, 다른 사용자가 먼저 예약할 수
-                  있습니다.
-                </p>
+          <div className="bg-white dark:bg-gray-900 border border-border/20 rounded-lg p-4 sm:p-6 lg:p-8 shadow-sm dark:shadow-gray-900/20">
+            <div className="relative">
+              {/* 좌석 배치도 컨테이너 */}
+              <div className="relative overflow-auto border border-border/10 rounded-lg">
+                <div className="min-h-[600px] sm:min-h-[800px] lg:min-h-[900px]">
+                  {/* 백엔드에서 제공하는 HTML을 iframe으로 표시 (배경 이미지 포함) */}
+                  <iframe
+                    src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/seats/${roomNo}/html`}
+                    title={`${seatData?.roomName || "열람실"} 좌석 배치도`}
+                    className="w-full h-full border-0 rounded-lg"
+                    style={{
+                      height: "100%",
+                      minHeight: "600px",
+                      width: "100%",
+                      minWidth: "320px", // 모바일 최소 너비
+                    }}
+                    scrolling="auto"
+                    onLoad={() => {}}
+                    onError={(e) => {
+                      console.error("Seat layout iframe failed to load:", e);
+                      console.error(
+                        "Failed URL:",
+                        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/seats/${roomNo}/html`
+                      );
+                      console.error("Error details:", e);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

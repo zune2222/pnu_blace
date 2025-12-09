@@ -21,7 +21,7 @@ export const TermsPage: React.FC = () => {
                 제1조 (목적)
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   이 약관은 PNU Blace(이하 "서비스")가 제공하는 부산대학교
                   도서관 좌석 모니터링 및 자동 예약 서비스의 이용조건 및 절차,
                   회사와 회원의 권리, 의무, 책임사항과 기타 필요한 사항을
@@ -38,7 +38,7 @@ export const TermsPage: React.FC = () => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   이 약관에서 사용하는 용어의 정의는 다음과 같습니다:
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>
                     1. "서비스"란 PNU Blace가 제공하는 부산대학교 도서관 좌석
                     관련 모든 서비스를 의미합니다.
@@ -78,7 +78,7 @@ export const TermsPage: React.FC = () => {
                   <li>• 이용 통계 제공 서비스</li>
                   <li>• 기타 관련 부가 서비스</li>
                 </ul>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   2. 서비스는 부산대학교 학사일정 및 도서관 운영시간에 따라
                   제공되며, 시스템 점검 등의 사유로 일시적으로 중단될 수
                   있습니다.
@@ -98,7 +98,7 @@ export const TermsPage: React.FC = () => {
                   2. 회원은 서비스를 선량한 관리자의 주의 의무로 이용해야 하며,
                   다음 행위를 하여서는 안 됩니다:
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>• 타인의 정보 도용</li>
                   <li>• 서비스의 안정적 운영을 방해하는 행위</li>
                   <li>• 과도한 자동 예약 시도로 인한 시스템 부하 유발</li>
@@ -113,7 +113,7 @@ export const TermsPage: React.FC = () => {
                 제5조 (개인정보보호)
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   서비스는 관련 법령이 정하는 바에 따라 회원의 개인정보를
                   보호하기 위해 노력합니다. 개인정보의 보호 및 사용에 대해서는
                   별도의 개인정보처리방침이 적용됩니다.
@@ -130,7 +130,7 @@ export const TermsPage: React.FC = () => {
                   서비스는 다음 각 호의 경우에는 회원의 서비스 이용을 제한할 수
                   있습니다:
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>1. 이 약관을 위반한 경우</li>
                   <li>2. 부산대학교 도서관 이용 규칙을 위반한 경우</li>
                   <li>3. 서비스의 정상적인 운영을 방해한 경우</li>
@@ -184,7 +184,7 @@ export const TermsPage: React.FC = () => {
                   3. 회원이 서비스를 이용하여 얻은 정보로 인한 손해에 대해서
                   서비스는 책임을 지지 않습니다.
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   4. 부산대학교 측의 요청에 따른 서비스 중단으로 인한 손해에
                   대해서는 책임을 지지 않습니다.
                 </p>
@@ -196,7 +196,7 @@ export const TermsPage: React.FC = () => {
                 제9조 (분쟁해결)
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   이 약관에 관한 분쟁은 대한민국 법률에 따라 해결하며,
                   관할법원은 부산지방법원으로 합니다.
                 </p>
@@ -211,7 +211,7 @@ export const TermsPage: React.FC = () => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   1. 이 약관은 2025년 1월 1일부터 시행됩니다.
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   2. 약관의 변경이 있는 경우, 서비스 내 공지를 통해 안내합니다.
                 </p>
               </div>

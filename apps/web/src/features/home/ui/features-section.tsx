@@ -3,25 +3,32 @@ import React from "react";
 const features = [
   {
     number: "01",
-    title: "실시간",
-    subtitle: "Real-time Monitoring",
+    title: "실시간 좌석 조회",
+    subtitle: "Real-time Seat Monitoring",
     description:
-      "도서관 좌석 현황을 실시간으로 모니터링하여 좌석을 예약할 수 있어요",
+      "도서관 좌석 현황을 실시간으로 확인하고 원하는 좌석을 발권할 수 있어요",
     status: "available",
   },
   {
     number: "02",
-    title: "이용 요약",
+    title: "이용 통계",
     subtitle: "Usage Analytics",
-    description: "도서관에서 시간을 얼마나 보냈는지 요약해드려요.",
+    description: "도서관 이용 시간과 패턴을 분석하여 개인 맞춤 통계를 제공해드려요",
     status: "available",
   },
   {
     number: "03",
-    title: "자리 예측",
-    subtitle: "Seat Prediction",
-    description: "예측 알고리즘을 통해 원하는 좌석이 언제 비는지 알 수 있어요.",
-    status: "coming-soon",
+    title: "스터디 그룹",
+    subtitle: "Study Groups",
+    description: "함께 공부할 동료들과 그룹을 만들어 출석체크와 진도관리를 해보세요",
+    status: "available",
+  },
+  {
+    number: "04",
+    title: "랭킹 시스템",
+    subtitle: "Ranking System",
+    description: "이용 시간과 출석일수를 기반으로 한 랭킹으로 학습 동기를 얻어보세요",
+    status: "available",
   },
 ];
 
@@ -66,7 +73,7 @@ export const FeaturesSection: React.FC = () => {
               </p>
 
               {/* 설명 */}
-              <p className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto break-keep">
                 {feature.description}
               </p>
 

@@ -9,7 +9,7 @@ export const AnnouncementContent = ({ content }: AnnouncementContentProps) => {
         if (!line.trim()) return <div key={index} className="h-2" />;
         
         return (
-          <p key={index} className="break-words">
+          <p key={index} className="break-words break-keep leading-relaxed">
             {line}
           </p>
         );

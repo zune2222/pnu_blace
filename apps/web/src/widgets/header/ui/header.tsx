@@ -200,14 +200,14 @@ export const Header: React.FC = () => {
           </div>
 
           {/* 모바일 메뉴 및 로그인 버튼 */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-3">
             {/* 모바일 로그인 버튼 */}
             {isAuthenticated ? (
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={logout} className="min-h-[44px]">
                 로그아웃
               </Button>
             ) : (
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="min-h-[44px]">
                 <Link href="/login">로그인</Link>
               </Button>
             )}
@@ -215,7 +215,7 @@ export const Header: React.FC = () => {
             {/* 햄버거 메뉴 버튼 */}
             <button
               onClick={toggleMobileMenu}
-              className="flex items-center justify-center w-10 h-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+              className="flex items-center justify-center w-12 h-12 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200 active:scale-95"
               aria-label="메뉴 토글"
             >
               <svg
@@ -250,7 +250,7 @@ export const Header: React.FC = () => {
             isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-background/80 backdrop-blur-sm border-t border-border/40">
+          <div className="px-4 pt-4 pb-4 space-y-2 bg-background/95 backdrop-blur-sm border-t border-border/40">
             {/* 모바일 네비게이션 */}
             <div
               className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
@@ -259,35 +259,35 @@ export const Header: React.FC = () => {
               <Link
                 href="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 대시보드
               </Link>
               <Link
                 href="/seats"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 좌석 찾기
               </Link>
               <Link
                 href="/stats"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 내 통계
               </Link>
               <Link
                 href="/rankings"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 랭킹
               </Link>
               <Link
                 href="/study"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 스터디
               </Link>
@@ -300,7 +300,7 @@ export const Header: React.FC = () => {
             >
               <button
                 onClick={toggleDarkMode}
-                className="flex items-center justify-between w-full px-3 py-3 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-200"
+                className="flex items-center justify-between w-full px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
               >
                 <span>
                   테마:{" "}
@@ -366,7 +366,7 @@ export const Header: React.FC = () => {
               {isAuthenticated ? (
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full min-h-[48px] active:scale-95"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
@@ -375,7 +375,7 @@ export const Header: React.FC = () => {
                   로그아웃
                 </Button>
               ) : (
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full min-h-[48px] active:scale-95" asChild>
                   <Link
                     href="/login"
                     onClick={() => setIsMobileMenuOpen(false)}

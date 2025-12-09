@@ -204,7 +204,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                 </h2>
                 <button
                   onClick={handleShowInviteCode}
-                  className="px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors whitespace-nowrap self-start sm:self-auto"
+                  className="px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors self-start sm:self-auto break-keep"
                 >
                   초대 코드 보기
                 </button>
@@ -264,7 +264,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                         onClick={() =>
                           handleKick(member.memberId, member.displayName)
                         }
-                        className="px-3 py-1.5 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors whitespace-nowrap"
+                        className="px-3 py-1.5 bg-red-500/10 text-red-500 rounded text-sm font-light hover:bg-red-500/20 transition-colors break-keep"
                       >
                         내보내기
                       </button>

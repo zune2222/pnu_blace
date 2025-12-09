@@ -46,6 +46,20 @@
   }
 }
 
+/* Korean text line break utilities */
+@layer utilities {
+  .break-keep {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  
+  .text-mobile-responsive {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    line-height: 1.6;
+  }
+}
+
 /* 모달 애니메이션 클래스들 */
 @layer utilities {
   .animate-in {

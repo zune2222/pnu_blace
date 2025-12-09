@@ -11,23 +11,23 @@ export const RankingTabs: React.FC<RankingTabsProps> = ({
   onTabChange,
 }) => {
   return (
-    <div className="flex space-x-8">
+    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8">
       <button
         onClick={() => onTabChange("all-time")}
-        className={`text-xl font-light pb-4 border-b-2 transition-colors ${
+        className={`text-lg sm:text-xl font-light pb-3 sm:pb-4 border-b-2 transition-colors min-h-[44px] px-2 rounded-t-md ${
           activeTab === "all-time"
-            ? "text-foreground border-foreground"
-            : "text-muted-foreground/60 border-transparent hover:text-foreground hover:border-muted-foreground/30"
+            ? "text-foreground border-foreground bg-muted/10"
+            : "text-muted-foreground/60 border-transparent hover:text-foreground hover:border-muted-foreground/30 hover:bg-muted/5"
         }`}
       >
         전체 랭킹
       </button>
       <button
         onClick={() => onTabChange("weekly")}
-        className={`text-xl font-light pb-4 border-b-2 transition-colors ${
+        className={`text-lg sm:text-xl font-light pb-3 sm:pb-4 border-b-2 transition-colors min-h-[44px] px-2 rounded-t-md ${
           activeTab === "weekly"
-            ? "text-foreground border-foreground"
-            : "text-muted-foreground/60 border-transparent hover:text-foreground hover:border-muted-foreground/30"
+            ? "text-foreground border-foreground bg-muted/10"
+            : "text-muted-foreground/60 border-transparent hover:text-foreground hover:border-muted-foreground/30 hover:bg-muted/5"
         }`}
       >
         이번주 랭킹

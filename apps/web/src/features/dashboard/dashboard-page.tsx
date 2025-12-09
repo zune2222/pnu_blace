@@ -13,47 +13,47 @@ import { useDashboardData } from "./model";
 const LoginPrompt: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center space-y-8">
-          <h1 className="text-4xl md:text-5xl font-extralight text-foreground">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
+        <div className="text-center space-y-6 sm:space-y-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extralight text-foreground">
             대시보드
           </h1>
-          <p className="text-lg text-muted-foreground/70 font-light max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground/70 font-light max-w-xl mx-auto leading-relaxed">
             로그인하면 현재 좌석 정보, 즐겨찾기 열람실, 빠른 통계 등을 한눈에
             확인할 수 있어요.
           </p>
 
           {/* 미리보기 카드들 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
-            <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mt-8 sm:mt-12">
+            <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3">
               <div className="text-2xl">🪑</div>
-              <h3 className="text-lg font-light text-foreground">현재 좌석</h3>
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <h3 className="text-base sm:text-lg font-light text-foreground">현재 좌석</h3>
+              <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
                 예약한 좌석 정보와 남은 시간을 실시간으로 확인
               </p>
             </div>
-            <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
+            <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3">
               <div className="text-2xl">⭐</div>
-              <h3 className="text-lg font-light text-foreground">
+              <h3 className="text-base sm:text-lg font-light text-foreground">
                 즐겨찾기 열람실
               </h3>
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
                 자주 가는 열람실의 현황을 빠르게 확인
               </p>
             </div>
-            <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
+            <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3 sm:col-span-2 lg:col-span-1">
               <div className="text-2xl">📊</div>
-              <h3 className="text-lg font-light text-foreground">빠른 통계</h3>
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <h3 className="text-base sm:text-lg font-light text-foreground">빠른 통계</h3>
+              <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
                 이번 주 이용 시간과 방문 횟수
               </p>
             </div>
           </div>
 
-          <div className="pt-8">
+          <div className="pt-6 sm:pt-8">
             <Link
               href="/login"
-              className="inline-block px-8 py-3 bg-foreground text-background rounded-lg font-light hover:bg-foreground/90 transition-colors"
+              className="inline-block px-6 sm:px-8 py-3 bg-foreground text-background rounded-lg font-light hover:bg-foreground/90 transition-colors min-h-[44px] flex items-center justify-center active:scale-95"
             >
               로그인하고 시작하기
             </Link>
@@ -70,15 +70,15 @@ const AuthenticatedDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* 메인 좌석 섹션 - 전체 너비 */}
         <div className="border-b border-border/20">
           <CurrentSeatWidget {...dashboardState} />
         </div>
 
         {/* 하단 섹션들 - 그리드 레이아웃 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-          <div className="border-r-0 lg:border-r border-border/20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 xl:gap-24">
+          <div className="border-r-0 lg:border-r border-border/20 pb-8 lg:pb-0">
             <FavoriteRoomsSection
               favoriteRooms={dashboardState.favoriteRooms}
               isLoading={dashboardState.isLoading}

@@ -53,9 +53,15 @@ export const SeatHistoryWidget: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-border/10">
-        <div className="flex items-center justify-center h-48">
-          <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+      <div className="space-y-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-16 bg-muted-foreground/10 rounded"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-20 bg-muted-foreground/10 rounded"></div>
+            ))}
+          </div>
+          <div className="h-32 bg-muted-foreground/10 rounded"></div>
         </div>
       </div>
     );
@@ -63,8 +69,8 @@ export const SeatHistoryWidget: React.FC = () => {
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-border/10">
-        <div className="text-center text-gray-500">
+      <div className="space-y-8">
+        <div className="text-center text-muted-foreground/70">
           <p>{error || "데이터를 불러올 수 없습니다."}</p>
         </div>
       </div>

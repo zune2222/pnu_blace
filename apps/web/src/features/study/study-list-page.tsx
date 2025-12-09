@@ -52,12 +52,12 @@ export const StudyListPage: React.FC = () => {
         {/* 헤더 섹션 */}
         <div className="py-16 md:py-24 border-b border-border/20">
           <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
               <div className="flex-1 min-w-0">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight text-foreground leading-tight mb-3 md:mb-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extralight text-foreground leading-tight mb-2 sm:mb-3 md:mb-4">
                   스터디
                 </h1>
-                <p className="text-base md:text-lg text-muted-foreground/70 font-light">
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground/70 font-light">
                   함께 공부하고, 서로의 출퇴근을 확인하세요
                 </p>
               </div>
@@ -65,7 +65,7 @@ export const StudyListPage: React.FC = () => {
               {isAuthenticated && (
                 <Link
                   href="/study/create"
-                  className="px-4 md:px-6 py-2 md:py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
+                  className="px-4 sm:px-6 py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors break-keep shrink-0 self-start sm:self-auto min-h-[44px] flex items-center justify-center"
                 >
                   스터디 만들기
                 </Link>
@@ -75,7 +75,7 @@ export const StudyListPage: React.FC = () => {
             {/* 검색 */}
             <form
               onSubmit={handleSearch}
-              className="flex flex-col sm:flex-row gap-2 sm:gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4"
             >
               <div className="flex-1 relative">
                 <input
@@ -83,12 +83,12 @@ export const StudyListPage: React.FC = () => {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="스터디 이름으로 검색..."
-                  className="w-full px-4 py-2 md:py-3 bg-muted-foreground/5 border border-border/20 rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-border/40 font-light text-sm md:text-base"
+                  className="w-full px-4 py-3 bg-muted-foreground/5 border border-border/20 rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-border/40 font-light text-sm sm:text-base min-h-[44px]"
                 />
               </div>
               <button
                 type="submit"
-                className="px-4 md:px-6 py-2 md:py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors whitespace-nowrap"
+                className="px-4 sm:px-6 py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors break-keep min-h-[44px] active:scale-95"
               >
                 검색
               </button>
@@ -151,7 +151,7 @@ export const StudyListPage: React.FC = () => {
               {isAuthenticated && (
                 <Link
                   href="/study/create"
-                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors min-h-[44px] flex items-center justify-center active:scale-95"
                 >
                   첫 번째 스터디 만들기
                 </Link>
@@ -159,7 +159,7 @@ export const StudyListPage: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {studyGroups?.items.map((study) => (
                   <StudyCard key={study.groupId} study={study} />
                 ))}
@@ -171,12 +171,12 @@ export const StudyListPage: React.FC = () => {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-4 py-2 text-sm font-light text-muted-foreground/60 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-4 py-3 text-sm font-light text-muted-foreground/60 hover:text-foreground hover:bg-muted/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-md min-h-[44px] active:scale-95"
                   >
                     이전
                   </button>
 
-                  <span className="px-4 py-2 text-sm font-light text-muted-foreground/60">
+                  <span className="px-4 py-3 text-sm font-light text-muted-foreground/60 min-h-[44px] flex items-center">
                     {page} / {studyGroups.pagination.totalPages}
                   </span>
 
@@ -187,7 +187,7 @@ export const StudyListPage: React.FC = () => {
                       )
                     }
                     disabled={page === studyGroups.pagination.totalPages}
-                    className="px-4 py-2 text-sm font-light text-muted-foreground/60 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-4 py-3 text-sm font-light text-muted-foreground/60 hover:text-foreground hover:bg-muted/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-md min-h-[44px] active:scale-95"
                   >
                     다음
                   </button>
@@ -209,7 +209,7 @@ export const StudyListPage: React.FC = () => {
               </p>
               <Link
                 href="/study/join"
-                className="inline-block px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                className="inline-block px-4 py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors min-h-[44px] flex items-center justify-center active:scale-95"
               >
                 초대 코드 입력하기
               </Link>

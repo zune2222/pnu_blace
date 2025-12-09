@@ -16,10 +16,22 @@ export const CtaSection: React.FC = () => {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground leading-tight">
               {isAuthenticated ? "지금 시작해보세요" : "지금 시작해보세요"}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
-              {isAuthenticated
-                ? "대시보드에서 좌석을 확인하고\n예약해보세요"
-                : "부산대학교 학번으로 로그인하고\n더 스마트한 도서관 경험을 만나보세요"}
+            <p className="text-lg md:text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed break-keep">
+              {isAuthenticated ? (
+                <>
+                  대시보드에서 좌석 현황을 확인하고
+                  <br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span>
+                  스터디 그룹에 참여해보세요
+                </>
+              ) : (
+                <>
+                  부산대학교 학번으로 로그인하고
+                  <br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span>
+                  더 스마트한 도서관 경험을 만나보세요
+                </>
+              )}
             </p>
           </div>
 

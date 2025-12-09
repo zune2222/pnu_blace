@@ -54,7 +54,7 @@ export const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
             <div className="flex items-center gap-2">
               <VisibilityBadge visibility={study.visibility} />
             </div>
-            <h3 className="text-lg font-light text-foreground group-hover:text-foreground/80 transition-colors">
+            <h3 className="text-lg font-light text-foreground group-hover:text-foreground/80 transition-colors break-keep">
               {study.name}
             </h3>
           </div>
@@ -62,13 +62,13 @@ export const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
 
         {/* 설명 */}
         {study.description && (
-          <p className="text-sm text-muted-foreground/60 font-light mb-4 line-clamp-2">
+          <p className="text-sm text-muted-foreground/60 font-light mb-4 line-clamp-2 break-keep">
             {study.description}
           </p>
         )}
 
         {/* 출퇴근 시간 */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground/50 font-light mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground/50 font-light mb-4">
           <span>
             출근 {study.checkInStartTime}~{study.checkInEndTime}
           </span>

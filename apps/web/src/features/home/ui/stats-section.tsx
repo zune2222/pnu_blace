@@ -32,7 +32,7 @@ export const StatsSection: React.FC = () => {
               <h3 className="text-2xl md:text-3xl font-medium text-foreground">
                 {feature.title}
               </h3>
-              <p className="text-lg text-muted-foreground font-light leading-relaxed">
+              <p className="text-lg text-muted-foreground font-light leading-relaxed break-keep">
                 {feature.description}
               </p>
             </div>
@@ -41,9 +41,10 @@ export const StatsSection: React.FC = () => {
 
         {/* 하단 메시지 */}
         <div className="text-center mt-16">
-          <p className="text-lg text-muted-foreground font-light max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground font-light max-w-3xl mx-auto break-keep">
             복잡한 도서관 좌석 예약 시스템을 간단하고 직관적으로 만들어
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             여러분의 학습에만 집중할 수 있도록 도와드립니다
           </p>
         </div>

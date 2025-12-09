@@ -250,11 +250,11 @@ export const AllTimeRankings: React.FC = () => {
           {Math.min(currentPage * 20, totalItems)}개 표시
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 sm:px-4 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
           >
             이전
           </button>
@@ -263,7 +263,7 @@ export const AllTimeRankings: React.FC = () => {
             <>
               <button
                 onClick={() => handlePageChange(1)}
-                className="px-3 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 transition-colors"
+                className="px-3 sm:px-4 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 transition-colors min-h-[44px]"
               >
                 1
               </button>
@@ -277,7 +277,7 @@ export const AllTimeRankings: React.FC = () => {
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`px-3 py-2 text-sm font-light border rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-2 text-sm font-light border rounded-lg transition-colors min-h-[44px] ${
                 page === currentPage
                   ? "bg-foreground text-background border-foreground"
                   : "border-border/40 hover:bg-muted-foreground/5"
@@ -294,7 +294,7 @@ export const AllTimeRankings: React.FC = () => {
               )}
               <button
                 onClick={() => handlePageChange(totalPages)}
-                className="px-3 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 transition-colors"
+                className="px-3 sm:px-4 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 transition-colors min-h-[44px]"
               >
                 {totalPages}
               </button>
@@ -304,7 +304,7 @@ export const AllTimeRankings: React.FC = () => {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 sm:px-4 py-2 text-sm font-light border border-border/40 rounded-lg hover:bg-muted-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
           >
             다음
           </button>
@@ -316,13 +316,13 @@ export const AllTimeRankings: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* 랭킹 타입 선택 */}
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 overflow-x-auto">
         <button
           onClick={() => {
             setActiveRanking("hours");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 rounded-lg font-light transition-colors min-h-[44px] break-keep ${
             activeRanking === "hours"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
@@ -335,7 +335,7 @@ export const AllTimeRankings: React.FC = () => {
             setActiveRanking("sessions");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 rounded-lg font-light transition-colors min-h-[44px] break-keep ${
             activeRanking === "sessions"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
@@ -348,7 +348,7 @@ export const AllTimeRankings: React.FC = () => {
             setActiveRanking("days");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 rounded-lg font-light transition-colors min-h-[44px] break-keep ${
             activeRanking === "days"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
@@ -370,12 +370,12 @@ export const AllTimeRankings: React.FC = () => {
           currentData.map((user) => (
             <div
               key={`${user.rank}-${user.publicNickname}`}
-              className="flex items-center justify-between p-6 border border-border/20 rounded-lg hover:bg-muted-foreground/5 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border border-border/20 rounded-lg hover:bg-muted-foreground/5 transition-colors space-y-3 sm:space-y-0"
             >
-              <div className="flex items-center space-x-6">
-                <div className="text-center min-w-[60px]">
+              <div className="flex items-center space-x-4 sm:space-x-6">
+                <div className="text-center min-w-[50px] sm:min-w-[60px]">
                   <div
-                    className={`text-2xl font-mono font-extralight ${
+                    className={`text-xl sm:text-2xl font-mono font-extralight ${
                       user.rank === 1
                         ? "text-yellow-500"
                         : user.rank === 2
@@ -389,8 +389,8 @@ export const AllTimeRankings: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <div className="text-lg font-light text-foreground">
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="text-base sm:text-lg font-light text-foreground truncate">
                     {user.publicNickname}
                   </div>
                   <div className="text-sm text-muted-foreground/60 font-light">
@@ -399,8 +399,8 @@ export const AllTimeRankings: React.FC = () => {
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className="text-xl font-mono font-extralight text-foreground">
+              <div className="text-left sm:text-right">
+                <div className="text-lg sm:text-xl font-mono font-extralight text-foreground">
                   {formatValue(activeRanking, getCurrentValue(user))}
                 </div>
               </div>

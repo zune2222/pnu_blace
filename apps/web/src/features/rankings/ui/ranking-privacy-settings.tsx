@@ -94,12 +94,12 @@ export const RankingPrivacySettings: React.FC = () => {
 
       <div className="space-y-6 border border-border/20 rounded-lg p-8">
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground/60 font-light">
+          <p className="text-sm text-muted-foreground/60 font-light break-keep">
             랭킹에 표시될 닉네임입니다. 모든 사용자는 자동으로 랭킹에
             참여합니다.
           </p>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={nickname}
@@ -111,14 +111,14 @@ export const RankingPrivacySettings: React.FC = () => {
             <button
               onClick={handleGenerateRandom}
               disabled={isGenerating}
-              className="px-4 py-3 border border-border/40 text-muted-foreground/70 font-light rounded-lg hover:bg-muted/20 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              className="px-4 py-3 border border-border/40 text-muted-foreground/70 font-light rounded-lg hover:bg-muted/20 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors break-keep sm:min-w-fit"
               title="랜덤 닉네임 생성"
             >
               {isGenerating ? "생성 중..." : "🎲 랜덤"}
             </button>
           </div>
 
-          <p className="text-xs text-muted-foreground/50 font-light">
+          <p className="text-xs text-muted-foreground/50 font-light break-keep">
             최대 20자 • 다른 사용자와 중복 불가
           </p>
         </div>

@@ -212,13 +212,13 @@ export const WeeklyRankings: React.FC = () => {
       </div>
 
       {/* 랭킹 타입 선택 */}
-      <div className="flex space-x-4">
+      <div className="flex flex-wrap gap-3">
         <button
           onClick={() => {
             setActiveRanking("hours");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 min-h-[44px] rounded-lg font-light transition-all active:scale-95 ${
             activeRanking === "hours"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
@@ -231,7 +231,7 @@ export const WeeklyRankings: React.FC = () => {
             setActiveRanking("sessions");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 min-h-[44px] rounded-lg font-light transition-all active:scale-95 ${
             activeRanking === "sessions"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"
@@ -244,7 +244,7 @@ export const WeeklyRankings: React.FC = () => {
             setActiveRanking("days");
             setCurrentPage(1);
           }}
-          className={`px-6 py-2 rounded-lg font-light transition-colors ${
+          className={`px-4 sm:px-6 py-3 min-h-[44px] rounded-lg font-light transition-all active:scale-95 ${
             activeRanking === "days"
               ? "bg-foreground text-background"
               : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20"

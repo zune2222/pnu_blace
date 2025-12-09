@@ -176,12 +176,12 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
                 </span>
               </div>
 
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-extralight text-foreground break-words">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-extralight text-foreground break-keep">
                 {study.name}
               </h1>
 
               {study.description && (
-                <p className="text-base md:text-lg text-muted-foreground/70 font-light break-words">
+                <p className="text-base md:text-lg text-muted-foreground/70 font-light break-keep">
                   {study.description}
                 </p>
               )}
@@ -202,11 +202,11 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             </div>
 
             {/* 참가/관리 버튼 */}
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 shrink-0">
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               {isAdmin && (
                 <Link
                   href={`/study/${groupId}/settings`}
-                  className="px-4 md:px-6 py-2 md:py-3 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors text-center"
+                  className="px-4 md:px-6 py-3 min-h-[44px] bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-all active:scale-95 text-center flex items-center justify-center"
                 >
                   ⚙️ 관리
                 </Link>
@@ -214,7 +214,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
               {!myMembership && study.visibility !== "PRIVATE" && (
                 <button
                   onClick={handleJoinClick}
-                  className="px-4 md:px-6 py-2 md:py-3 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors whitespace-nowrap"
+                  className="px-4 md:px-6 py-3 min-h-[44px] bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-all active:scale-95 break-keep text-center"
                 >
                   {study.visibility === "PASSWORD"
                     ? "비밀번호로 가입"
@@ -371,14 +371,14 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowJoinModal(false)}
-                className="flex-1 px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                className="flex-1 px-4 py-3 min-h-[44px] bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-all active:scale-95"
               >
                 취소
               </button>
               <button
                 onClick={handleRequestJoin}
                 disabled={requestJoinMutation.isPending}
-                className="flex-1 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 min-h-[44px] bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-all active:scale-95 disabled:opacity-50"
               >
                 {requestJoinMutation.isPending ? "신청 중..." : "신청하기"}
               </button>
@@ -423,14 +423,14 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPasswordModal(false)}
-                className="flex-1 px-4 py-2 bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-colors"
+                className="flex-1 px-4 py-3 min-h-[44px] bg-muted-foreground/10 text-foreground rounded-lg text-sm font-light hover:bg-muted-foreground/20 transition-all active:scale-95"
               >
                 취소
               </button>
               <button
                 onClick={handleJoinWithPassword}
                 disabled={joinWithPasswordMutation.isPending}
-                className="flex-1 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 min-h-[44px] bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-all active:scale-95 disabled:opacity-50"
               >
                 {joinWithPasswordMutation.isPending ? "가입 중..." : "가입하기"}
               </button>

@@ -36,7 +36,7 @@ export const PrivacyPage: React.FC = () => {
                   <li>• 사용자의 개인정보는 서비스 제공 목적으로만 사용</li>
                   <li>• 부산대학교 측 요청 시 즉시 데이터 처리 중단 및 삭제</li>
                 </ul>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   본 서비스는 부산대학교의 정보시스템 운영에 지장을 주지 않는
                   범위 내에서만 운영되며, 필요시 서비스를 중단할 수 있습니다.
                 </p>
@@ -51,7 +51,7 @@ export const PrivacyPage: React.FC = () => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   PNU Blace는 다음의 목적을 위하여 개인정보를 처리합니다:
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>• 부산대학교 포털 연동을 통한 사용자 인증</li>
                   <li>• 도서관 좌석 예약 서비스 제공</li>
                   <li>• 좌석 현황 알림 서비스 제공</li>
@@ -105,7 +105,7 @@ export const PrivacyPage: React.FC = () => {
                   정보주체로부터 개인정보를 수집 시에 동의받은 개인정보
                   보유·이용기간 내에서 개인정보를 처리·보유합니다.
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>• 사용자 계정 정보: 서비스 이용 종료 시까지</li>
                   <li>• 좌석 예약 이력: 수집일로부터 1년</li>
                   <li>• 서비스 이용 로그: 수집일로부터 3개월</li>
@@ -125,7 +125,7 @@ export const PrivacyPage: React.FC = () => {
                   규정 등 개인정보보호법 제17조 및 제18조에 해당하는 경우에만
                   개인정보를 제3자에게 제공합니다.
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   현재 PNU Blace는 개인정보를 제3자에게 제공하지 않습니다.
                 </p>
               </div>
@@ -136,7 +136,7 @@ export const PrivacyPage: React.FC = () => {
                 6. 개인정보처리의 위탁
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   현재 PNU Blace는 개인정보 처리업무를 외부에 위탁하지 않습니다.
                   향후 위탁이 필요한 경우 위탁받는 자, 위탁하는 업무의 내용을
                   사전에 공지하겠습니다.
@@ -159,7 +159,7 @@ export const PrivacyPage: React.FC = () => {
                   <li>• 개인정보 정정·삭제요구</li>
                   <li>• 개인정보 처리정지요구</li>
                 </ul>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   위의 권리 행사는 개인정보보호법 시행령 제41조제1항에 따라
                   서면, 전자우편을 통하여 하실 수 있으며, PNU Blace는 이에 대해
                   지체없이 조치하겠습니다.
@@ -178,12 +178,12 @@ export const PrivacyPage: React.FC = () => {
                   파기합니다.
                 </p>
                 <div className="space-y-2">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed break-keep">
                     <strong>파기절차:</strong> 보유기간이 경과하거나 처리목적이
                     달성된 개인정보는 별도의 DB로 옮겨져 내부 방침 및 기타 관련
                     법령에 따라 파기됩니다.
                   </p>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed break-keep">
                     <strong>파기방법:</strong> 전자적 파일 형태의 정보는 기록을
                     재생할 수 없는 기술적 방법을 사용하여 파기합니다.
                   </p>
@@ -200,7 +200,7 @@ export const PrivacyPage: React.FC = () => {
                   PNU Blace는 개인정보보호법 제29조에 따라 다음과 같이 안전성
                   확보에 필요한 기술적/관리적 및 물리적 조치를 하고 있습니다:
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>• 개인정보 처리 직원의 최소화 및 교육</li>
                   <li>• 개인정보에 대한 접근 제한</li>
                   <li>
@@ -233,7 +233,7 @@ export const PrivacyPage: React.FC = () => {
                   컴퓨터 브라우저에게 보내는 소량의 정보이며 이용자의 PC
                   컴퓨터내의 하드디스크에 저장되기도 합니다.
                 </p>
-                <ul className="space-y-2 text-muted-foreground">
+                <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>
                     • 쿠키의 사용목적: 이용자가 방문한 각 서비스와 웹 사이트들에
                     대한 방문 및 이용형태, 인기 검색어, 보안접속 여부 등을
@@ -284,7 +284,7 @@ export const PrivacyPage: React.FC = () => {
                 12. 개인정보 처리방침의 변경
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-keep">
                   이 개인정보처리방침은 시행일로부터 적용되며, 법령 및 방침에
                   따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의
                   시행 7일 전부터 공지사항을 통하여 고지할 것입니다.

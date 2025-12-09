@@ -187,7 +187,7 @@ export const SeatSelectionModal = ({
 
       {/* Modal */}
       <div
-        className={`relative bg-white dark:bg-gray-950 rounded-2xl shadow-2xl dark:shadow-black/80 max-w-md w-full mx-4 overflow-hidden transition-all duration-300 ease-out transform border border-gray-200 dark:border-gray-800 ${
+        className={`relative bg-white dark:bg-gray-950 rounded-2xl shadow-2xl dark:shadow-black/80 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto overflow-hidden transition-all duration-300 ease-out transform border border-gray-200 dark:border-gray-800 ${
           isOpen
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4"
@@ -239,7 +239,7 @@ export const SeatSelectionModal = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200 hover:scale-110 active:scale-95"
+            className="p-3 min-h-[44px] min-w-[44px] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200 hover:scale-110 active:scale-95 flex items-center justify-center"
             style={{
               backgroundColor: document.documentElement.classList.contains(
                 "dark"
@@ -460,7 +460,7 @@ export const SeatSelectionModal = ({
               <button
                 onClick={() => handleAction("reserve")}
                 disabled={isLoading}
-                className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                className={`w-full py-4 px-4 min-h-[48px] rounded-xl font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
                   isLoading && actionType === "reserve"
                     ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 shadow-lg hover:shadow-xl dark:shadow-blue-500/25"
