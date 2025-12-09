@@ -5,7 +5,7 @@ import { useAuth } from "@/entities/auth";
 import {
   CurrentSeatWidget,
   FavoriteRoomsSection,
-  QuickInsightsSection,
+  MyDashboardRankings,
 } from "./ui";
 import { useDashboardData } from "./model";
 
@@ -42,10 +42,10 @@ const LoginPrompt: React.FC = () => {
               </p>
             </div>
             <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3 sm:col-span-2 lg:col-span-1">
-              <div className="text-2xl">📊</div>
-              <h3 className="text-base sm:text-lg font-light text-foreground">빠른 통계</h3>
+              <div className="text-2xl">🏆</div>
+              <h3 className="text-base sm:text-lg font-light text-foreground">내 랭킹</h3>
               <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
-                이번 주 이용 시간과 방문 횟수
+                이번 주와 전체 이용 랭킹 확인
               </p>
             </div>
           </div>
@@ -87,10 +87,7 @@ const AuthenticatedDashboard: React.FC = () => {
             />
           </div>
           <div>
-            <QuickInsightsSection
-              {...dashboardState}
-              onRefresh={dashboardState.refresh}
-            />
+            <MyDashboardRankings />
           </div>
         </div>
       </div>
