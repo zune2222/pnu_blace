@@ -51,7 +51,7 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
       const now = new Date();
       const diffTime = now.getTime() - date.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays === 0) return "오늘부터";
       if (diffDays === 1) return "어제부터";
       if (diffDays < 7) return `${diffDays}일 전부터`;
@@ -141,7 +141,7 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
                 </span>
               )}
             </div>
-            
+
             {/* 진행바 */}
             {longestStreak > 0 && (
               <div className="space-y-2">
@@ -166,20 +166,16 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
             </p>
             {currentStreak > 0 && (
               <p className="text-sm text-muted-foreground/60 font-light">
-                {currentStreak === 1 
-                  ? "첫 걸음을 시작했어요!" 
-                  : `${currentStreak}일 동안 꾸준히 해왔어요!`
-                }
+                {currentStreak === 1
+                  ? "첫 걸음을 시작했어요!"
+                  : `${currentStreak}일 동안 꾸준히 해왔어요!`}
               </p>
             )}
           </div>
 
           {/* 히트맵 */}
           <div className="pt-4 border-t border-border/10">
-            <StreakHeatmap
-              currentStreak={currentStreak}
-              lastStudyDate={streakStats.lastStudyDate}
-            />
+            <StreakHeatmap />
           </div>
 
           {/* 추가 통계 */}
@@ -205,7 +201,7 @@ const LoadingSkeleton: React.FC = () => {
           <div className="h-10 bg-border/20 rounded animate-pulse" />
           <div className="h-4 bg-border/20 rounded animate-pulse w-32" />
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="text-center space-y-4">
@@ -218,7 +214,7 @@ const LoadingSkeleton: React.FC = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="border border-border/20 rounded-lg p-6">
           <div className="h-6 bg-border/20 rounded animate-pulse mb-4" />
           <div className="h-2 bg-border/20 rounded animate-pulse mb-4" />
@@ -249,7 +245,8 @@ const ErrorState: React.FC<{ error?: string | null }> = ({ error }) => {
             스트릭 데이터를 불러올 수 없어요
           </h3>
           <p className="text-sm text-muted-foreground/60 font-light max-w-md mx-auto leading-relaxed">
-            {error || "연결에 문제가 있거나 아직 스터디 기록이 없을 수 있어요. 잠시 후 다시 시도해주세요."}
+            {error ||
+              "연결에 문제가 있거나 아직 스터디 기록이 없을 수 있어요. 잠시 후 다시 시도해주세요."}
           </p>
         </div>
       </div>
