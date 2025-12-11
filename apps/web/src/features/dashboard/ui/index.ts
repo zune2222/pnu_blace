@@ -6,3 +6,4 @@ export { StreakSummaryCard } from "./streak-summary-card";
 export { AutoExtensionWidget } from "./auto-extension-widget";
 export { QueueStatusWidget } from "./queue-status-widget";
 export { SeatHistoryWidget } from "./seat-history-widget";
+export { SeatHistoryTable } from "./seat-history-table";

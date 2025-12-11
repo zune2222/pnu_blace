@@ -12,20 +12,6 @@ interface SeatHistoryData {
     count: number;
     totalHours: number;
   } | null;
-  recentActivity: Array<{
-    date: string;
-    roomName: string;
-    seatNo: string;
-    startTime: string;
-    endTime: string;
-    duration: string;
-  }>;
-  stats: {
-    message: string;
-    totalTimeMessage: string;
-    visitCountMessage: string;
-    favoriteRoomMessage: string;
-  };
 }
 
 export const SeatHistoryWidget: React.FC = () => {
@@ -91,13 +77,7 @@ export const SeatHistoryWidget: React.FC = () => {
             내 도서관 이용 통계
           </h1>
           <p className="text-lg text-muted-foreground/70 font-light">
-            {data.stats.message}
-          </p>
-        </div>
-
-        <div className="text-center">
-          <p className="text-2xl md:text-3xl font-light text-foreground">
-            {data.stats.totalTimeMessage}
+            지금까지의 도서관 이용 현황을 한눈에 확인하세요.
           </p>
         </div>
       </div>
@@ -136,54 +116,6 @@ export const SeatHistoryWidget: React.FC = () => {
             Average
           </p>
         </div>
-      </div>
-
-      {/* 인사이트 메시지 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        {/* <div className="space-y-6">
-          <p className="text-xl font-light text-foreground leading-relaxed">
-            {data.stats.visitCountMessage}
-          </p>
-          <p className="text-xl font-light text-foreground leading-relaxed">
-            {data.stats.favoriteRoomMessage}
-          </p>
-        </div> */}
-
-        {/* 최근 활동 */}
-        {/* {data.recentActivity.length > 0 && (
-          <div className="space-y-8">
-            <h3 className="text-2xl font-light text-foreground">
-              최근 이용 내역
-            </h3>
-            <div className="space-y-6">
-              {data.recentActivity.slice(0, 3).map((activity, index) => (
-                <div
-                  key={index}
-                  className="border-b border-border/20 pb-6 last:border-b-0"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <h4 className="text-lg font-light text-foreground">
-                        {activity.roomName}
-                      </h4>
-                      <p className="text-sm text-muted-foreground/60 font-light">
-                        {activity.date} • 좌석 {activity.seatNo}
-                      </p>
-                    </div>
-                    <div className="text-right space-y-1">
-                      <div className="font-mono text-lg font-light text-foreground">
-                        {activity.duration}
-                      </div>
-                      <div className="text-xs text-muted-foreground/50 font-light">
-                        {activity.startTime} — {activity.endTime}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

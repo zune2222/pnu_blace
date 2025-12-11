@@ -51,6 +51,32 @@ export class StatsController {
   }
 
   /**
+   * 전체 자리 이용 내역 조회 (페이지네이션, 기간 필터 지원)
+   */
+  @Get('seat-history/full')
+  @UseGuards(JwtAuthGuard)
+  async getFullSeatHistory(
+    @Request() req,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const user = req.user;
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 10, 50); // 최대 50개
+    
+    return this.statsService.getFullSeatHistory(
+      user.studentId,
+      user.sessionID,
+      pageNum,
+      limitNum,
+      startDate,
+      endDate,
+    );
+  }
+
+  /**
    * 전체 랭킹 조회
    */
   @Get('rankings/all-time')
@@ -172,6 +198,20 @@ export class StatsController {
   ) {
     const user = req.user;
     return this.attendanceService.getStudyMemberStreakStats(groupId, user.studentId);
+  }
+
+  /**
+   * 내 연간 도서관 이용 히트맵 데이터 조회
+   */
+  @Get('streak/heatmap')
+  @UseGuards(JwtAuthGuard)
+  async getMyLibraryHeatmap(
+    @Request() req,
+    @Query('year') year?: string,
+  ) {
+    const user = req.user;
+    const targetYear = year ? parseInt(year) : undefined;
+    return this.statsService.getUserLibraryHeatmap(user.studentId, targetYear);
   }
 }
 

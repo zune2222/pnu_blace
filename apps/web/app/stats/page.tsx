@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/auth";
-import { SeatHistoryWidget, StudyContinuitySection } from "@/features/dashboard/ui";
+import { SeatHistoryWidget, StudyContinuitySection, SeatHistoryTable } from "@/features/dashboard/ui";
 import { useDashboardData } from "@/features/dashboard/model";
 
 // 비로그인 시 로그인 유도 UI
@@ -106,6 +106,7 @@ const AuthenticatedStatsPage: React.FC = () => {
             isLoading={dashboardState.isLoading}
             error={dashboardState.error}
           />
+          <SeatHistoryTable />
         </div>
       </section>
     </div>

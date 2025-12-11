@@ -194,6 +194,30 @@ export interface AttendanceStats {
 	averageUsageMinutes: number;
 }
 
+// 멤버 출석 이력 조회 요청
+export interface MemberAttendanceHistoryRequest {
+	page?: number;
+	limit?: number;
+	startDate?: string; // "YYYY-MM-DD"
+	endDate?: string; // "YYYY-MM-DD"
+}
+
+// 멤버 출석 이력 응답
+export interface MemberAttendanceHistoryResponse {
+	member: {
+		memberId: string;
+		displayName: string;
+	};
+	records: AttendanceRecordDetail[];
+	pagination: {
+		page: number;
+		limit: number;
+		total: number;
+		totalPages: number;
+	};
+	summary: AttendanceStats;
+}
+
 // ==================== 휴가 관련 ====================
 
 // 휴가 신청 요청

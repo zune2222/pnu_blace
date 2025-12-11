@@ -8,6 +8,7 @@ import {
   JoinStudyRequestDto,
   JoinStudyWithPasswordDto,
   JoinStudyWithCodeDto,
+  MemberAttendanceHistoryRequest,
 } from "@pnu-blace/types";
 
 // Query Keys
@@ -21,6 +22,8 @@ export const studyQueryKeys = {
     [...studyQueryKeys.all, "attendance", groupId] as const,
   streakStats: (groupId: string) =>
     [...studyQueryKeys.all, "streak", groupId] as const,
+  memberHistory: (groupId: string, memberId: string, request: MemberAttendanceHistoryRequest) =>
+    [...studyQueryKeys.all, "memberHistory", groupId, memberId, request] as const,
   myStudies: () => [...studyQueryKeys.all, "my"] as const,
   popularTags: () => [...studyQueryKeys.all, "tags"] as const,
 };
@@ -70,6 +73,22 @@ export const useGroupStreakStats = (groupId: string, enabled: boolean = true) =>
     queryKey: studyQueryKeys.streakStats(groupId),
     queryFn: () => studyApi.getGroupStreakStats(groupId),
     enabled: !!groupId && enabled,
+  });
+};
+
+/**
+ * 멤버 출석 이력 조회
+ */
+export const useMemberAttendanceHistory = (
+  groupId: string,
+  memberId: string,
+  request: MemberAttendanceHistoryRequest = {},
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: studyQueryKeys.memberHistory(groupId, memberId, request),
+    queryFn: () => studyApi.getMemberAttendanceHistory(groupId, memberId, request),
+    enabled: !!groupId && !!memberId && enabled,
   });
 };
 

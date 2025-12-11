@@ -15,6 +15,8 @@ import {
   StudyMemberDetail,
   StudyMemberRole,
   JoinRequestInfo,
+  MemberAttendanceHistoryRequest,
+  MemberAttendanceHistoryResponse,
 } from "@pnu-blace/types";
 
 // 멤버별 연속성 통계
@@ -259,6 +261,37 @@ class StudyApi {
     return apiClient.get<MemberStreakStats[]>(
       `/api/v1/study-groups/${groupId}/streak-stats`
     );
+  }
+
+  /**
+   * 멤버의 출석 이력 조회
+   */
+  async getMemberAttendanceHistory(
+    groupId: string,
+    memberId: string,
+    request: MemberAttendanceHistoryRequest = {}
+  ): Promise<MemberAttendanceHistoryResponse> {
+    const params = new URLSearchParams();
+    
+    if (request.page) {
+      params.append("page", request.page.toString());
+    }
+    if (request.limit) {
+      params.append("limit", request.limit.toString());
+    }
+    if (request.startDate) {
+      params.append("startDate", request.startDate);
+    }
+    if (request.endDate) {
+      params.append("endDate", request.endDate);
+    }
+
+    const queryString = params.toString();
+    const url = `/api/v1/study-groups/${groupId}/members/${memberId}/attendance-history${
+      queryString ? `?${queryString}` : ""
+    }`;
+
+    return apiClient.get<MemberAttendanceHistoryResponse>(url);
   }
 }
 

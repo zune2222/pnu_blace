@@ -442,10 +442,10 @@ export class StatsService {
           favoriteRoom: null,
           recentActivity: [],
           stats: {
-            message: '아직 도서관 이용 기록이 없네요! 첫 방문을 환영합니다 🎉',
-            totalTimeMessage: '이용 시간: 0시간',
-            visitCountMessage: '방문 횟수: 0회',
-            favoriteRoomMessage: '자주 이용하는 방: 없음',
+            message: '도서관 이용 기록이 없습니다.',
+            totalTimeMessage: '총 0시간 이용',
+            visitCountMessage: '총 0회 방문',
+            favoriteRoomMessage: '이용 기록이 없습니다.',
           },
         };
       }
@@ -531,6 +531,7 @@ export class StatsService {
         recentActivity,
         stats,
         weeklyStats,
+        seatHistory, // 원본 데이터 추가 (스트릭 계산용)
       };
 
       // 통계를 DB에 저장하고 랭킹 업데이트
@@ -645,7 +646,7 @@ export class StatsService {
   }
 
   /**
-   * 재미있는 통계 메시지 생성
+   * 간단한 통계 메시지 생성
    */
   private generateFunMessages(
     totalHours: number,
@@ -653,63 +654,13 @@ export class StatsService {
     _totalDays: number,
     favoriteRoom: { name: string; count: number; totalHours: number } | null,
   ) {
-    // 기본 메시지들
-    let message = '';
-    let totalTimeMessage = '';
-    let visitCountMessage = '';
-    let favoriteRoomMessage = '';
-
-    // 총 이용시간에 따른 메시지
-    if (totalHours < 100) {
-      message = '도서관 탐험을 시작하셨네요! 📚✨';
-      totalTimeMessage = `총 ${Math.round(totalHours * 10) / 10}시간 이용하셨어요`;
-    } else if (totalHours < 500) {
-      message = '도서관이 조금씩 익숙해지고 있군요! 😊📖';
-      totalTimeMessage = `벌써 ${Math.round(totalHours * 10) / 10}시간이나 공부하셨네요!`;
-    } else if (totalHours < 1000) {
-      message = '와우! 진정한 도서관러네요! 🔥📚';
-      totalTimeMessage = `무려 ${Math.round(totalHours * 10) / 10}시간! 대단해요!`;
-    } else if (totalHours < 3000) {
-      message = '도서관 마스터 등극! 🏆📚';
-      totalTimeMessage = `${Math.round(totalHours * 10) / 10}시간... 진짜 대단합니다!`;
-    } else if (totalHours < 5000) {
-      message = '도서관의 전설이 되셨습니다! 👑📚';
-      totalTimeMessage = `${Math.round(totalHours * 10) / 10}시간... 말이 안되는 기록이에요!`;
-    } else {
-      message = '도서관계의 신화가 되셨습니다! ⚡👑';
-      totalTimeMessage = `${Math.round(totalHours * 10) / 10}시간... 이건 정말 전설입니다!`;
-    }
-
-    // 방문 횟수 메시지
-    if (totalSessions < 5) {
-      visitCountMessage = `${totalSessions}번의 소중한 방문 💫`;
-    } else if (totalSessions < 20) {
-      visitCountMessage = `${totalSessions}번이나 오셨네요! 열심히 하시는군요 👏`;
-    } else if (totalSessions < 50) {
-      visitCountMessage = `${totalSessions}번... 이제 단골이시네요! 🎯`;
-    } else {
-      visitCountMessage = `${totalSessions}번... 도서관이 제2의 집이군요! 🏠`;
-    }
-
-    // 선호 장소 메시지
-    if (favoriteRoom) {
-      const { name, count } = favoriteRoom;
-      if (count < 3) {
-        favoriteRoomMessage = `${name}을 좋아하시는 것 같아요 💝`;
-      } else if (count < 10) {
-        favoriteRoomMessage = `${name}이 최애 장소네요! (${count}번 방문) ❤️`;
-      } else {
-        favoriteRoomMessage = `${name}의 터줏대감! (${count}번 방문) 👑`;
-      }
-    } else {
-      favoriteRoomMessage = '아직 단골 장소가 정해지지 않았네요 🤔';
-    }
-
     return {
-      message,
-      totalTimeMessage,
-      visitCountMessage,
-      favoriteRoomMessage,
+      message: '도서관 이용 통계입니다.',
+      totalTimeMessage: `총 ${Math.round(totalHours * 10) / 10}시간 이용`,
+      visitCountMessage: `총 ${totalSessions}회 방문`,
+      favoriteRoomMessage: favoriteRoom 
+        ? `가장 자주 이용한 장소: ${favoriteRoom.name} (${favoriteRoom.count}회)`
+        : '아직 이용 기록이 충분하지 않습니다.',
     };
   }
 
@@ -724,6 +675,9 @@ export class StatsService {
         where: { studentId },
       });
 
+      // 스트릭 계산
+      const streakStats = await this.calculateStreakStats(studentId, statsData.seatHistory || []);
+
       const statsToSave: any = {
         studentId,
         totalUsageHours: statsData.totalUsageHours,
@@ -737,6 +691,10 @@ export class StatsService {
         weeklySessions: statsData.weeklyStats.weeklySessions,
         weeklyDays: statsData.weeklyStats.weeklyDays,
         weekStartDate: statsData.weeklyStats.weekStartDate,
+        currentStreak: streakStats.currentStreak,
+        longestStreak: streakStats.longestStreak,
+        lastStudyDate: streakStats.lastStudyDate,
+        streakStartDate: streakStats.streakStartDate,
         tier,
         lastDataSyncAt: new Date(),
       };
@@ -1507,5 +1465,338 @@ export class StatsService {
       this.logger.error(`Failed to get weekly rankings: ${error.message}`);
       throw new Error('주간 랭킹 조회 중 오류가 발생했습니다.');
     }
+  }
+
+  /**
+   * 사용자의 스트릭 통계를 계산합니다
+   */
+  private async calculateStreakStats(
+    studentId: string,
+    seatHistory: any[],
+  ): Promise<{
+    currentStreak: number;
+    longestStreak: number;
+    lastStudyDate?: Date;
+    streakStartDate?: Date;
+  }> {
+    try {
+      // 기존 통계 조회
+      const existingStats = await this.userStatsRepository.findOne({
+        where: { studentId },
+      });
+
+      if (!seatHistory || seatHistory.length === 0) {
+        return {
+          currentStreak: 0,
+          longestStreak: existingStats?.longestStreak || 0,
+        };
+      }
+
+      // 날짜별로 그룹핑 (YYYY.MM.DD 형태)
+      const studyDates = new Set<string>();
+      seatHistory.forEach((record) => {
+        if (record.useDt) {
+          studyDates.add(record.useDt);
+        }
+      });
+
+      // 날짜를 Date 객체로 변환하고 정렬
+      const sortedDates = Array.from(studyDates)
+        .map((dateStr) => {
+          const [year, month, day] = dateStr.split('.').map(Number);
+          return new Date(year, month - 1, day);
+        })
+        .sort((a, b) => a.getTime() - b.getTime());
+
+      if (sortedDates.length === 0) {
+        return {
+          currentStreak: 0,
+          longestStreak: existingStats?.longestStreak || 0,
+        };
+      }
+
+      const lastStudyDate = sortedDates[sortedDates.length - 1];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // 현재 스트릭 계산
+      let currentStreak = 0;
+      let streakStartDate: Date | undefined;
+
+      // 오늘이나 어제까지 연속으로 공부했는지 확인
+      const daysDiff = Math.floor(
+        (today.getTime() - lastStudyDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
+      if (daysDiff <= 1) {
+        // 현재 스트릭 계산 (역순으로)
+        currentStreak = 1;
+        streakStartDate = lastStudyDate;
+
+        for (let i = sortedDates.length - 2; i >= 0; i--) {
+          const currentDate = sortedDates[i + 1];
+          const prevDate = sortedDates[i];
+          
+          const dateDiff = Math.floor(
+            (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24),
+          );
+
+          if (dateDiff === 1) {
+            // 연속적인 날짜
+            currentStreak++;
+            streakStartDate = prevDate;
+          } else {
+            // 연속성이 끊김
+            break;
+          }
+        }
+      } else {
+        // 2일 이상 간격이 있으면 스트릭 끊김
+        currentStreak = 0;
+        streakStartDate = undefined;
+      }
+
+      // 최장 스트릭 계산
+      let longestStreak = existingStats?.longestStreak || 0;
+      let maxStreakLength = 0;
+
+      if (sortedDates.length > 0) {
+        let tempStreak = 1;
+
+        for (let i = 1; i < sortedDates.length; i++) {
+          const currentDate = sortedDates[i];
+          const prevDate = sortedDates[i - 1];
+          
+          const dateDiff = Math.floor(
+            (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24),
+          );
+
+          if (dateDiff === 1) {
+            tempStreak++;
+          } else {
+            maxStreakLength = Math.max(maxStreakLength, tempStreak);
+            tempStreak = 1;
+          }
+        }
+        maxStreakLength = Math.max(maxStreakLength, tempStreak);
+      }
+
+      longestStreak = Math.max(longestStreak, maxStreakLength, currentStreak);
+
+      return {
+        currentStreak,
+        longestStreak,
+        lastStudyDate,
+        streakStartDate,
+      };
+    } catch (error: any) {
+      this.logger.error(`Failed to calculate streak stats: ${error.message}`);
+      return {
+        currentStreak: 0,
+        longestStreak: 0,
+      };
+    }
+  }
+
+  /**
+   * 전체 자리 이용 내역을 페이지네이션과 기간 필터로 조회합니다
+   */
+  async getFullSeatHistory(
+    userID: string,
+    sessionID: string,
+    page: number = 1,
+    limit: number = 10,
+    startDate?: string,
+    endDate?: string,
+  ) {
+    try {
+      this.logger.debug(`Getting full seat history for user: ${userID}, page: ${page}, limit: ${limit}`);
+
+      // 학교 API에서 모든 이용 내역 가져오기
+      const seatHistory = await this.schoolApiService.getMySeatHistory(
+        userID,
+        sessionID,
+      );
+
+      if (!seatHistory || seatHistory.length === 0) {
+        return {
+          activities: [],
+          totalCount: 0,
+          currentPage: page,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        };
+      }
+
+      // 기간 필터 적용
+      let filteredHistory = seatHistory;
+      if (startDate || endDate) {
+        filteredHistory = seatHistory.filter((record: any) => {
+          const recordDate = record.useDt; // YYYY.MM.DD 형태
+          const recordDateFormatted = recordDate.replace(/\./g, '-'); // YYYY-MM-DD로 변환
+          
+          if (startDate && recordDateFormatted < startDate) {
+            return false;
+          }
+          if (endDate && recordDateFormatted > endDate) {
+            return false;
+          }
+          return true;
+        });
+      }
+
+      // 총 개수
+      const totalCount = filteredHistory.length;
+      const totalPages = Math.ceil(totalCount / limit);
+
+      // 페이지네이션 적용
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedHistory = filteredHistory.slice(startIndex, endIndex);
+
+      // 데이터 변환
+      const activities = paginatedHistory.map((record: any, index: number) => ({
+        id: `${record.useDt}-${record.seatNo}-${index}`,
+        date: record.useDt,
+        roomName: record.roomNm,
+        seatNo: record.seatNo,
+        startTime: record.startTm,
+        endTime: record.endTm,
+        duration: this.formatDuration(
+          this.calculateUsageMinutes(record.startTm, record.endTm),
+        ),
+        usageHours: Math.round(
+          this.calculateUsageMinutes(record.startTm, record.endTm) / 60 * 10
+        ) / 10,
+      }));
+
+      return {
+        activities,
+        totalCount,
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+    } catch (error: any) {
+      this.logger.error(`Get full seat history error: ${error.message}`);
+      throw new Error('전체 이용 내역 조회 중 오류가 발생했습니다.');
+    }
+  }
+
+  /**
+   * 사용자의 연간 도서관 이용 히트맵 데이터 조회
+   */
+  async getUserLibraryHeatmap(studentId: string, year?: number): Promise<{
+    currentStreak: number;
+    longestStreak: number;
+    lastStudyDate?: Date;
+    streakHistory: Array<{
+      date: string;
+      hasActivity: boolean;
+      usageHours: number;
+      level: number; // 0-4 색상 강도 레벨
+    }>;
+  }> {
+    try {
+      const targetYear = year || new Date().getFullYear();
+      
+      // 사용자 정보 조회
+      const user = await this.userRepository.findOne({
+        where: { studentId },
+      });
+
+      if (!user || !user.schoolSessionId) {
+        return this.getEmptyHeatmapData();
+      }
+
+      // 학교 API에서 도서관 이용 기록 가져오기
+      const seatHistory = await this.schoolApiService.getMySeatHistory(
+        studentId,
+        user.schoolSessionId,
+      );
+
+      if (!seatHistory || seatHistory.length === 0) {
+        return this.getEmptyHeatmapData();
+      }
+
+      // 기존 스트릭 통계 조회
+      const userStats = await this.userStatsRepository.findOne({
+        where: { studentId },
+      });
+
+      // 날짜별 이용 시간 계산
+      const dailyUsageMap = new Map<string, number>();
+      
+      seatHistory.forEach((record: any) => {
+        // YYYY.MM.DD를 YYYY-MM-DD 형태로 변환
+        const dateStr = record.useDt.replace(/\./g, '-');
+        const usageMinutes = this.calculateUsageMinutes(record.startTm, record.endTm);
+        const usageHours = usageMinutes / 60;
+        
+        const existingHours = dailyUsageMap.get(dateStr) || 0;
+        dailyUsageMap.set(dateStr, existingHours + usageHours);
+      });
+
+      // 연간 히트맵 데이터 생성
+      const startDate = new Date(targetYear, 0, 1);
+      const endDate = new Date(targetYear, 11, 31);
+      const streakHistory: Array<{
+        date: string;
+        hasActivity: boolean;
+        usageHours: number;
+        level: number;
+      }> = [];
+
+      const currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const usageHours = dailyUsageMap.get(dateStr) || 0;
+        const hasActivity = usageHours > 0;
+        const level = this.calculateUsageLevel(usageHours);
+        
+        streakHistory.push({
+          date: dateStr,
+          hasActivity,
+          usageHours: Math.round(usageHours * 10) / 10,
+          level,
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return {
+        currentStreak: userStats?.currentStreak || 0,
+        longestStreak: userStats?.longestStreak || 0,
+        lastStudyDate: userStats?.lastStudyDate,
+        streakHistory,
+      };
+    } catch (error: any) {
+      this.logger.error(`Get user library heatmap error: ${error.message}`);
+      return this.getEmptyHeatmapData();
+    }
+  }
+
+  /**
+   * 이용 시간에 따른 색상 강도 레벨 계산 (0-4)
+   */
+  private calculateUsageLevel(usageHours: number): number {
+    if (usageHours === 0) return 0;      // 흰색 (이용 없음)
+    if (usageHours <= 2) return 1;       // 연한 주황색
+    if (usageHours <= 5) return 2;       // 중간 주황색
+    if (usageHours <= 8) return 3;       // 진한 주황색
+    return 4;                            // 가장 진한 주황색
+  }
+
+  /**
+   * 빈 히트맵 데이터 반환
+   */
+  private getEmptyHeatmapData() {
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      streakHistory: [],
+    };
   }
 }

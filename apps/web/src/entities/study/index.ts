@@ -8,6 +8,7 @@ export {
   useStudyGroupDetail,
   useTodayAttendance,
   useGroupStreakStats,
+  useMemberAttendanceHistory,
   useMyStudyGroups,
   usePopularTags,
   useCreateStudyGroup,

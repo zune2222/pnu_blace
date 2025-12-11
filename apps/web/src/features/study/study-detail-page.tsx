@@ -303,6 +303,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
 
           <div className="bg-background border border-border/20 rounded-lg p-6">
             <AttendanceList
+              groupId={groupId}
               attendance={attendance || []}
               streakStats={streakStats || []}
               isLoading={isLoadingAttendance || isLoadingStreakStats}

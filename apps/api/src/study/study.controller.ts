@@ -26,6 +26,8 @@ import {
   TodayAttendancePublic,
   MyStudyGroupListResponse,
   StudyActionResponse,
+  MemberAttendanceHistoryRequest,
+  MemberAttendanceHistoryResponse,
 } from '@pnu-blace/types';
 
 // ==================== Public API (비로그인 접근 가능) ====================
@@ -258,5 +260,28 @@ export class StudyController {
   ) {
     // 연속성 통계는 멤버만 볼 수 있도록 AttendanceService에서 처리
     return this.attendanceService.getGroupStreakStats(groupId);
+  }
+
+  /**
+   * 멤버의 출석 이력 조회
+   */
+  @Get(':id/members/:memberId/attendance-history')
+  async getMemberAttendanceHistory(
+    @Request() req,
+    @Param('id') groupId: string,
+    @Param('memberId') memberId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ): Promise<MemberAttendanceHistoryResponse> {
+    const request: MemberAttendanceHistoryRequest = {
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
+      startDate,
+      endDate,
+    };
+
+    return this.attendanceService.getMemberAttendanceHistory(groupId, memberId, request);
   }
 }

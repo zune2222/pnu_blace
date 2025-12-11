@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { TodayAttendancePublic, AttendanceStatus } from "@pnu-blace/types";
 import { MemberStreakStats } from "@/entities/study/api/study-api";
+import { MemberUsageHistoryModal } from "./member-usage-history-modal";
 
 interface AttendanceListProps {
+  groupId: string;
   attendance: TodayAttendancePublic[];
   streakStats?: MemberStreakStats[];
   isLoading?: boolean;
@@ -81,10 +83,15 @@ const StreakBadge: React.FC<{ currentStreak: number }> = ({ currentStreak }) => 
 };
 
 export const AttendanceList: React.FC<AttendanceListProps> = ({
+  groupId,
   attendance,
   streakStats,
   isLoading,
 }) => {
+  const [selectedMember, setSelectedMember] = useState<{
+    memberId: string;
+    displayName: string;
+  } | null>(null);
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -172,11 +179,32 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                   {formatMinutes(member.usageMinutes)}
                 </span>
               )}
+              <button
+                onClick={() => setSelectedMember({ 
+                  memberId: member.memberId, 
+                  displayName: member.displayName 
+                })}
+                className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors p-1 rounded"
+                title="출석 이력 보기"
+              >
+                📊
+              </button>
               <StatusBadge status={member.status} />
             </div>
           </div>
         );
       })}
+      
+      {/* Member Usage History Modal */}
+      {selectedMember && (
+        <MemberUsageHistoryModal
+          groupId={groupId}
+          memberId={selectedMember.memberId}
+          displayName={selectedMember.displayName}
+          isOpen={!!selectedMember}
+          onClose={() => setSelectedMember(null)}
+        />
+      )}
     </div>
   );
 };
