@@ -7,6 +7,7 @@ export {
   usePublicStudyGroups,
   useStudyGroupDetail,
   useTodayAttendance,
+  useGroupStreakStats,
   useMyStudyGroups,
   usePopularTags,
   useCreateStudyGroup,

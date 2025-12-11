@@ -2,7 +2,8 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/auth";
-import { SeatHistoryWidget } from "@/features/dashboard/ui";
+import { SeatHistoryWidget, StudyContinuitySection } from "@/features/dashboard/ui";
+import { useDashboardData } from "@/features/dashboard/model";
 
 // 비로그인 시 로그인 유도 UI
 const StatsLoginPrompt: React.FC = () => {
@@ -19,7 +20,16 @@ const StatsLoginPrompt: React.FC = () => {
             </p>
 
             {/* 미리보기 카드들 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+              <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
+                <div className="text-2xl">🔥</div>
+                <h3 className="text-lg font-light text-foreground">
+                  스터디 스트릭
+                </h3>
+                <p className="text-sm text-muted-foreground/60 font-light">
+                  연속으로 공부한 날을 확인하고 동기부여 받기
+                </p>
+              </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
                 <div className="text-2xl">📊</div>
                 <h3 className="text-lg font-light text-foreground">
@@ -56,6 +66,15 @@ const StatsLoginPrompt: React.FC = () => {
                   시간대별, 요일별 이용 패턴 분석
                 </p>
               </div>
+              <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
+                <div className="text-2xl">📊</div>
+                <h3 className="text-lg font-light text-foreground">
+                  활동 히트맵
+                </h3>
+                <p className="text-sm text-muted-foreground/60 font-light">
+                  최근 30일간의 공부 활동을 시각적으로 확인
+                </p>
+              </div>
             </div>
 
             <div className="pt-8">
@@ -73,6 +92,26 @@ const StatsLoginPrompt: React.FC = () => {
   );
 };
 
+// 로그인된 사용자용 통계 페이지 컴포넌트
+const AuthenticatedStatsPage: React.FC = () => {
+  const dashboardState = useDashboardData();
+
+  return (
+    <div className="min-h-screen bg-background">
+      <section className="py-20 md:py-32">
+        <div className="max-w-4xl mx-auto px-6 space-y-16">
+          <SeatHistoryWidget />
+          <StudyContinuitySection
+            streakStats={dashboardState.dashboardData?.streakStats || null}
+            isLoading={dashboardState.isLoading}
+            error={dashboardState.error}
+          />
+        </div>
+      </section>
+    </div>
+  );
+};
+
 export default function StatsPage() {
   const { isAuthenticated } = useAuth();
 
@@ -81,13 +120,5 @@ export default function StatsPage() {
     return <StatsLoginPrompt />;
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <section className="py-20 md:py-32">
-        <div className="max-w-4xl mx-auto px-6">
-          <SeatHistoryWidget />
-        </div>
-      </section>
-    </div>
-  );
+  return <AuthenticatedStatsPage />;
 }

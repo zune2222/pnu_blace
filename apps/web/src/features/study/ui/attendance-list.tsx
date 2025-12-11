@@ -2,9 +2,11 @@
 
 import React from "react";
 import { TodayAttendancePublic, AttendanceStatus } from "@pnu-blace/types";
+import { MemberStreakStats } from "@/entities/study/api/study-api";
 
 interface AttendanceListProps {
   attendance: TodayAttendancePublic[];
+  streakStats?: MemberStreakStats[];
   isLoading?: boolean;
 }
 
@@ -67,8 +69,20 @@ const formatMinutes = (minutes?: number): string => {
   return `${hours}시간 ${mins}분`;
 };
 
+// 연속성 표시 컴포넌트
+const StreakBadge: React.FC<{ currentStreak: number }> = ({ currentStreak }) => {
+  if (currentStreak === 0) return null;
+
+  return (
+    <span className="text-xs text-orange-500 font-light ml-2 inline-flex items-center gap-1">
+      🔥 {currentStreak}일 스트릭
+    </span>
+  );
+};
+
 export const AttendanceList: React.FC<AttendanceListProps> = ({
   attendance,
+  streakStats,
   isLoading,
 }) => {
   if (isLoading) {
@@ -109,41 +123,60 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
 
   return (
     <div className="space-y-1">
-      {sortedAttendance.map((member) => (
-        <div
-          key={member.memberId}
-          className="flex items-center justify-between py-3 border-b border-border/10 last:border-0"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-muted-foreground/10 flex items-center justify-center text-sm font-light text-muted-foreground/60">
-              {member.displayName.charAt(0)}
-            </div>
-            <div>
-              <p className="text-sm font-light text-foreground">
-                {member.displayName}
-              </p>
-              {member.checkInTime && (
-                <p className="text-xs text-muted-foreground/50 font-light">
-                  {member.checkInTime} 출근
-                  {member.checkOutTime && ` → ${member.checkOutTime} 퇴근`}
-                  {member.isCurrentlyIn && (
-                    <span className="ml-2 text-green-500">• 이용 중</span>
-                  )}
-                </p>
-              )}
-            </div>
-          </div>
+      {sortedAttendance.map((member) => {
+        // 해당 멤버의 연속성 정보 찾기 (memberId로 매칭, 없으면 displayName으로 매칭)
+        const memberStreak = streakStats?.find(
+          (streak) => 
+            streak.memberId === member.memberId || 
+            streak.displayName === member.displayName
+        );
 
-          <div className="flex items-center gap-4">
-            {member.usageMinutes !== undefined && member.usageMinutes > 0 && (
-              <span className="text-xs text-muted-foreground/50 font-light">
-                {formatMinutes(member.usageMinutes)}
-              </span>
-            )}
-            <StatusBadge status={member.status} />
+        return (
+          <div
+            key={member.memberId}
+            className="flex items-center justify-between py-3 border-b border-border/10 last:border-0"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-muted-foreground/10 flex items-center justify-center text-sm font-light text-muted-foreground/60">
+                {member.displayName.charAt(0)}
+              </div>
+              <div>
+                <div className="flex items-center">
+                  <p className="text-sm font-light text-foreground">
+                    {member.displayName}
+                  </p>
+                  {memberStreak && (
+                    <StreakBadge currentStreak={memberStreak.currentStreak} />
+                  )}
+                </div>
+                {member.checkInTime && (
+                  <p className="text-xs text-muted-foreground/50 font-light">
+                    {member.checkInTime} 출근
+                    {member.checkOutTime && ` → ${member.checkOutTime} 퇴근`}
+                    {member.isCurrentlyIn && (
+                      <span className="ml-2 text-green-500">• 이용 중</span>
+                    )}
+                  </p>
+                )}
+                {memberStreak && memberStreak.longestStreak > memberStreak.currentStreak && (
+                  <p className="text-xs text-muted-foreground/40 font-light">
+                    최고 스트릭: {memberStreak.longestStreak}일
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {member.usageMinutes !== undefined && member.usageMinutes > 0 && (
+                <span className="text-xs text-muted-foreground/50 font-light">
+                  {formatMinutes(member.usageMinutes)}
+                </span>
+              )}
+              <StatusBadge status={member.status} />
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

@@ -45,11 +45,20 @@ export interface InsightItem {
   isNew?: boolean;
 }
 
+// 연속성 통계
+export interface StreakStats {
+  currentStreak: number;
+  longestStreak: number;
+  streakStartDate?: string;
+  lastStudyDate?: string;
+}
+
 // 대시보드 데이터 (조합)
 export interface DashboardData {
   currentSeat: CurrentSeat | null;
   favoriteRooms: ReadingRoomInfo[];
   personalStats: MyUsageStatsDto | null;
+  streakStats: StreakStats | null;
   insights: InsightItem[];
   lastUpdated: string;
 }

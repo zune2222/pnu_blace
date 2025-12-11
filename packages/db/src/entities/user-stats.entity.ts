@@ -72,6 +72,19 @@ export class UserStats {
   @Column({ type: 'varchar', length: 50, nullable: true })
   publicNickname?: string;
 
+  // 연속성 추적 (전체 스터디)
+  @Column({ type: 'int', default: 0 })
+  currentStreak!: number; // 현재 연속 출석일
+
+  @Column({ type: 'int', default: 0 })
+  longestStreak!: number; // 최고 연속 출석일
+
+  @Column({ type: 'date', nullable: true })
+  lastStudyDate?: Date; // 마지막 스터디 출석일
+
+  @Column({ type: 'date', nullable: true })
+  streakStartDate?: Date; // 현재 연속 출석 시작일
+
   @CreateDateColumn()
   createdAt!: Date;
 

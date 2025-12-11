@@ -37,7 +37,9 @@ export const SeatHistoryWidget: React.FC = () => {
     const fetchSeatHistory = async () => {
       try {
         setIsLoading(true);
-        const response = await apiClient.get<SeatHistoryData>("/api/v1/stats/seat-history");
+        const response = await apiClient.get<SeatHistoryData>(
+          "/api/v1/stats/seat-history"
+        );
         setData(response);
         setError(null);
       } catch (err) {
@@ -58,7 +60,10 @@ export const SeatHistoryWidget: React.FC = () => {
           <div className="h-16 bg-muted-foreground/10 rounded"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 bg-muted-foreground/10 rounded"></div>
+              <div
+                key={i}
+                className="h-20 bg-muted-foreground/10 rounded"
+              ></div>
             ))}
           </div>
           <div className="h-32 bg-muted-foreground/10 rounded"></div>
@@ -89,7 +94,7 @@ export const SeatHistoryWidget: React.FC = () => {
             {data.stats.message}
           </p>
         </div>
-        
+
         <div className="text-center">
           <p className="text-2xl md:text-3xl font-light text-foreground">
             {data.stats.totalTimeMessage}
@@ -135,24 +140,27 @@ export const SeatHistoryWidget: React.FC = () => {
 
       {/* 인사이트 메시지 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        <div className="space-y-6">
+        {/* <div className="space-y-6">
           <p className="text-xl font-light text-foreground leading-relaxed">
             {data.stats.visitCountMessage}
           </p>
           <p className="text-xl font-light text-foreground leading-relaxed">
             {data.stats.favoriteRoomMessage}
           </p>
-        </div>
+        </div> */}
 
         {/* 최근 활동 */}
-        {data.recentActivity.length > 0 && (
+        {/* {data.recentActivity.length > 0 && (
           <div className="space-y-8">
             <h3 className="text-2xl font-light text-foreground">
               최근 이용 내역
             </h3>
             <div className="space-y-6">
               {data.recentActivity.slice(0, 3).map((activity, index) => (
-                <div key={index} className="border-b border-border/20 pb-6 last:border-b-0">
+                <div
+                  key={index}
+                  className="border-b border-border/20 pb-6 last:border-b-0"
+                >
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
                       <h4 className="text-lg font-light text-foreground">
@@ -175,7 +183,7 @@ export const SeatHistoryWidget: React.FC = () => {
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

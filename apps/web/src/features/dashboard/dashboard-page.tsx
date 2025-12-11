@@ -77,7 +77,7 @@ const AuthenticatedDashboard: React.FC = () => {
         </div>
 
         {/* 하단 섹션들 - 그리드 레이아웃 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 xl:gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 xl:gap-24 py-16 md:py-20">
           <div className="border-r-0 lg:border-r border-border/20 pb-8 lg:pb-0">
             <FavoriteRoomsSection
               favoriteRooms={dashboardState.favoriteRooms}

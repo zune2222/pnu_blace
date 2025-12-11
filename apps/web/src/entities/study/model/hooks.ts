@@ -19,6 +19,8 @@ export const studyQueryKeys = {
     [...studyQueryKeys.all, "detail", groupId] as const,
   attendance: (groupId: string) =>
     [...studyQueryKeys.all, "attendance", groupId] as const,
+  streakStats: (groupId: string) =>
+    [...studyQueryKeys.all, "streak", groupId] as const,
   myStudies: () => [...studyQueryKeys.all, "my"] as const,
   popularTags: () => [...studyQueryKeys.all, "tags"] as const,
 };
@@ -57,6 +59,17 @@ export const useTodayAttendance = (groupId: string) => {
     queryFn: () => studyApi.getTodayAttendance(groupId),
     enabled: !!groupId,
     refetchInterval: 60000, // 1분마다 자동 갱신
+  });
+};
+
+/**
+ * 스터디 그룹 연속성 통계 조회
+ */
+export const useGroupStreakStats = (groupId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: studyQueryKeys.streakStats(groupId),
+    queryFn: () => studyApi.getGroupStreakStats(groupId),
+    enabled: !!groupId && enabled,
   });
 };
 

@@ -20,6 +20,7 @@ import {
   AddToQueueRequestDto,
   QueueStatusDto,
 } from "@pnu-blace/types";
+import { StreakStats } from "../model/types";
 
 class DashboardApi {
   private favoriteRooms = ["A202", "A301", "A101"]; // 로컬 스토리지로 관리할 수 있음
@@ -165,6 +166,16 @@ class DashboardApi {
     }
   }
 
+  // 연속성 통계 조회
+  async getStreakStats(): Promise<StreakStats | null> {
+    try {
+      return await apiClient.get<StreakStats>("/api/v1/stats/streak");
+    } catch (error) {
+      console.warn("연속성 통계 조회 실패:", error);
+      return null;
+    }
+  }
+
   // 인사이트 생성 (통계 데이터 기반)
   async generateInsights(): Promise<InsightItem[]> {
     try {
@@ -271,11 +282,12 @@ class DashboardApi {
   // 대시보드 전체 데이터 조회
   async getDashboardData(): Promise<ApiResponse<DashboardData>> {
     try {
-      const [currentSeat, favoriteRooms, personalStats, insights] =
+      const [currentSeat, favoriteRooms, personalStats, streakStats, insights] =
         await Promise.all([
           this.getCurrentSeat().catch(() => null),
           this.getFavoriteRooms().catch(() => []),
           this.getPersonalStats().catch(() => null),
+          this.getStreakStats().catch(() => null),
           this.generateInsights().catch(() => []),
         ]);
 
@@ -283,6 +295,7 @@ class DashboardApi {
         currentSeat,
         favoriteRooms,
         personalStats,
+        streakStats,
         insights,
         lastUpdated: new Date().toISOString(),
       };

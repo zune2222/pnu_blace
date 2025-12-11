@@ -52,4 +52,17 @@ export class StudyMember {
 
 	@Column({ type: "timestamp", nullable: true })
 	lastActiveAt?: Date;
+
+	// 개별 스터디별 연속성 추적
+	@Column({ type: 'int', default: 0 })
+	currentStreak!: number; // 이 스터디에서의 현재 연속 출석일
+
+	@Column({ type: 'int', default: 0 })
+	longestStreak!: number; // 이 스터디에서의 최고 연속 출석일
+
+	@Column({ type: 'date', nullable: true })
+	lastAttendanceDate?: Date; // 마지막 출석일
+
+	@Column({ type: 'date', nullable: true })
+	streakStartDate?: Date; // 현재 연속 출석 시작일
 }

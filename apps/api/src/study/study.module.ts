@@ -7,6 +7,7 @@ import {
   AttendanceRecord,
   VacationRequest,
   User,
+  UserStats,
 } from '@pnu-blace/db';
 import { StudyController, StudyPublicController } from './study.controller';
 import { MemberController } from './member.controller';
@@ -24,6 +25,7 @@ import { SchoolApiModule } from '../school-api/school-api.module';
       AttendanceRecord,
       VacationRequest,
       User,
+      UserStats,
     ]),
     SchoolApiModule,
   ],

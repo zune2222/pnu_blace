@@ -11,6 +11,7 @@ import { StatsController, AdminController } from './stats.controller';
 import { StatsService } from './stats.service';
 import { CalendarService } from './calendar.service';
 import { SchoolApiModule } from '../school-api/school-api.module';
+import { StudyModule } from '../study/study.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SchoolApiModule } from '../school-api/school-api.module';
       UserStats,
     ]),
     SchoolApiModule,
+    StudyModule,
   ],
   controllers: [StatsController, AdminController],
   providers: [StatsService, CalendarService],

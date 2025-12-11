@@ -13,6 +13,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { StudyService } from './study.service';
+import { AttendanceService } from './attendance.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   CreateStudyGroupDto,
@@ -104,7 +105,10 @@ export class StudyPublicController {
 @Controller('api/v1/study-groups')
 @UseGuards(JwtAuthGuard)
 export class StudyController {
-  constructor(private readonly studyService: StudyService) {}
+  constructor(
+    private readonly studyService: StudyService,
+    private readonly attendanceService: AttendanceService,
+  ) {}
 
   /**
    * 스터디 생성
@@ -242,5 +246,17 @@ export class StudyController {
     );
 
     return { inviteCode };
+  }
+
+  /**
+   * 스터디 그룹 내 모든 멤버의 연속성 통계 조회
+   */
+  @Get(':id/streak-stats')
+  async getGroupStreakStats(
+    @Request() req,
+    @Param('id') groupId: string,
+  ) {
+    // 연속성 통계는 멤버만 볼 수 있도록 AttendanceService에서 처리
+    return this.attendanceService.getGroupStreakStats(groupId);
   }
 }

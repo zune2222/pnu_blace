@@ -17,6 +17,17 @@ import {
   JoinRequestInfo,
 } from "@pnu-blace/types";
 
+// 멤버별 연속성 통계
+export interface MemberStreakStats {
+  studentId: string;
+  memberId?: string;
+  displayName: string;
+  currentStreak: number;
+  longestStreak: number;
+  streakStartDate?: string;
+  lastAttendanceDate?: string;
+}
+
 /**
  * 스터디 API 클라이언트
  */
@@ -238,6 +249,15 @@ class StudyApi {
     return apiClient.put<StudyActionResponse>(
       `/api/v1/study-groups/${groupId}/requests/${requestId}`,
       { status, rejectionReason }
+    );
+  }
+
+  /**
+   * 스터디 그룹 내 모든 멤버의 연속성 통계 조회
+   */
+  async getGroupStreakStats(groupId: string): Promise<MemberStreakStats[]> {
+    return apiClient.get<MemberStreakStats[]>(
+      `/api/v1/study-groups/${groupId}/streak-stats`
     );
   }
 }

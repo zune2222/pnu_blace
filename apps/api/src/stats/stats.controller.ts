@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { CalendarService } from './calendar.service';
+import { AttendanceService } from '../study/attendance.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   MyUsageStatsDto,
@@ -26,6 +27,7 @@ export class StatsController {
   constructor(
     private readonly statsService: StatsService,
     private readonly calendarService: CalendarService,
+    private readonly attendanceService: AttendanceService,
   ) {}
 
   /**
@@ -147,6 +149,29 @@ export class StatsController {
     @Param('seatNo') seatNo: string,
   ): Promise<SeatPredictionDto> {
     return this.statsService.getSeatPrediction(roomNo, seatNo);
+  }
+
+  /**
+   * 내 연속성 통계 조회
+   */
+  @Get('streak')
+  @UseGuards(JwtAuthGuard)
+  async getMyStreakStats(@Request() req) {
+    const user = req.user;
+    return this.attendanceService.getUserStreakStats(user.studentId);
+  }
+
+  /**
+   * 특정 스터디에서 내 연속성 통계 조회
+   */
+  @Get('streak/study/:groupId')
+  @UseGuards(JwtAuthGuard)
+  async getMyStudyStreakStats(
+    @Request() req,
+    @Param('groupId') groupId: string,
+  ) {
+    const user = req.user;
+    return this.attendanceService.getStudyMemberStreakStats(groupId, user.studentId);
   }
 }
 

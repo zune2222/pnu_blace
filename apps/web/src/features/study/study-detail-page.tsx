@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   useStudyGroupDetail,
   useTodayAttendance,
+  useGroupStreakStats,
   useRequestJoin,
   useJoinWithPassword,
   useMyStudyGroups,
@@ -50,6 +51,8 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   const { data: study, isLoading, error } = useStudyGroupDetail(groupId);
   const { data: attendance, isLoading: isLoadingAttendance } =
     useTodayAttendance(groupId);
+  const { data: streakStats, isLoading: isLoadingStreakStats } =
+    useGroupStreakStats(groupId, isAuthenticated);
   const { data: myStudies } = useMyStudyGroups(isAuthenticated);
 
   // 내가 이 스터디의 관리자인지 확인
@@ -301,7 +304,8 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
           <div className="bg-background border border-border/20 rounded-lg p-6">
             <AttendanceList
               attendance={attendance || []}
-              isLoading={isLoadingAttendance}
+              streakStats={streakStats || []}
+              isLoading={isLoadingAttendance || isLoadingStreakStats}
             />
           </div>
         </div>
