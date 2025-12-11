@@ -10,7 +10,9 @@ async function bootstrap() {
     debug: process.env.NODE_ENV === 'development',
   });
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'debug', 'verbose'],
+  });
 
   // CORS 설정
   app.enableCors({

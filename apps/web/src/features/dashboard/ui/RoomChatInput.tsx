@@ -29,6 +29,7 @@ export const RoomChatInput: React.FC<RoomChatInputProps> = ({
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.nativeEvent.isComposing) return; // 한글 조합 중일 때는 전송 막기
       e.preventDefault();
       handleSubmit(e);
     }

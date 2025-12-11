@@ -26,8 +26,8 @@ interface UseStudyChatReturn {
   isLoading: boolean;
 }
 
-export function useStudyChat(groupId: string): UseStudyChatReturn {
-  const { token, isAuthenticated } = useAuth();
+export function useStudyChat(groupId: string, isChatActive: boolean): UseStudyChatReturn {
+  const { token, isAuthenticated, user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -35,6 +35,15 @@ export function useStudyChat(groupId: string): UseStudyChatReturn {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Socket callback에서 최신 상태를 참조하기 위한 Refs
+  const userRef = useRef(user);
+  const isChatActiveRef = useRef(isChatActive);
+
+  useEffect(() => {
+    userRef.current = user;
+    isChatActiveRef.current = isChatActive;
+  }, [user, isChatActive]);
 
   // Socket 연결
   useEffect(() => {
@@ -66,8 +75,12 @@ export function useStudyChat(groupId: string): UseStudyChatReturn {
 
     socket.on("newMessage", (message: ChatMessage) => {
       setMessages((prev) => [...prev, message]);
-      // 새 메시지 수신 시 unreadCount 증가
-      setUnreadCount((prev) => prev + 1);
+      
+      // 내 메시지가 아니고, 채팅 탭이 활성화되어 있지 않을 때만 unreadCount 증가
+      const isMyMessage = userRef.current?.studentId && message.studentId === userRef.current.studentId;
+      if (!isMyMessage && !isChatActiveRef.current) {
+        setUnreadCount((prev) => prev + 1);
+      }
     });
 
     socket.on("userCount", (data: { roomId: string; count: number }) => {
@@ -81,7 +94,7 @@ export function useStudyChat(groupId: string): UseStudyChatReturn {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [groupId, token, isAuthenticated]);
+  }, [groupId, token, isAuthenticated]); // user와 isChatActive는 ref로 참조하므로 의존성 제거
 
   // 메시지 전송
   const sendMessage = useCallback(async (content: string): Promise<boolean> => {

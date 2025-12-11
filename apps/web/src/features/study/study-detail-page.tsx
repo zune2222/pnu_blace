@@ -73,14 +73,12 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
     resetUnread,
     hasMore: chatHasMore,
     isLoading: chatIsLoading,
-  } = useStudyChat(groupId);
+  } = useStudyChat(groupId, activeTab === "chat");
 
   // 채팅 탭으로 전환 시 읽음 처리
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    if (tab === "chat") {
-      resetUnread();
-    }
+    resetUnread();
   };
 
   // 내가 이 스터디의 관리자인지 확인

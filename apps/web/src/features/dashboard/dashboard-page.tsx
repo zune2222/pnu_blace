@@ -80,7 +80,7 @@ const AuthenticatedDashboard: React.FC = () => {
     isConnected,
     myNickname,
     messages,
-    todayHistory,
+    historyMessages,
     isHistoryOpen,
     sendMessage,
     openHistory,
@@ -128,7 +128,7 @@ const AuthenticatedDashboard: React.FC = () => {
       <RoomChatHistoryModal
         isOpen={isHistoryOpen}
         onClose={closeHistory}
-        messages={todayHistory}
+        messages={historyMessages}
         roomName={currentRoomName}
       />
     </div>

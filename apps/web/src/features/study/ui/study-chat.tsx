@@ -121,6 +121,7 @@ export const StudyChat: React.FC<StudyChatProps> = ({
   // Enter 키로 전송
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
+      if (e.nativeEvent.isComposing) return;
       e.preventDefault();
       handleSend();
     }

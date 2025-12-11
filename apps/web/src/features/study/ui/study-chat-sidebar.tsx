@@ -40,6 +40,8 @@ export const StudyChatSidebar: React.FC<StudyChatSidebarProps> = ({
   defaultOpen = true,
 }) => {
   const { user, isAuthenticated } = useAuth();
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
   const {
     messages,
     isConnected,
@@ -48,9 +50,7 @@ export const StudyChatSidebar: React.FC<StudyChatSidebarProps> = ({
     loadMore,
     hasMore,
     isLoading,
-  } = useStudyChat(groupId);
-
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  } = useStudyChat(groupId, isOpen);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

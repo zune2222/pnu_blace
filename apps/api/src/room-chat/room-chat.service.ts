@@ -69,21 +69,27 @@ export class RoomChatService {
   }
 
   /**
-   * 오늘 채팅 내역 조회
+   * 채팅 내역 조회 (페이징)
    */
-  async getTodayMessages(roomNo: string): Promise<RoomChatMessageDto[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  async getMessages(
+    roomNo: string,
+    before?: Date,
+    limit: number = 50,
+  ): Promise<RoomChatMessageDto[]> {
+    const queryBuilder = this.roomChatMessageRepository
+      .createQueryBuilder('message')
+      .where('message.roomNo = :roomNo', { roomNo })
+      .orderBy('message.createdAt', 'DESC')
+      .take(limit);
 
-    const messages = await this.roomChatMessageRepository.find({
-      where: {
-        roomNo,
-        createdAt: MoreThanOrEqual(today),
-      },
-      order: { createdAt: 'ASC' },
-    });
+    if (before) {
+      queryBuilder.andWhere('message.createdAt < :before', { before });
+    }
 
-    return messages.map((msg) => this.toDto(msg));
+    const messages = await queryBuilder.getMany();
+
+    // 과거 -> 최신 순으로 정렬하여 반환
+    return messages.reverse().map((msg) => this.toDto(msg));
   }
 
   /**

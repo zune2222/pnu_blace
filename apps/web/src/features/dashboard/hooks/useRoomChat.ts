@@ -1,18 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '@/entities/auth';
-
-export interface FloatingMessage {
-  messageId: string;
-  anonymousName: string;
-  content: string;
-  createdAt: string;
-  // UI용 필드
-  id: string; // 애니메이션 키
-  xPosition: number; // 랜덤 X 위치 (0-80%)
-}
 
 export interface RoomChatMessage {
   messageId: string;
@@ -22,21 +12,24 @@ export interface RoomChatMessage {
   createdAt: string;
 }
 
-interface UseRoomChatOptions {
-  onNewMessage?: (message: FloatingMessage) => void;
+interface FloatingMessage extends RoomChatMessage {
+  id: string;
+  xPosition: number;
 }
 
-export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions) => {
+export const useRoomChat = (roomNo: string | null) => {
   const { token } = useAuth();
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [myNickname, setMyNickname] = useState<string | null>(null);
   const [messages, setMessages] = useState<FloatingMessage[]>([]);
-  const [todayHistory, setTodayHistory] = useState<RoomChatMessage[]>([]);
+  const [historyMessages, setHistoryMessages] = useState<RoomChatMessage[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // 메시지 자동 제거 (5초 후)
-  const addMessage = useCallback((msg: RoomChatMessage) => {
+  // 플로팅 메시지 추가 (5초 후 자동 제거)
+  const addFloatingMessage = useCallback((msg: RoomChatMessage) => {
     const floatingMsg: FloatingMessage = {
       ...msg,
       id: `${msg.messageId}-${Date.now()}`,
@@ -44,13 +37,12 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
     };
 
     setMessages((prev) => [...prev, floatingMsg]);
-    options?.onNewMessage?.(floatingMsg);
 
     // 5초 후 제거
     setTimeout(() => {
-      setMessages((prev) => prev.filter((m) => m.id !== floatingMsg.id));
+      setMessages((prev) => prev.filter(m => m.id !== floatingMsg.id));
     }, 5000);
-  }, [options]);
+  }, []);
 
   // 소켓 연결
   useEffect(() => {
@@ -66,21 +58,30 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
     socketRef.current = socket;
 
     socket.on('connect', () => {
+      console.log('🔗 Room chat connected:', socket.id);
       setIsConnected(true);
+      
       // 방 입장
       socket.emit('joinRoom', { roomNo }, (response: any) => {
+        console.log('🚪 Join room response:', response);
         if (response.success) {
           setMyNickname(response.anonymousName);
         }
       });
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.log('🔌 Room chat disconnected:', reason);
       setIsConnected(false);
     });
 
     socket.on('newMessage', (message: RoomChatMessage) => {
-      addMessage(message);
+      console.log('📩 New message:', message);
+      addFloatingMessage(message);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('❌ Connection error:', error);
     });
 
     return () => {
@@ -91,7 +92,7 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
       socketRef.current = null;
       setIsConnected(false);
     };
-  }, [roomNo, token, addMessage]);
+  }, [roomNo, token, addFloatingMessage]);
 
   // 메시지 전송
   const sendMessage = useCallback((content: string) => {
@@ -101,6 +102,7 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
       'sendMessage',
       { roomNo, content: content.trim() },
       (response: any) => {
+        console.log('📤 Send message response:', response);
         if (!response.success) {
           console.error('Failed to send message:', response.error);
         }
@@ -108,16 +110,24 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
     );
   }, [roomNo]);
 
-  // 오늘 채팅 내역 조회
-  const loadTodayHistory = useCallback(() => {
-    if (!socketRef.current || !roomNo) return;
+  // 채팅 내역 조회
+  const loadHistory = useCallback(() => {
+    if (!socketRef.current || !roomNo) {
+      console.warn('Socket or roomNo not available');
+      return;
+    }
+
+    console.log('📥 Loading history for room:', roomNo);
 
     socketRef.current.emit(
-      'getTodayHistory',
+      'getMessages',
       { roomNo },
       (response: any) => {
+        console.log('📥 History response:', response);
         if (response.success) {
-          setTodayHistory(response.messages);
+          setHistoryMessages(response.messages);
+        } else {
+          console.error('Failed to load history:', response.error);
         }
       }
     );
@@ -125,19 +135,21 @@ export const useRoomChat = (roomNo: string | null, options?: UseRoomChatOptions)
 
   // 히스토리 모달 열기
   const openHistory = useCallback(() => {
-    loadTodayHistory();
     setIsHistoryOpen(true);
-  }, [loadTodayHistory]);
+    loadHistory();
+  }, [loadHistory]);
 
+  // 히스토리 모달 닫기
   const closeHistory = useCallback(() => {
     setIsHistoryOpen(false);
+    setHistoryMessages([]);
   }, []);
 
   return {
     isConnected,
     myNickname,
     messages,
-    todayHistory,
+    historyMessages,
     isHistoryOpen,
     sendMessage,
     openHistory,

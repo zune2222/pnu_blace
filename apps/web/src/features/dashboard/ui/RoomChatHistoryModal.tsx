@@ -36,25 +36,25 @@ export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-background border border-border/30 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col">
+      <div className="relative bg-white dark:bg-zinc-900 border border-border/30 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
+        <div className="flex-none flex items-center justify-between px-5 py-4 border-b border-border/20">
           <div>
-            <h2 className="text-lg font-medium text-foreground">오늘의 채팅</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">오늘의 채팅</h2>
             {roomName && (
-              <p className="text-sm text-muted-foreground mt-0.5">{roomName}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{roomName}</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-muted/50 transition-colors -mr-2"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors -mr-2"
           >
-            <X className="w-5 h-5 text-muted-foreground" />
+            <X className="w-5 h-5 text-black dark:text-white" />
           </button>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
           {messages.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p className="text-sm">오늘 채팅 내역이 없습니다.</p>
@@ -64,14 +64,14 @@ export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
             messages.map((msg) => (
               <div key={msg.messageId} className="space-y-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {msg.anonymousName}
                   </span>
-                  <span className="text-xs text-muted-foreground/60">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     {formatTime(msg.createdAt)}
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 pl-0.5">
+                <p className="text-sm text-gray-800 dark:text-gray-200 pl-0.5 whitespace-pre-wrap break-words">
                   {msg.content}
                 </p>
               </div>

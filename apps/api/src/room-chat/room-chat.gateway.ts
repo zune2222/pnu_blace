@@ -203,7 +203,7 @@ export class RoomChatGateway
   }
 
   /**
-   * 오늘 채팅 내역 조회
+   * 오늘 채팅 내역 조회 (간단 버전)
    */
   @SubscribeMessage('getTodayHistory')
   async handleGetTodayHistory(
@@ -213,15 +213,50 @@ export class RoomChatGateway
     const { roomNo } = data;
     const studentId = client.data.studentId;
 
+    this.logger.debug(`🔍 getTodayHistory event received from ${client.id}, studentId: ${studentId}, roomNo: ${roomNo}`);
+
     if (!studentId) {
+      this.logger.warn(`❌ Unauthenticated user trying to get today history: ${client.id}`);
       return { success: false, error: '인증되지 않은 사용자입니다.' };
     }
 
     try {
-      const messages = await this.roomChatService.getTodayMessages(roomNo);
+      this.logger.debug(`📚 Fetching today messages for room ${roomNo}`);
+      const messages = await this.roomChatService.getMessages(roomNo, undefined);
+      this.logger.debug(`✅ Found ${messages.length} today messages for room ${roomNo}`);
       return { success: true, messages };
     } catch (error: any) {
-      this.logger.error(`Failed to get room chat history: ${error.message}`);
+      this.logger.error(`❌ Failed to get today chat history: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 채팅 내역 조회 (페이징)
+   */
+  @SubscribeMessage('getMessages')
+  async handleGetMessages(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomNo: string; before?: string },
+  ) {
+    const { roomNo, before } = data;
+    const studentId = client.data.studentId;
+
+    this.logger.debug(`🔍 getMessages event received from ${client.id}, studentId: ${studentId}, roomNo: ${roomNo}, before: ${before}`);
+
+    if (!studentId) {
+      this.logger.warn(`❌ Unauthenticated user trying to get messages: ${client.id}`);
+      return { success: false, error: '인증되지 않은 사용자입니다.' };
+    }
+
+    try {
+      const beforeDate = before ? new Date(before) : undefined;
+      this.logger.debug(`📚 Fetching messages for room ${roomNo}, before: ${beforeDate}`);
+      const messages = await this.roomChatService.getMessages(roomNo, beforeDate);
+      this.logger.debug(`✅ Found ${messages.length} messages for room ${roomNo}`);
+      return { success: true, messages };
+    } catch (error: any) {
+      this.logger.error(`❌ Failed to get room chat history: ${error.message}`);
       return { success: false, error: error.message };
     }
   }
