@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { RoomChatMessage } from '../hooks/useRoomChat';
 
@@ -9,6 +9,9 @@ interface RoomChatHistoryModalProps {
   onClose: () => void;
   messages: RoomChatMessage[];
   roomName?: string;
+  hasMore?: boolean;
+  isLoading?: boolean;
+  onLoadMore?: () => void;
 }
 
 export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
@@ -16,7 +19,31 @@ export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
   onClose,
   messages,
   roomName,
+  hasMore = false,
+  isLoading = false,
+  onLoadMore,
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // 무한 스크롤 구현
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !onLoadMore) return;
+
+    const handleScroll = () => {
+      const { scrollTop } = container;
+      
+      // 스크롤이 맨 위에 가까워지면 더 로드
+      if (scrollTop <= 100 && hasMore && !isLoading) {
+        console.log('🔄 Loading more messages...');
+        onLoadMore();
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [hasMore, isLoading, onLoadMore]);
+
   if (!isOpen) return null;
 
   const formatTime = (dateString: string) => {
@@ -54,8 +81,20 @@ export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
         </div>
 
         {/* Messages */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
-          {messages.length === 0 ? (
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4"
+        >
+          {/* Loading indicator at top */}
+          {isLoading && (
+            <div className="flex justify-center py-2">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                이전 메시지를 불러오는 중...
+              </div>
+            </div>
+          )}
+          
+          {messages.length === 0 && !isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
               <p className="text-sm">오늘 채팅 내역이 없습니다.</p>
               <p className="text-xs mt-1 opacity-70">첫 번째 메시지를 보내보세요!</p>
@@ -76,6 +115,13 @@ export const RoomChatHistoryModal: React.FC<RoomChatHistoryModalProps> = ({
                 </p>
               </div>
             ))
+          )}
+          
+          {/* Load more indicator */}
+          {messages.length > 0 && !hasMore && (
+            <div className="text-center py-4 text-xs text-gray-400">
+              모든 메시지를 불러왔습니다
+            </div>
           )}
         </div>
       </div>

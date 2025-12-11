@@ -12,7 +12,7 @@ export interface RoomChatMessage {
   createdAt: string;
 }
 
-interface FloatingMessage extends RoomChatMessage {
+export interface FloatingMessage extends RoomChatMessage {
   id: string;
   xPosition: number;
 }
@@ -110,39 +110,78 @@ export const useRoomChat = (roomNo: string | null) => {
     );
   }, [roomNo]);
 
-  // 채팅 내역 조회
-  const loadHistory = useCallback(() => {
+  // 채팅 내역 조회 (페이지네이션)
+  const loadMessages = useCallback((before?: string) => {
     if (!socketRef.current || !roomNo) {
       console.warn('Socket or roomNo not available');
       return;
     }
 
-    console.log('📥 Loading history for room:', roomNo);
+    if (isLoadingHistory) return;
+
+    console.log('📥 Loading messages for room:', roomNo, 'before:', before);
+    setIsLoadingHistory(true);
 
     socketRef.current.emit(
       'getMessages',
-      { roomNo },
+      { roomNo, before },
       (response: any) => {
-        console.log('📥 History response:', response);
+        console.log('📥 Messages response:', response);
+        setIsLoadingHistory(false);
+        
         if (response.success) {
-          setHistoryMessages(response.messages);
+          const newMessages = response.messages || [];
+          
+          // 50개 미만이면 더 이상 없음
+          if (newMessages.length < 50) {
+            setHasMore(false);
+          }
+          
+          setHistoryMessages(prev => {
+            if (before) {
+              // 중복 제거: 새로운 메시지 중 기존에 없는 것만 추가
+              const existingIds = new Set(prev.map((msg: RoomChatMessage) => msg.messageId));
+              const uniqueNewMessages = newMessages.filter((msg: RoomChatMessage) => !existingIds.has(msg.messageId));
+              
+              // 이전 메시지들을 앞에 추가 (과거 -> 현재 순서 유지)
+              return [...uniqueNewMessages, ...prev];
+            } else {
+              // 첫 로드시 전체 교체
+              return newMessages;
+            }
+          });
         } else {
-          console.error('Failed to load history:', response.error);
+          console.error('Failed to load messages:', response.error);
         }
       }
     );
-  }, [roomNo]);
+  }, [roomNo, isLoadingHistory]);
+
+  // 더 많은 메시지 로드 (무한 스크롤)
+  const loadMoreMessages = useCallback(() => {
+    if (!hasMore || isLoadingHistory || historyMessages.length === 0) return;
+    
+    // 가장 오래된 메시지의 시간을 before로 사용
+    const oldestMessage = historyMessages[0];
+    if (oldestMessage) {
+      loadMessages(oldestMessage.createdAt);
+    }
+  }, [hasMore, isLoadingHistory, historyMessages, loadMessages]);
 
   // 히스토리 모달 열기
   const openHistory = useCallback(() => {
     setIsHistoryOpen(true);
-    loadHistory();
-  }, [loadHistory]);
+    setHasMore(true);
+    setHistoryMessages([]);
+    loadMessages(); // 최신 메시지부터 로드
+  }, [loadMessages]);
 
   // 히스토리 모달 닫기
   const closeHistory = useCallback(() => {
     setIsHistoryOpen(false);
     setHistoryMessages([]);
+    setHasMore(true);
+    setIsLoadingHistory(false);
   }, []);
 
   return {
@@ -151,8 +190,11 @@ export const useRoomChat = (roomNo: string | null) => {
     messages,
     historyMessages,
     isHistoryOpen,
+    hasMore,
+    isLoadingHistory,
     sendMessage,
     openHistory,
     closeHistory,
+    loadMoreMessages,
   };
 };

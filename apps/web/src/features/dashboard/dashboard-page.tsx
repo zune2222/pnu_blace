@@ -82,9 +82,12 @@ const AuthenticatedDashboard: React.FC = () => {
     messages,
     historyMessages,
     isHistoryOpen,
+    hasMore,
+    isLoadingHistory,
     sendMessage,
     openHistory,
     closeHistory,
+    loadMoreMessages,
   } = useRoomChat(currentRoomNo);
 
   return (
@@ -130,6 +133,9 @@ const AuthenticatedDashboard: React.FC = () => {
         onClose={closeHistory}
         messages={historyMessages}
         roomName={currentRoomName}
+        hasMore={hasMore}
+        isLoading={isLoadingHistory}
+        onLoadMore={loadMoreMessages}
       />
     </div>
   );
