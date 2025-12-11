@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/auth";
+import { apiClient } from "@/lib/api";
 import { RankingTabs } from "./ui/ranking-tabs";
 import { AllTimeRankings } from "./ui/all-time-rankings";
 import { WeeklyRankings } from "./ui/weekly-rankings";
@@ -10,9 +11,31 @@ import { RankingPrivacySettings } from "./ui/ranking-privacy-settings";
 
 type TabType = "all-time" | "weekly";
 
+interface MyRankInfo {
+  publicNickname?: string;
+}
+
 export const RankingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("all-time");
   const { isAuthenticated } = useAuth();
+  const [myNickname, setMyNickname] = useState<string | null>(null);
+
+  // 로그인 사용자의 닉네임 가져오기
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchMyNickname = async () => {
+        try {
+          const response = await apiClient.get<MyRankInfo>("/api/v1/stats/my-rank");
+          if (response.publicNickname) {
+            setMyNickname(response.publicNickname);
+          }
+        } catch (error) {
+          console.error("내 랭킹 정보 조회 실패:", error);
+        }
+      };
+      fetchMyNickname();
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,9 +90,9 @@ export const RankingsPage: React.FC = () => {
           {/* 랭킹 콘텐츠 - 항상 표시 */}
           <div>
             {activeTab === "all-time" ? (
-              <AllTimeRankings />
+              <AllTimeRankings myNickname={myNickname} />
             ) : (
-              <WeeklyRankings />
+              <WeeklyRankings myNickname={myNickname} />
             )}
           </div>
         </div>

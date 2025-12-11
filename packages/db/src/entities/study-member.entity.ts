@@ -65,4 +65,14 @@ export class StudyMember {
 
 	@Column({ type: 'date', nullable: true })
 	streakStartDate?: Date; // 현재 연속 출석 시작일
+
+	// 벌점 시스템
+	@Column({ type: 'int', default: 0 })
+	currentPenaltyPoints!: number; // 현재 벌점 (리셋 주기 내)
+
+	@Column({ type: 'int', default: 0 })
+	totalPenaltyPoints!: number; // 누적 벌점 (전체 기간)
+
+	@Column({ type: 'timestamp', nullable: true })
+	lastPenaltyResetAt?: Date; // 마지막 벌점 리셋 시간
 }

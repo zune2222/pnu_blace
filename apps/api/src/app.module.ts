@@ -19,6 +19,9 @@ import {
   JoinRequest,
   AttendanceRecord,
   VacationRequest,
+  PenaltyRecord,
+  ChatMessage,
+  RoomChatMessage,
 } from '@pnu-blace/db';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -30,6 +33,9 @@ import { SchoolApiModule } from './school-api/school-api.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { StudyModule } from './study/study.module';
+import { ChatModule } from './chat/chat.module';
+import { RedisModule } from './redis/redis.module';
+import { RoomChatModule } from './room-chat/room-chat.module';
 
 @Module({
   imports: [
@@ -40,6 +46,9 @@ import { StudyModule } from './study/study.module';
 
     // 1-1. ScheduleModule 추가
     ScheduleModule.forRoot(),
+
+    // 1-2. RedisModule (Global)
+    RedisModule,
 
     // 2. TypeOrmModule을 비동기 방식으로 설정합니다.
     TypeOrmModule.forRootAsync({
@@ -64,6 +73,9 @@ import { StudyModule } from './study/study.module';
           JoinRequest,
           AttendanceRecord,
           VacationRequest,
+          PenaltyRecord,
+          ChatMessage,
+          RoomChatMessage,
         ], // 모든 엔티티 클래스 추가
         synchronize: true, // 개발 환경에서는 true로 설정하여 테이블 자동 생성
         logging:
@@ -84,8 +96,11 @@ import { StudyModule } from './study/study.module';
     StatsModule,
     FavoritesModule,
     StudyModule,
+    ChatModule,
+    RoomChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+

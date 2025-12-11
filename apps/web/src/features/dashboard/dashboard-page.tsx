@@ -6,8 +6,12 @@ import {
   CurrentSeatWidget,
   FavoriteRoomsSection,
   MyDashboardRankings,
+  FloatingChatLayer,
+  RoomChatInput,
+  RoomChatHistoryModal,
 } from "./ui";
 import { useDashboardData } from "./model";
+import { useRoomChat } from "./hooks/useRoomChat";
 
 // 로그인 유도 UI 컴포넌트
 const LoginPrompt: React.FC = () => {
@@ -67,9 +71,27 @@ const LoginPrompt: React.FC = () => {
 // 로그인된 사용자용 대시보드 콘텐츠 (훅 호출은 여기서만)
 const AuthenticatedDashboard: React.FC = () => {
   const dashboardState = useDashboardData();
+  
+  // 좌석 예약 중일 때만 채팅 활성화
+  const currentRoomNo = dashboardState.currentSeat?.roomNo || null;
+  const currentRoomName = dashboardState.currentSeat?.roomName || undefined;
+  
+  const {
+    isConnected,
+    myNickname,
+    messages,
+    todayHistory,
+    isHistoryOpen,
+    sendMessage,
+    openHistory,
+    closeHistory,
+  } = useRoomChat(currentRoomNo);
 
   return (
     <div className="min-h-screen bg-background">
+      {/* 플로팅 채팅 레이어 - 좌석 예약 중일 때만 */}
+      {currentRoomNo && <FloatingChatLayer messages={messages} />}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* 메인 좌석 섹션 - 전체 너비 */}
         <div className="border-b border-border/20">
@@ -91,6 +113,24 @@ const AuthenticatedDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 채팅 입력 UI - 좌석 예약 중일 때만 */}
+      {currentRoomNo && (
+        <RoomChatInput
+          myNickname={myNickname}
+          isConnected={isConnected}
+          onSendMessage={sendMessage}
+          onOpenHistory={openHistory}
+        />
+      )}
+
+      {/* 채팅 히스토리 모달 */}
+      <RoomChatHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={closeHistory}
+        messages={todayHistory}
+        roomName={currentRoomName}
+      />
     </div>
   );
 };
@@ -106,3 +146,4 @@ export const DashboardPage: React.FC = () => {
   // 로그인 시에만 훅이 있는 컴포넌트 렌더링
   return <AuthenticatedDashboard />;
 };
+

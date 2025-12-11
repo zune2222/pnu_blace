@@ -203,6 +203,81 @@ export class StudyService {
   }
 
   /**
+   * 특정 날짜의 출퇴근 현황 조회
+   */
+  async getAttendanceByDate(groupId: string, dateString: string): Promise<TodayAttendancePublic[]> {
+    const group = await this.studyGroupRepository.findOne({
+      where: { groupId },
+    });
+
+    if (!group) {
+      throw new NotFoundException('스터디를 찾을 수 없습니다.');
+    }
+
+    // 날짜 파싱
+    const targetDate = new Date(dateString);
+    targetDate.setHours(0, 0, 0, 0);
+
+    // 멤버 목록
+    const members = await this.studyMemberRepository.find({
+      where: { groupId },
+    });
+
+    // 해당 날짜의 출퇴근 기록
+    const attendanceRecords = await this.attendanceRecordRepository.find({
+      where: {
+        groupId,
+        date: targetDate,
+      },
+    });
+
+    const attendanceMap = new Map(
+      attendanceRecords.map((record) => [record.studentId, record]),
+    );
+
+    return members.map((member) => {
+      const record = attendanceMap.get(member.studentId);
+
+      if (record) {
+        return {
+          memberId: member.memberId,
+          displayName: member.displayName,
+          status: record.status,
+          checkInTime: record.checkInTime,
+          checkOutTime: record.checkOutTime,
+          usageMinutes: record.usageMinutes,
+          isCurrentlyIn: false, // 과거 날짜이므로 항상 false
+        };
+      }
+
+      return {
+        memberId: member.memberId,
+        displayName: member.displayName,
+        status: 'NOT_YET' as const,
+        isCurrentlyIn: false,
+      };
+    });
+  }
+
+  /**
+   * 스터디의 운영일 목록 조회 (출결 기록이 있는 날짜들)
+   */
+  async getOperatingDates(groupId: string, limit: number = 30): Promise<string[]> {
+    const records = await this.attendanceRecordRepository
+      .createQueryBuilder('record')
+      .select('DISTINCT DATE(record.date)', 'date')
+      .where('record.groupId = :groupId', { groupId })
+      .orderBy('date', 'DESC')
+      .limit(limit)
+      .getRawMany();
+
+    return records.map((r) => {
+      const date = new Date(r.date);
+      return date.toISOString().split('T')[0];
+    });
+  }
+
+  /**
    * 스터디 검색
    */
   async searchStudyGroups(

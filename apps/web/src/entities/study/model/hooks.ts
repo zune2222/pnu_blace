@@ -26,6 +26,10 @@ export const studyQueryKeys = {
     [...studyQueryKeys.all, "memberHistory", groupId, memberId, request] as const,
   myStudies: () => [...studyQueryKeys.all, "my"] as const,
   popularTags: () => [...studyQueryKeys.all, "tags"] as const,
+  operatingDates: (groupId: string) =>
+    [...studyQueryKeys.all, "operatingDates", groupId] as const,
+  attendanceByDate: (groupId: string, date: string) =>
+    [...studyQueryKeys.all, "attendanceByDate", groupId, date] as const,
 };
 
 /**
@@ -110,6 +114,28 @@ export const usePopularTags = () => {
   return useQuery({
     queryKey: studyQueryKeys.popularTags(),
     queryFn: () => studyApi.getPopularTags(),
+  });
+};
+
+/**
+ * 운영일 목록 조회
+ */
+export const useOperatingDates = (groupId: string, limit: number = 30) => {
+  return useQuery({
+    queryKey: studyQueryKeys.operatingDates(groupId),
+    queryFn: () => studyApi.getOperatingDates(groupId, limit),
+    enabled: !!groupId,
+  });
+};
+
+/**
+ * 특정 날짜의 출결 현황 조회
+ */
+export const useAttendanceByDate = (groupId: string, date: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: studyQueryKeys.attendanceByDate(groupId, date),
+    queryFn: () => studyApi.getAttendanceByDate(groupId, date),
+    enabled: !!groupId && !!date && enabled,
   });
 };
 

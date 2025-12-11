@@ -18,6 +18,7 @@ import {
   AttendanceStats
 } from '@pnu-blace/types';
 import { SchoolApiService } from '../school-api/school-api.service';
+import { PenaltyService } from './penalty.service';
 
 interface LibraryUsageRecord {
   useDt: string; // "YYYY.MM.DD"
@@ -45,6 +46,13 @@ export class AttendanceService {
     private userStatsRepository: Repository<UserStats>,
     private schoolApiService: SchoolApiService,
   ) {}
+
+  // PenaltyService는 지연 주입 (순환 의존성 방지)
+  private penaltyService?: PenaltyService;
+
+  setPenaltyService(penaltyService: PenaltyService) {
+    this.penaltyService = penaltyService;
+  }
 
   /**
    * 30분마다 출퇴근 동기화 실행
@@ -182,6 +190,16 @@ export class AttendanceService {
 
       // 연속성 업데이트
       await this.updateStreakStats(group.groupId, member.studentId, date, status);
+
+      // 벌점 자동 부여
+      if (this.penaltyService) {
+        await this.penaltyService.applyPenaltyForAttendance(
+          group.groupId,
+          member.studentId,
+          status,
+          date,
+        );
+      }
 
       this.logger.debug(
         `Updated attendance for ${member.studentId}: ${status}`,

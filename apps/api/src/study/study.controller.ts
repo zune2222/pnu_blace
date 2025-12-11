@@ -79,6 +79,29 @@ export class StudyPublicController {
   }
 
   /**
+   * 특정 날짜의 출퇴근 현황 조회
+   */
+  @Get(':id/attendance/:date')
+  async getAttendanceByDate(
+    @Param('id') groupId: string,
+    @Param('date') date: string,
+  ): Promise<TodayAttendancePublic[]> {
+    return this.studyService.getAttendanceByDate(groupId, date);
+  }
+
+  /**
+   * 출결 기록이 있는 운영일 목록 조회
+   */
+  @Get(':id/operating-dates')
+  async getOperatingDates(
+    @Param('id') groupId: string,
+    @Query('limit') limit?: string,
+  ): Promise<string[]> {
+    const limitNum = limit ? parseInt(limit) : 30;
+    return this.studyService.getOperatingDates(groupId, limitNum);
+  }
+
+  /**
    * 스터디 검색
    */
   @Get('search')

@@ -7,3 +7,6 @@ export { AutoExtensionWidget } from "./auto-extension-widget";
 export { QueueStatusWidget } from "./queue-status-widget";
 export { SeatHistoryWidget } from "./seat-history-widget";
 export { SeatHistoryTable } from "./seat-history-table";
+export { FloatingChatLayer } from "./FloatingChatLayer";
+export { RoomChatInput } from "./RoomChatInput";
+export { RoomChatHistoryModal } from "./RoomChatHistoryModal";

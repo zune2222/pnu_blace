@@ -14,7 +14,14 @@ import {
 } from "@/entities/study";
 import { useAuth } from "@/entities/auth";
 import { AttendanceList } from "./ui/attendance-list";
+import { StudyOverallStats } from "./ui/study-overall-stats";
+import { StudyChat } from "./ui/study-chat";
+import { DailyAttendanceViewer } from "./ui/daily-attendance-viewer";
+import { PenaltyStats } from "./ui/penalty-stats";
 import { StudyVisibility } from "@pnu-blace/types";
+import { useStudyChat } from "@/entities/study/model/use-study-chat";
+
+type TabType = "attendance" | "chat";
 
 interface StudyDetailPageProps {
   groupId: string;
@@ -47,6 +54,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   const [joinDisplayName, setJoinDisplayName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [joinMessage, setJoinMessage] = useState("");
+  const [activeTab, setActiveTab] = useState<TabType>("attendance");
 
   const { data: study, isLoading, error } = useStudyGroupDetail(groupId);
   const { data: attendance, isLoading: isLoadingAttendance } =
@@ -54,6 +62,26 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   const { data: streakStats, isLoading: isLoadingStreakStats } =
     useGroupStreakStats(groupId, isAuthenticated);
   const { data: myStudies } = useMyStudyGroups(isAuthenticated);
+  // 채팅 hook (단일 소켓 연결)
+  const {
+    messages: chatMessages,
+    isConnected: chatConnected,
+    userCount: chatUserCount,
+    unreadCount,
+    sendMessage,
+    loadMore: chatLoadMore,
+    resetUnread,
+    hasMore: chatHasMore,
+    isLoading: chatIsLoading,
+  } = useStudyChat(groupId);
+
+  // 채팅 탭으로 전환 시 읽음 처리
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    if (tab === "chat") {
+      resetUnread();
+    }
+  };
 
   // 내가 이 스터디의 관리자인지 확인
   const myMembership = myStudies?.items.find((s) => s.groupId === groupId);
@@ -228,8 +256,40 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
           </div>
         </div>
 
-        {/* 출퇴근 규칙 */}
-        <div className="py-8 border-b border-border/20">
+        {/* 탭 네비게이션 */}
+        <div className="flex gap-1 border-b border-border/20">
+          <button
+            onClick={() => handleTabChange("attendance")}
+            className={`px-6 py-3 text-sm font-light transition-all border-b-2 ${
+              activeTab === "attendance"
+                ? "border-foreground text-foreground"
+                : "border-transparent text-muted-foreground/60 hover:text-foreground"
+            }`}
+          >
+            📋 출결
+          </button>
+          <button
+            onClick={() => handleTabChange("chat")}
+            className={`px-6 py-3 text-sm font-light transition-all border-b-2 relative ${
+              activeTab === "chat"
+                ? "border-foreground text-foreground"
+                : "border-transparent text-muted-foreground/60 hover:text-foreground"
+            }`}
+          >
+            💬 채팅
+            {unreadCount > 0 && activeTab !== "chat" && (
+              <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* 탭 콘텐츠 */}
+        {activeTab === "attendance" ? (
+          <>
+            {/* 출퇴근 규칙 */}
+            <div className="py-8 border-b border-border/20">
           <h2 className="text-lg font-light text-foreground mb-4">
             출퇴근 규칙
           </h2>
@@ -270,6 +330,15 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             </div>
           </div>
         </div>
+
+        {/* 스터디 전체 통계 */}
+        <StudyOverallStats groupId={groupId} />
+
+        {/* 날짜별 출결 현황 */}
+        <DailyAttendanceViewer groupId={groupId} />
+
+        {/* 벌점 현황 */}
+        <PenaltyStats study={study} />
 
         {/* 오늘의 출퇴근 현황 */}
         <div className="py-8">
@@ -341,6 +410,21 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             ))}
           </div>
         </div>
+          </>
+        ) : (
+          /* 채팅 탭 - 화면 높이에 맞게 고정 */
+          <div className="h-[calc(100vh-280px)] min-h-[400px]">
+            <StudyChat
+              messages={chatMessages}
+              isConnected={chatConnected}
+              userCount={chatUserCount}
+              sendMessage={sendMessage}
+              loadMore={chatLoadMore}
+              hasMore={chatHasMore}
+              isLoading={chatIsLoading}
+            />
+          </div>
+        )}
       </div>
 
       {/* 참가 신청 모달 */}

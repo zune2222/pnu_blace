@@ -90,6 +90,27 @@ class StudyApi {
     );
   }
 
+  /**
+   * 특정 날짜의 출퇴근 현황 조회
+   */
+  async getAttendanceByDate(
+    groupId: string,
+    date: string
+  ): Promise<TodayAttendancePublic[]> {
+    return apiClient.publicGet<TodayAttendancePublic[]>(
+      `/api/v1/study-groups/public/${groupId}/attendance/${date}`
+    );
+  }
+
+  /**
+   * 출결 기록이 있는 운영일 목록 조회
+   */
+  async getOperatingDates(groupId: string, limit: number = 30): Promise<string[]> {
+    return apiClient.publicGet<string[]>(
+      `/api/v1/study-groups/public/${groupId}/operating-dates?limit=${limit}`
+    );
+  }
+
   // ==================== 인증 필요 API ====================
 
   /**

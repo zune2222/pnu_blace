@@ -9,6 +9,7 @@ export type AttendanceStatus =
 	| "ABSENT"
 	| "VACATION";
 export type VacationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type PenaltyType = "LATE" | "ABSENT" | "EARLY_LEAVE" | "MANUAL";
 
 // ==================== 스터디 그룹 ====================
 

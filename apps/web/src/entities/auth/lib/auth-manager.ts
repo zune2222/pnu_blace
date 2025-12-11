@@ -3,6 +3,18 @@ import { TokenManager } from "./token-manager";
 import { LoginCredentials } from "../model/types";
 
 export class AuthManager {
+  // JWT 토큰에서 payload를 디코딩
+  private static decodeJwtPayload(token: string): { sub: string } | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3 || !parts[1]) return null;
+      const payload = JSON.parse(atob(parts[1]));
+      return payload;
+    } catch {
+      return null;
+    }
+  }
+
   static async initialize(): Promise<{
     isAuthenticated: boolean;
     user: any;
@@ -20,9 +32,13 @@ export class AuthManager {
 
     const isValid = await TokenManager.validateToken();
     if (isValid) {
+      // JWT에서 studentId 파싱
+      const payload = this.decodeJwtPayload(token);
+      const user = payload ? { studentId: payload.sub } : null;
+      
       return {
         isAuthenticated: true,
-        user: null, // JWT에서 파싱하거나 별도 API 호출
+        user,
         token,
       };
     }

@@ -35,7 +35,11 @@ interface WeeklyRankingsData {
 
 type RankingType = "hours" | "sessions" | "days";
 
-export const WeeklyRankings: React.FC = () => {
+interface WeeklyRankingsProps {
+  myNickname?: string | null;
+}
+
+export const WeeklyRankings: React.FC<WeeklyRankingsProps> = ({ myNickname }) => {
   const [rankings, setRankings] = useState<WeeklyRankingsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeRanking, setActiveRanking] = useState<RankingType>("hours");
@@ -263,48 +267,62 @@ export const WeeklyRankings: React.FC = () => {
             </p>
           </div>
         ) : (
-          currentData.map((user) => (
-            <div
-              key={`${user.rank}-${user.publicNickname}`}
-              className="flex items-center justify-between p-6 border border-border/20 rounded-lg hover:bg-muted-foreground/5 transition-colors"
-            >
-              <div className="flex items-center space-x-6">
-                <div className="text-center min-w-[60px]">
-                  <div
-                    className={`text-2xl font-mono font-extralight ${
-                      user.rank === 1
-                        ? "text-yellow-500"
-                        : user.rank === 2
-                          ? "text-gray-400"
-                          : user.rank === 3
-                            ? "text-amber-600"
-                            : "text-foreground"
-                    }`}
-                  >
-                    #{user.rank}
+          currentData.map((user) => {
+            const isMe = myNickname && user.publicNickname === myNickname;
+            return (
+              <div
+                key={`${user.rank}-${user.publicNickname}`}
+                className={`flex items-center justify-between p-6 border rounded-lg transition-colors ${
+                  isMe 
+                    ? "border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20" 
+                    : "border-border/20 hover:bg-muted-foreground/5"
+                }`}
+              >
+                <div className="flex items-center space-x-6">
+                  <div className="text-center min-w-[60px]">
+                    <div
+                      className={`text-2xl font-mono font-extralight ${
+                        user.rank === 1
+                          ? "text-yellow-500"
+                          : user.rank === 2
+                            ? "text-gray-400"
+                            : user.rank === 3
+                              ? "text-amber-600"
+                              : "text-foreground"
+                      }`}
+                    >
+                      #{user.rank}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-light text-foreground">
+                        {user.publicNickname}
+                      </span>
+                      {isMe && (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-500 text-white rounded-full shrink-0">
+                          나
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground/60 font-light">
+                      {getTierDisplay(user.tier)}
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <div className="text-lg font-light text-foreground">
-                    {user.publicNickname}
+                <div className="text-right">
+                  <div className="text-xl font-mono font-extralight text-foreground">
+                    {formatValue(activeRanking, getCurrentValue(user))}
                   </div>
                   <div className="text-sm text-muted-foreground/60 font-light">
-                    {getTierDisplay(user.tier)}
+                    이번 주
                   </div>
                 </div>
               </div>
-
-              <div className="text-right">
-                <div className="text-xl font-mono font-extralight text-foreground">
-                  {formatValue(activeRanking, getCurrentValue(user))}
-                </div>
-                <div className="text-sm text-muted-foreground/60 font-light">
-                  이번 주
-                </div>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

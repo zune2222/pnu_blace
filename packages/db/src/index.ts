@@ -30,3 +30,9 @@ export {
 	VacationRequest,
 	type VacationStatus,
 } from "./entities/vacation-request.entity";
+export {
+	PenaltyRecord,
+	type PenaltyType,
+} from "./entities/penalty-record.entity";
+export { ChatMessage } from "./entities/chat-message.entity";
+export { RoomChatMessage } from "./entities/room-chat-message.entity";
