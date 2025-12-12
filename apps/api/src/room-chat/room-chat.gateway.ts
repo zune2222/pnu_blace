@@ -8,14 +8,11 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
 } from '@nestjs/websockets';
-import { Logger, Inject, Optional } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { RoomChatService } from './room-chat.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { createAdapter } from '@socket.io/redis-adapter';
-import Redis from 'ioredis';
-import { REDIS_CLIENT } from '../redis/redis.module';
 
 interface AuthenticatedSocket extends Socket {
   data: {
@@ -49,22 +46,14 @@ export class RoomChatGateway
     private roomChatService: RoomChatService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    @Optional() @Inject(REDIS_CLIENT) private redisClient: Redis | null,
   ) {}
 
   /**
-   * Gateway 초기화 - Redis Adapter 설정
+   * Gateway 초기화
+   * Note: Redis Adapter는 main.ts에서 커스텀 IoAdapter를 통해 설정됩니다.
    */
-  afterInit(server: Server) {
-    if (this.redisClient) {
-      const pubClient = this.redisClient.duplicate();
-      const subClient = this.redisClient.duplicate();
-
-      server.adapter(createAdapter(pubClient, subClient));
-      this.logger.log('✅ Redis adapter attached to room-chat gateway');
-    } else {
-      this.logger.warn('⚠️ Redis not available, running without adapter');
-    }
+  afterInit() {
+    this.logger.log('✅ RoomChatGateway initialized');
   }
 
   /**
