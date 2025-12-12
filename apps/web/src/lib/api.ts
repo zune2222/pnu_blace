@@ -1,7 +1,23 @@
 import { RoomInfo } from "@pnu-blace/types";
 
 // API 기본 설정
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const getApiBaseUrl = (): string => {
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  
+  if (!url) {
+    // 개발 환경에서만 localhost 폴백 허용
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:8080';
+    }
+    // 프로덕션에서는 경고 (빌드 시점에서는 체크 안됨, 런타임 경고)
+    console.warn('[API] NEXT_PUBLIC_API_URL is not configured. API calls may fail.');
+    return '';
+  }
+  
+  return url;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 const API_TIMEOUT = 10000; // 10초
 
 // API 에러 타입

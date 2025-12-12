@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { RotateCcw, Settings } from "lucide-react";
 import { AutoExtensionConfigDto } from "@pnu-blace/types";
 import { dashboardApi } from "@/entities/dashboard/api";
 import { toast } from "sonner";
-import { AutoExtensionSettingsModal } from "./auto-extension-settings-modal";
+import { logger } from "@/shared/lib/logger";
 
 export interface SeatActionButtonsProps {
   onExtend: () => void;
@@ -34,8 +33,8 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
         setIsLoading(true);
         const data = await dashboardApi.getAutoExtensionConfig();
         setConfig(data);
-      } catch (error: any) {
-        console.warn("자동 연장 설정 로드 실패:", error);
+      } catch (error: unknown) {
+        logger.warn("자동 연장 설정 로드 실패:", error);
         // 설정이 없는 경우 기본값 설정
         const defaultConfig: AutoExtensionConfigDto = {
           isEnabled: false,
@@ -68,8 +67,9 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
       const newConfig = await dashboardApi.toggleAutoExtension(false);
       setConfig(newConfig);
       toast.success("자동 연장이 비활성화되었습니다");
-    } catch (error: any) {
-      toast.error("설정 변경에 실패했습니다: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+      toast.error("설정 변경에 실패했습니다: " + errorMessage);
     } finally {
       setIsToggling(false);
     }
@@ -87,10 +87,19 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
       setConfig(updatedConfig);
       setShowSettingsModal(false);
       toast.success("자동 연장이 활성화되었습니다");
-    } catch (error: any) {
-      toast.error("설정 저장에 실패했습니다: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+      toast.error("설정 저장에 실패했습니다: " + errorMessage);
     }
   };
+
+  // 미사용 변수 린트 에러 방지 (추후 자동연장 기능 재활성화 시 사용)
+  void isLoading;
+  void isToggling;
+  void showSettingsModal;
+  void handleAutoExtensionToggle;
+  void handleConfigSave;
+  void setShowSettingsModal;
 
   return (
     <>
@@ -151,24 +160,8 @@ export const SeatActionButtons: React.FC<SeatActionButtonsProps> = ({
           )}
         </button>
 
-        {/* 자동 연장 버튼 - 일시 비활성화 */}
-        {/* <button
-          onClick={handleAutoExtensionToggle}
-          disabled={isToggling || isLoading}
-          className="group inline-flex items-center space-x-3 text-base font-light transition-colors duration-300"
-        >
-          <span>자동 연장</span>
-          <RotateCcw className="w-4 h-4" />
-        </button> */}
+        {/* TODO: 자동 연장 기능 재활성화 시 버튼/모달 복원 필요 */}
       </div>
-
-      {/* 자동 연장 설정 모달 - 일시 비활성화 */}
-      {/* <AutoExtensionSettingsModal
-        isOpen={showSettingsModal}
-        onClose={() => setShowSettingsModal(false)}
-        onSave={handleConfigSave}
-        initialConfig={config}
-      /> */}
     </>
   );
 };

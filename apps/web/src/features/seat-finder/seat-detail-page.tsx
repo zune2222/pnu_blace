@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   SeatDetailDto,
   ReserveSeatRequestDto,
@@ -10,9 +10,10 @@ import {
 } from "@pnu-blace/types";
 import { apiClient } from "@/lib/api";
 import { SeatSelectionModal } from "./ui";
-import React from "react"; // Added for React.Fragment
+import React from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/entities/auth";
+import { logger } from "@/shared/lib/logger";
 
 interface SeatDetailPageProps {
   roomNo: string;
@@ -145,7 +146,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
-        console.error("Unexpected reservation error:", err);
+        logger.error("Unexpected reservation error:", err);
       }
 
       // 토스트로 에러 메시지 표시
@@ -197,7 +198,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
       } else if (err.message) {
         errorMessage = err.message;
         // 예상치 못한 에러만 콘솔에 출력
-        console.error("Unexpected empty seat reservation error:", err);
+        logger.error("Unexpected empty seat reservation error:", err);
       }
 
       // 토스트로 에러 메시지 표시
