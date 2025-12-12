@@ -27,12 +27,6 @@ export class User {
 	@OneToMany("NotificationRequest", "user")
 	notificationRequests!: Relation<any[]>;
 
-	@OneToMany("AutoExtensionConfig", "user")
-	autoExtensionConfigs!: Relation<any[]>;
-
-	@OneToMany("QueueRequest", "user")
-	queueRequests!: Relation<any[]>;
-
 	@OneToMany("FavoriteRoom", "user")
 	favoriteRooms!: Relation<any[]>;
 }

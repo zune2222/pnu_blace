@@ -46,8 +46,9 @@ export const RankingPrivacySettings: React.FC = () => {
       });
       setOriginalNickname(nickname.trim());
       toast.success("닉네임이 변경되었습니다.");
-    } catch (error: any) {
-      toast.error(error.message || "닉네임 저장에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '닉네임 저장에 실패했습니다.';
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -68,8 +69,9 @@ export const RankingPrivacySettings: React.FC = () => {
         setOriginalNickname(response.nickname);
         toast.success("새로운 랜덤 닉네임이 생성되었습니다.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "랜덤 닉네임 생성에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '랜덤 닉네임 생성에 실패했습니다.';
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
     }

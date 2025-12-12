@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Clock, Calendar, AlertCircle } from "lucide-react";
 import { SeatDetailDto, SeatPredictionDto } from "@pnu-blace/types";
 import { apiClient } from "@/lib/api";
+import { logger } from "@/shared/lib/logger";
 
 interface SeatSelectionModalProps {
   isOpen: boolean;
@@ -15,7 +16,6 @@ interface SeatSelectionModalProps {
     seatNo: string,
     autoExtensionEnabled?: boolean
   ) => Promise<void>;
-  onReserveEmptySeat: (seatNo: string) => Promise<void>;
 }
 
 export const SeatSelectionModal = ({
@@ -25,20 +25,12 @@ export const SeatSelectionModal = ({
   roomNo,
   seatData,
   onReserveSeat,
-  onReserveEmptySeat,
 }: SeatSelectionModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [actionType, setActionType] = useState<
-    "reserve" | "reserve-empty" | null
-  >(null);
   const [prediction, setPrediction] = useState<SeatPredictionDto | null>(null);
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [autoExtensionEnabled, setAutoExtensionEnabled] = useState(false);
-  const [duplicateReservationError, setDuplicateReservationError] = useState<
-    string | null
-  >(null);
-  const [isProcessingCancel, setIsProcessingCancel] = useState(false);
+  const [autoExtensionEnabled] = useState(false);
 
   const isSeatOccupied =
     seatData?.occupiedSeats.includes(selectedSeat || "") || false;
@@ -69,8 +61,8 @@ export const SeatSelectionModal = ({
             `/api/v1/seats/${roomNo}/${selectedSeat}/prediction`
           );
           setPrediction(predictionData);
-        } catch (error) {
-          console.error("Failed to fetch prediction:", error);
+        } catch {
+          // 예측 실패는 무시
           setPrediction(null);
         } finally {
           setIsLoadingPrediction(false);
@@ -81,7 +73,7 @@ export const SeatSelectionModal = ({
     } else {
       setPrediction(null);
     }
-  }, [isOpen, selectedSeat, roomNo, isSeatOccupied]);
+  }, [isOpen, selectedSeat, roomNo, isSeatOccupied, seatData]);
 
   // 예측 시간 포맷팅
   const getPredictedTime = () => {
@@ -95,83 +87,25 @@ export const SeatSelectionModal = ({
     return "분석 중...";
   };
 
-  const handleAction = async (type: "reserve" | "reserve-empty") => {
+  const handleReserve = async () => {
     if (!selectedSeat) return;
 
     try {
       setIsLoading(true);
-      setActionType(type);
-      setDuplicateReservationError(null);
-
-      if (type === "reserve") {
-        await onReserveSeat(selectedSeat, autoExtensionEnabled);
-      } else {
-        await onReserveEmptySeat(selectedSeat);
-      }
-
+      await onReserveSeat(selectedSeat, autoExtensionEnabled);
       onClose();
-    } catch (error: any) {
-      // 중복 예약 에러 처리 (409 또는 관련 메시지)
-      if (
-        error.status === 409 ||
-        error.message?.includes("이미") ||
-        error.message?.includes("대기")
-      ) {
-        setDuplicateReservationError(
-          error.message || "이미 다른 좌석을 예약하거나 대기 중입니다."
-        );
-        return;
-      }
-
+    } catch (error: unknown) {
+      const apiError = error as { status?: number; message?: string };
       // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
-      // 예상치 못한 에러만 콘솔에 출력
-      if (error.status !== 400) {
-        console.error("Unexpected action error:", error);
+      // 예상치 못한 에러만 로그에 출력
+      if (apiError.status !== 400 && apiError.status !== 409) {
+        logger.error("Unexpected action error:", error);
       }
     } finally {
       setIsLoading(false);
-      setActionType(null);
     }
   };
 
-  // 기존 예약/대기 취소 후 새 예약
-  const handleCancelAndReserve = async (type: "reserve" | "reserve-empty") => {
-    try {
-      setIsProcessingCancel(true);
-
-      // 기존 예약이나 대기열 요청 취소
-      try {
-        await apiClient.post("/api/v1/seats/return");
-      } catch (returnError) {
-        // 현재 좌석이 없으면 대기열 취소 시도
-        try {
-          await apiClient.post("/api/v1/seats/queue/reservation/cancel");
-        } catch (queueError) {
-          console.warn(
-            "Failed to cancel existing reservation/queue:",
-            queueError
-          );
-        }
-      }
-
-      // 새로운 예약 시도
-      if (type === "reserve") {
-        await onReserveSeat(selectedSeat!, autoExtensionEnabled);
-      } else {
-        await onReserveEmptySeat(selectedSeat!);
-      }
-
-      setDuplicateReservationError(null);
-      onClose();
-    } catch (error: any) {
-      console.error("Failed to cancel and reserve:", error);
-      setDuplicateReservationError(
-        "예약 변경에 실패했습니다. 다시 시도해 주세요."
-      );
-    } finally {
-      setIsProcessingCancel(false);
-    }
-  };
 
   if (!isVisible || !selectedSeat || !seatData) return null;
 
@@ -458,15 +392,15 @@ export const SeatSelectionModal = ({
           <div className="space-y-3 animate-in slide-in-from-bottom-2 duration-300 delay-200">
             {isSeatAvailable && (
               <button
-                onClick={() => handleAction("reserve")}
+                onClick={handleReserve}
                 disabled={isLoading}
                 className={`w-full py-4 px-4 min-h-[48px] rounded-xl font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
-                  isLoading && actionType === "reserve"
+                  isLoading
                     ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 shadow-lg hover:shadow-xl dark:shadow-blue-500/25"
                 }`}
               >
-                {isLoading && actionType === "reserve"
+                {isLoading
                   ? "발권 중..."
                   : "좌석 발권하기"}
               </button>

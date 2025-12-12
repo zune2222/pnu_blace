@@ -119,8 +119,9 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
       toast.success(
         "참가 신청이 완료되었습니다. 스터디장의 승인을 기다려주세요."
       );
-    } catch (error: any) {
-      toast.error(error.message || "참가 신청에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "참가 신청에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -138,8 +139,9 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
       setShowPasswordModal(false);
       toast.success("스터디에 가입되었습니다!");
       router.push(`/study/${groupId}`);
-    } catch (error: any) {
-      toast.error(error.message || "가입에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "가입에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 

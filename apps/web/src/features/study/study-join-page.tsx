@@ -35,8 +35,9 @@ export const StudyJoinPage: React.FC = () => {
 
       toast.success("스터디에 가입되었습니다!");
       router.push(`/study/${result.data?.groupId || ""}`);
-    } catch (error: any) {
-      toast.error(error.message || "가입에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "가입에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 

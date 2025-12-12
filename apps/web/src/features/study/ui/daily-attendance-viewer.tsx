@@ -5,7 +5,6 @@ import {
   useOperatingDates,
   useAttendanceByDate,
 } from "@/entities/study/model/hooks";
-import { TodayAttendancePublic } from "@pnu-blace/types";
 
 interface DailyAttendanceViewerProps {
   groupId: string;

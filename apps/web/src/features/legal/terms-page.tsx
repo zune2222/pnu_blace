@@ -22,7 +22,7 @@ export const TermsPage: React.FC = () => {
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
                 <p className="text-muted-foreground leading-relaxed break-keep">
-                  이 약관은 PNU Blace(이하 "서비스")가 제공하는 부산대학교
+                  이 약관은 PNU Blace(이하 &quot;서비스&quot;)가 제공하는 부산대학교
                   도서관 좌석 모니터링 및 자동 예약 서비스의 이용조건 및 절차,
                   회사와 회원의 권리, 의무, 책임사항과 기타 필요한 사항을
                   규정함을 목적으로 합니다.
@@ -40,23 +40,23 @@ export const TermsPage: React.FC = () => {
                 </p>
                 <ul className="space-y-2 text-muted-foreground break-keep">
                   <li>
-                    1. "서비스"란 PNU Blace가 제공하는 부산대학교 도서관 좌석
+                    1. &quot;서비스&quot;란 PNU Blace가 제공하는 부산대학교 도서관 좌석
                     관련 모든 서비스를 의미합니다.
                   </li>
                   <li>
-                    2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를
+                    2. &quot;회원&quot;이란 서비스에 접속하여 이 약관에 따라 서비스를
                     이용하는 부산대학교 학생을 말합니다.
                   </li>
                   <li>
-                    3. "좌석 모니터링"이란 부산대학교 도서관 좌석 현황을
+                    3. &quot;좌석 모니터링&quot;이란 부산대학교 도서관 좌석 현황을
                     실시간으로 확인할 수 있는 서비스를 말합니다.
                   </li>
                   <li>
-                    4. "자동 예약"이란 사용자가 설정한 조건에 따라 자동으로
+                    4. &quot;자동 예약&quot;이란 사용자가 설정한 조건에 따라 자동으로
                     좌석을 예약하는 서비스를 말합니다.
                   </li>
                   <li>
-                    5. "알림 서비스"란 좌석 현황 변경 등을 사용자에게 알려주는
+                    5. &quot;알림 서비스&quot;란 좌석 현황 변경 등을 사용자에게 알려주는
                     서비스를 말합니다.
                   </li>
                 </ul>

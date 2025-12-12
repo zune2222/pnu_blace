@@ -3,8 +3,6 @@ export { FavoriteRoomsSection } from "./favorite-rooms-section";
 export { MyDashboardRankings } from "./my-dashboard-rankings";
 export { StudyContinuitySection } from "./study-continuity-section";
 export { StreakSummaryCard } from "./streak-summary-card";
-export { AutoExtensionWidget } from "./auto-extension-widget";
-export { QueueStatusWidget } from "./queue-status-widget";
 export { SeatHistoryWidget } from "./seat-history-widget";
 export { SeatHistoryTable } from "./seat-history-table";
 export { FloatingChatLayer } from "./FloatingChatLayer";

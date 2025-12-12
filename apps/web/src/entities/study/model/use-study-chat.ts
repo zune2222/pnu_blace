@@ -26,6 +26,20 @@ interface UseStudyChatReturn {
   isLoading: boolean;
 }
 
+interface JoinRoomResponse {
+  success: boolean;
+  messages?: ChatMessage[];
+}
+
+interface SendMessageResponse {
+  success: boolean;
+}
+
+interface LoadMoreResponse {
+  success: boolean;
+  messages?: ChatMessage[];
+}
+
 export function useStudyChat(groupId: string, isChatActive: boolean): UseStudyChatReturn {
   const { token, isAuthenticated, user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
@@ -61,7 +75,7 @@ export function useStudyChat(groupId: string, isChatActive: boolean): UseStudyCh
     socket.on("connect", () => {
       setIsConnected(true);
       // 방 입장
-      socket.emit("joinRoom", { groupId }, (response: any) => {
+      socket.emit("joinRoom", { groupId }, (response: JoinRoomResponse) => {
         if (response.success && response.messages) {
           setMessages(response.messages);
           setHasMore(response.messages.length >= 50);
@@ -104,7 +118,7 @@ export function useStudyChat(groupId: string, isChatActive: boolean): UseStudyCh
       socketRef.current!.emit(
         "sendMessage",
         { groupId, content },
-        (response: any) => {
+        (response: SendMessageResponse) => {
           resolve(response.success);
         }
       );
@@ -126,12 +140,12 @@ export function useStudyChat(groupId: string, isChatActive: boolean): UseStudyCh
     socketRef.current.emit(
       "loadMore",
       { groupId, before: oldestMessage.createdAt },
-      (response: any) => {
+      (response: LoadMoreResponse) => {
         if (response.success && response.messages) {
           if (response.messages.length < 50) {
             setHasMore(false);
           }
-          setMessages((prev) => [...response.messages, ...prev]);
+          setMessages((prev) => [...response.messages!, ...prev]);
         }
         setIsLoading(false);
       }

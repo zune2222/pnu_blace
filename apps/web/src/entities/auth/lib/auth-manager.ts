@@ -1,6 +1,12 @@
 import { authApi } from "../api/auth-api";
 import { TokenManager } from "./token-manager";
 import { LoginCredentials } from "../model/types";
+import { logger } from "@/shared/lib/logger";
+
+// User info extracted from JWT
+interface AuthUser {
+  studentId: string;
+}
 
 export class AuthManager {
   // JWT 토큰에서 payload를 디코딩
@@ -17,7 +23,7 @@ export class AuthManager {
 
   static async initialize(): Promise<{
     isAuthenticated: boolean;
-    user: any;
+    user: AuthUser | null;
     token: string | null;
   }> {
     const token = TokenManager.getCurrentToken();
@@ -51,7 +57,7 @@ export class AuthManager {
   }
 
   static async login(credentials: LoginCredentials): Promise<{
-    user: any;
+    user: AuthUser;
     token: string;
   }> {
     const response = await authApi.login(credentials);
@@ -70,8 +76,8 @@ export class AuthManager {
   static async logout(): Promise<void> {
     try {
       await authApi.logout();
-    } catch (error) {
-      console.error("Logout API failed:", error);
+    } catch (err) {
+      logger.error("Logout API failed:", err);
     } finally {
       TokenManager.clearToken();
     }

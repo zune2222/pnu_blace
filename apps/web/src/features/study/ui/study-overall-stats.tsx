@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useGroupStreakStats } from "@/entities/study";
-import { MemberStreakStats } from "@/entities/study/api/study-api";
 import { useAuth } from "@/entities/auth";
 import { MemberUsageHistoryModal } from "./member-usage-history-modal";
 

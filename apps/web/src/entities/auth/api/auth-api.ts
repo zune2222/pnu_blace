@@ -41,9 +41,8 @@ class AuthApi {
     try {
       // 서버에 로그아웃 요청 (선택사항)
       await apiClient.post("/api/v1/auth/logout");
-    } catch (error) {
-      // 로그아웃 실패해도 로컬 토큰은 제거
-      console.warn("로그아웃 API 호출 실패:", error);
+    } catch {
+      // 로그아웃 실패해도 로컬 토큰은 제거 (무시)
     } finally {
       // 로컬 토큰 제거
       apiClient.removeAuthToken();
@@ -79,7 +78,7 @@ class AuthApi {
       // 토큰 유효성 검사 (선택사항)
       await apiClient.get("/api/v1/users/me");
       return true;
-    } catch (error) {
+    } catch {
       // 인증 실패시 토큰 제거
       apiClient.removeAuthToken();
       return false;

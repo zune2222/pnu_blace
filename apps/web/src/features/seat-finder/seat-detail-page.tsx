@@ -14,6 +14,10 @@ import React from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/entities/auth";
 import { logger } from "@/shared/lib/logger";
+import { 
+  getSeatReservationErrorMessage, 
+  isExpectedApiError 
+} from "@/shared/lib/error-utils";
 
 interface SeatDetailPageProps {
   roomNo: string;
@@ -25,7 +29,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isReserving, setIsReserving] = useState(false);
+  const [, setIsReserving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [seatData, setSeatData] = useState<SeatDetailDto | null>(null);
 
@@ -54,9 +58,10 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
           `/api/v1/seats/${roomNo}/detail`
         );
         setSeatData(data);
-      } catch (err: any) {
-        console.error("Error fetching seat data:", err);
-        setError(err.message || "좌석 정보를 불러오는데 실패했습니다.");
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : '좌석 정보를 불러오는데 실패했습니다.';
+        logger.error("Error fetching seat data:", err);
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -104,23 +109,6 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         setSeatData(updatedData);
         setSelectedSeat(null);
 
-        // 자동 연장이 활성화된 경우 백엔드에 설정 요청
-        if (autoExtensionEnabled) {
-          try {
-            await apiClient.post("/api/v1/seats/auto-extension/config", {
-              isEnabled: true,
-              triggerMinutesBefore: 10,
-              maxAutoExtensions: 2,
-              timeRestriction: "ALL_TIMES",
-            });
-
-            // 대시보드 위젯에 설정 업데이트 알림
-            window.dispatchEvent(new CustomEvent("autoExtensionConfigUpdated"));
-          } catch (configError) {
-            console.warn("자동 연장 설정 생성 실패:", configError);
-          }
-        }
-
         // 성공 메시지 표시
         if (response.requiresGateEntry) {
           toast.success("좌석이 성공적으로 발권되었습니다!", {
@@ -133,76 +121,15 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
           );
         }
       }
-    } catch (err: any) {
-      // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
-      let errorMessage = "좌석 발권에 실패했습니다.";
-
-      if (err.status === 409) {
-        // 백엔드에서 제공하는 상세한 메시지 사용
-        errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
-      } else if (err.status === 400) {
-        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
-        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
-      } else if (err.message) {
-        errorMessage = err.message;
-        // 예상치 못한 에러만 콘솔에 출력
+    } catch (err: unknown) {
+      const errorMessage = getSeatReservationErrorMessage(err);
+      
+      // 예상치 못한 에러만 로그에 출력
+      if (!isExpectedApiError(err)) {
         logger.error("Unexpected reservation error:", err);
       }
 
-      // 토스트로 에러 메시지 표시
       toast.error("좌석 발권 실패", {
-        description: errorMessage,
-        duration: 4000,
-      });
-      throw err; // 모달에서 에러를 처리할 수 있도록 다시 던짐
-    } finally {
-      setIsReserving(false);
-    }
-  };
-
-  const handleReserveEmptySeat = async (seatNo: string) => {
-    try {
-      setIsReserving(true);
-
-      // 빈자리 예약 대기열에 추가
-      const queueRequest = {
-        roomNo,
-        seatNo: seatNo,
-      };
-
-      const response = await apiClient.post<any>(
-        "/api/v1/seats/queue/reservation",
-        queueRequest
-      );
-
-      if (response.queueId) {
-        // 대기열 등록 성공
-        setSelectedSeat(null);
-
-        // 성공 메시지 표시
-        toast.success("빈자리 발권 예약이 완료되었습니다!", {
-          description: `대기열 ${response.queuePosition + 1}번으로 등록되었습니다. 좌석이 비워지면 자동으로 발권됩니다.`,
-          duration: 4000,
-        });
-      }
-    } catch (err: any) {
-      // 정상적인 비즈니스 로직 에러는 콘솔에 출력하지 않음
-      let errorMessage = "빈자리 발권 예약에 실패했습니다.";
-
-      if (err.status === 409) {
-        // 백엔드에서 제공하는 상세한 메시지 사용
-        errorMessage = err.message || "이미 발권된 좌석이 있습니다.";
-      } else if (err.status === 400) {
-        // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
-        errorMessage = err.message || "발권 정보가 올바르지 않습니다.";
-      } else if (err.message) {
-        errorMessage = err.message;
-        // 예상치 못한 에러만 콘솔에 출력
-        logger.error("Unexpected empty seat reservation error:", err);
-      }
-
-      // 토스트로 에러 메시지 표시
-      toast.error("빈자리 예약 실패", {
         description: errorMessage,
         duration: 4000,
       });
@@ -212,46 +139,7 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     }
   };
 
-  const getSeatStatus = (seatNo: string) => {
-    if (!seatData) return "unknown";
-
-    if (seatData.occupiedSeats.includes(seatNo)) return "occupied";
-    if (seatData.unavailableSeats.includes(seatNo)) return "fixed";
-    if (selectedSeat === seatNo) return "selected";
-    return "available";
-  };
-
-  const renderSeat = (seatNo: string) => {
-    const seatNoStr = seatNo.toString();
-    return (
-      <button
-        key={seatNoStr}
-        onClick={() => handleSeatClick(seatNoStr)}
-        className={getSeatClassName(seatNoStr)}
-      >
-        {seatNoStr}
-      </button>
-    );
-  };
-
-  const getSeatClassName = (seatNo: string) => {
-    const baseClasses =
-      "w-7 h-9 rounded border flex items-center justify-center text-xs font-medium transition-all duration-200 cursor-pointer backdrop-blur-sm";
-    const status = getSeatStatus(seatNo);
-
-    switch (status) {
-      case "fixed":
-        return `${baseClasses} border-gray-400 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed bg-gray-100/80 dark:bg-gray-800/80`;
-      case "occupied":
-        return `${baseClasses} border-red-400 dark:border-red-500 text-red-600 dark:text-red-400 cursor-not-allowed bg-red-100/80 dark:bg-red-900/20`;
-      case "selected":
-        return `${baseClasses} border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-200/90 dark:bg-blue-900/30 shadow-lg scale-110`;
-      case "available":
-        return `${baseClasses} border-green-400 dark:border-green-500 text-green-700 dark:text-green-400 hover:bg-green-100/90 dark:hover:bg-green-900/20 hover:border-green-500 dark:hover:border-green-400 hover:scale-105 bg-white/80 dark:bg-gray-800/80`;
-      default:
-        return `${baseClasses} bg-white/80 dark:bg-gray-800/80`;
-    }
-  };
+  // TODO: 네이티브 UI로 좌석 렌더링 구현 시 getSeatStatus, getSeatClassName 복원 필요
 
   if (isLoading) {
     return (
@@ -402,7 +290,6 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
         roomNo={roomNo}
         seatData={seatData}
         onReserveSeat={handleReserveSeat}
-        onReserveEmptySeat={handleReserveEmptySeat}
       />
     </div>
   );

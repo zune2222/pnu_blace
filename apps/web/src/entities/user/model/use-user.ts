@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { UserState, UserProfile } from "./types";
+import { UserState } from "./types";
 import { userApi } from "../api/user-api";
 
 export const useUser = (token: string | null) => {

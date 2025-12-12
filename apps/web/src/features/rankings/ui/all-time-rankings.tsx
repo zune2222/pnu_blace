@@ -129,8 +129,8 @@ export const AllTimeRankings: React.FC<AllTimeRankingsProps> = ({ myNickname }) 
     );
   };
 
-  const formatValue = (type: RankingType, value: any) => {
-    const numValue = parseFloat(value) || 0;
+  const formatValue = (type: RankingType, value: number) => {
+    const numValue = Number(value) || 0;
 
     switch (type) {
       case "hours":
@@ -237,7 +237,7 @@ export const AllTimeRankings: React.FC<AllTimeRankingsProps> = ({ myNickname }) 
     const pages = [];
     const showPages = 5; // 표시할 페이지 수
     let startPage = Math.max(1, currentPage - Math.floor(showPages / 2));
-    let endPage = Math.min(totalPages, startPage + showPages - 1);
+    const endPage = Math.min(totalPages, startPage + showPages - 1);
 
     if (endPage - startPage + 1 < showPages) {
       startPage = Math.max(1, endPage - showPages + 1);

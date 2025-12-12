@@ -18,9 +18,28 @@ export interface FloatingMessage extends RoomChatMessage {
   xPosition: number;
 }
 
+// Socket response types
+interface JoinRoomResponse {
+  success: boolean;
+  anonymousName?: string;
+  error?: string;
+}
+
+interface SendMessageResponse {
+  success: boolean;
+  error?: string;
+}
+
+interface GetMessagesResponse {
+  success: boolean;
+  messages?: RoomChatMessage[];
+  error?: string;
+}
+
 export const useRoomChat = (roomNo: string | null) => {
   const { token } = useAuth();
   const socketRef = useRef<Socket | null>(null);
+  const timeoutIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const [isConnected, setIsConnected] = useState(false);
   const [myNickname, setMyNickname] = useState<string | null>(null);
   const [messages, setMessages] = useState<FloatingMessage[]>([]);
@@ -28,6 +47,15 @@ export const useRoomChat = (roomNo: string | null) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    const timeoutIds = timeoutIdsRef.current;
+    return () => {
+      timeoutIds.forEach((id) => clearTimeout(id));
+      timeoutIds.clear();
+    };
+  }, []);
 
   // 플로팅 메시지 추가 (5초 후 자동 제거)
   const addFloatingMessage = useCallback((msg: RoomChatMessage) => {
@@ -39,10 +67,12 @@ export const useRoomChat = (roomNo: string | null) => {
 
     setMessages((prev) => [...prev, floatingMsg]);
 
-    // 5초 후 제거
-    setTimeout(() => {
+    // 5초 후 제거 (cleanup을 위해 timeout ID 저장)
+    const timeoutId = setTimeout(() => {
       setMessages((prev) => prev.filter(m => m.id !== floatingMsg.id));
+      timeoutIdsRef.current.delete(timeoutId);
     }, 5000);
+    timeoutIdsRef.current.add(timeoutId);
   }, []);
 
   // 소켓 연결
@@ -63,9 +93,9 @@ export const useRoomChat = (roomNo: string | null) => {
       setIsConnected(true);
       
       // 방 입장
-      socket.emit('joinRoom', { roomNo }, (response: any) => {
+      socket.emit('joinRoom', { roomNo }, (response: JoinRoomResponse) => {
         logger.socket.event('🚪', 'Join room response', response);
-        if (response.success) {
+        if (response.success && response.anonymousName) {
           setMyNickname(response.anonymousName);
         }
       });
@@ -102,7 +132,7 @@ export const useRoomChat = (roomNo: string | null) => {
     socketRef.current.emit(
       'sendMessage',
       { roomNo, content: content.trim() },
-      (response: any) => {
+      (response: SendMessageResponse) => {
         logger.socket.event('📤', 'Send message response', response);
         if (!response.success) {
           logger.error('Failed to send message:', response.error);
@@ -126,7 +156,7 @@ export const useRoomChat = (roomNo: string | null) => {
     socketRef.current.emit(
       'getMessages',
       { roomNo, before },
-      (response: any) => {
+      (response: GetMessagesResponse) => {
         logger.socket.event('📥', 'Messages response', response);
         setIsLoadingHistory(false);
         

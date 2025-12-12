@@ -129,8 +129,8 @@ export const WeeklyRankings: React.FC<WeeklyRankingsProps> = ({ myNickname }) =>
     );
   };
 
-  const formatValue = (type: RankingType, value: any) => {
-    const numValue = parseFloat(value) || 0;
+  const formatValue = (type: RankingType, value: number) => {
+    const numValue = Number(value) || 0;
 
     switch (type) {
       case "hours":

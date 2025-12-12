@@ -3,7 +3,6 @@ import {
   MySeatDto,
   SeatStatusDto,
   MyUsageStatsDto,
-  SeatPredictionDto,
 } from "@pnu-blace/types";
 
 // 좌석 상태 (백엔드와 동일)

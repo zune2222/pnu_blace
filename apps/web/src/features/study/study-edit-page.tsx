@@ -121,8 +121,9 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
 
       toast.success("스터디 정보가 수정되었습니다!");
       router.push(`/study/${groupId}/settings`);
-    } catch (error: any) {
-      toast.error(error.message || "스터디 수정에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "스터디 수정에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 

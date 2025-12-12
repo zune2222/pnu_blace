@@ -5,16 +5,6 @@
 
 const isDev = process.env.NODE_ENV === 'development';
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-const formatArgs = (args: unknown[]): string => {
-  return args
-    .map((arg) =>
-      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-    )
-    .join(' ');
-};
-
 export const logger = {
   debug: (...args: unknown[]) => {
     if (isDev) {
