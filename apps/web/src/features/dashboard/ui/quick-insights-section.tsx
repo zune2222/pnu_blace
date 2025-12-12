@@ -1,12 +1,10 @@
 "use client";
 import React from "react";
-import { QueueStatusWidget } from "./queue-status-widget";
 
 // TODO: 인사이트 기능 재활성화 시 복원 필요
 // - InsightItem, dashboardApi, toast imports
 // - InsightType, QuickInsights types
 // - getInsightIcon, getInsightBadgeStyle functions
-// - handleCancelQueue, sortedInsights logic
 
 interface QuickInsightsSectionProps {
   // 향후 인사이트 기능 재활성화 시 사용될 props
@@ -30,9 +28,12 @@ export const QuickInsightsSection: React.FC<QuickInsightsSectionProps> = () => {
           </p>
         </div>
 
-        {/* 대기열 상태 위젯 */}
-        <QueueStatusWidget />
         {/* TODO: 인사이트 기능 재활성화 시 복원 필요 */}
+        <div className="text-center py-8">
+          <p className="text-muted-foreground/50 font-light">
+            인사이트 기능 준비 중...
+          </p>
+        </div>
       </div>
     </section>
   );
