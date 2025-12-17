@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '@/entities/auth';
+import { logger } from '@/shared/lib/logger';
 
 export interface RoomChatMessage {
   messageId: string;
@@ -17,9 +18,28 @@ export interface FloatingMessage extends RoomChatMessage {
   xPosition: number;
 }
 
+// Socket response types
+interface JoinRoomResponse {
+  success: boolean;
+  anonymousName?: string;
+  error?: string;
+}
+
+interface SendMessageResponse {
+  success: boolean;
+  error?: string;
+}
+
+interface GetMessagesResponse {
+  success: boolean;
+  messages?: RoomChatMessage[];
+  error?: string;
+}
+
 export const useRoomChat = (roomNo: string | null) => {
   const { token } = useAuth();
   const socketRef = useRef<Socket | null>(null);
+  const timeoutIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const [isConnected, setIsConnected] = useState(false);
   const [myNickname, setMyNickname] = useState<string | null>(null);
   const [messages, setMessages] = useState<FloatingMessage[]>([]);
@@ -27,6 +47,15 @@ export const useRoomChat = (roomNo: string | null) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    const timeoutIds = timeoutIdsRef.current;
+    return () => {
+      timeoutIds.forEach((id) => clearTimeout(id));
+      timeoutIds.clear();
+    };
+  }, []);
 
   // 플로팅 메시지 추가 (5초 후 자동 제거)
   const addFloatingMessage = useCallback((msg: RoomChatMessage) => {
@@ -38,10 +67,12 @@ export const useRoomChat = (roomNo: string | null) => {
 
     setMessages((prev) => [...prev, floatingMsg]);
 
-    // 5초 후 제거
-    setTimeout(() => {
+    // 5초 후 제거 (cleanup을 위해 timeout ID 저장)
+    const timeoutId = setTimeout(() => {
       setMessages((prev) => prev.filter(m => m.id !== floatingMsg.id));
+      timeoutIdsRef.current.delete(timeoutId);
     }, 5000);
+    timeoutIdsRef.current.add(timeoutId);
   }, []);
 
   // 소켓 연결
@@ -58,30 +89,30 @@ export const useRoomChat = (roomNo: string | null) => {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('🔗 Room chat connected:', socket.id);
+      logger.socket.connected(socket.id ?? 'unknown');
       setIsConnected(true);
       
       // 방 입장
-      socket.emit('joinRoom', { roomNo }, (response: any) => {
-        console.log('🚪 Join room response:', response);
-        if (response.success) {
+      socket.emit('joinRoom', { roomNo }, (response: JoinRoomResponse) => {
+        logger.socket.event('🚪', 'Join room response', response);
+        if (response.success && response.anonymousName) {
           setMyNickname(response.anonymousName);
         }
       });
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('🔌 Room chat disconnected:', reason);
+      logger.socket.disconnected(reason);
       setIsConnected(false);
     });
 
     socket.on('newMessage', (message: RoomChatMessage) => {
-      console.log('📩 New message:', message);
+      logger.socket.message('New message', message);
       addFloatingMessage(message);
     });
 
     socket.on('connect_error', (error) => {
-      console.error('❌ Connection error:', error);
+      logger.socket.error(error);
     });
 
     return () => {
@@ -101,10 +132,10 @@ export const useRoomChat = (roomNo: string | null) => {
     socketRef.current.emit(
       'sendMessage',
       { roomNo, content: content.trim() },
-      (response: any) => {
-        console.log('📤 Send message response:', response);
+      (response: SendMessageResponse) => {
+        logger.socket.event('📤', 'Send message response', response);
         if (!response.success) {
-          console.error('Failed to send message:', response.error);
+          logger.error('Failed to send message:', response.error);
         }
       }
     );
@@ -113,20 +144,20 @@ export const useRoomChat = (roomNo: string | null) => {
   // 채팅 내역 조회 (페이지네이션)
   const loadMessages = useCallback((before?: string) => {
     if (!socketRef.current || !roomNo) {
-      console.warn('Socket or roomNo not available');
+      logger.warn('Socket or roomNo not available');
       return;
     }
 
     if (isLoadingHistory) return;
 
-    console.log('📥 Loading messages for room:', roomNo, 'before:', before);
+    logger.socket.event('📥', 'Loading messages for room', { roomNo, before });
     setIsLoadingHistory(true);
 
     socketRef.current.emit(
       'getMessages',
       { roomNo, before },
-      (response: any) => {
-        console.log('📥 Messages response:', response);
+      (response: GetMessagesResponse) => {
+        logger.socket.event('📥', 'Messages response', response);
         setIsLoadingHistory(false);
         
         if (response.success) {
@@ -151,7 +182,7 @@ export const useRoomChat = (roomNo: string | null) => {
             }
           });
         } else {
-          console.error('Failed to load messages:', response.error);
+          logger.error('Failed to load messages:', response.error);
         }
       }
     );

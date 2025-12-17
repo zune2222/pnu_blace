@@ -98,8 +98,9 @@ export const StudyCreatePage: React.FC = () => {
 
       toast.success("스터디가 생성되었습니다!");
       router.push(`/study/${result.groupId}`);
-    } catch (error: any) {
-      toast.error(error.message || "스터디 생성에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "스터디 생성에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 

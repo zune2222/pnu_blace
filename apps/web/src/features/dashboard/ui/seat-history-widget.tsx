@@ -1,43 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
-
-interface SeatHistoryData {
-  totalSessions: number;
-  totalUsageHours: number;
-  totalDays: number;
-  averageSessionHours: number;
-  favoriteRoom: {
-    name: string;
-    count: number;
-    totalHours: number;
-  } | null;
-}
+import React from "react";
+import { useSeatHistory } from "@/entities/dashboard";
 
 export const SeatHistoryWidget: React.FC = () => {
-  const [data, setData] = useState<SeatHistoryData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSeatHistory = async () => {
-      try {
-        setIsLoading(true);
-        const response = await apiClient.get<SeatHistoryData>(
-          "/api/v1/stats/seat-history"
-        );
-        setData(response);
-        setError(null);
-      } catch (err) {
-        console.error("자리 내역 조회 실패:", err);
-        setError("자리 내역을 불러올 수 없습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSeatHistory();
-  }, []);
+  const { data, isLoading, error } = useSeatHistory();
 
   if (isLoading) {
     return (
@@ -62,7 +28,7 @@ export const SeatHistoryWidget: React.FC = () => {
     return (
       <div className="space-y-8">
         <div className="text-center text-muted-foreground/70">
-          <p>{error || "데이터를 불러올 수 없습니다."}</p>
+          <p>데이터를 불러올 수 없습니다.</p>
         </div>
       </div>
     );

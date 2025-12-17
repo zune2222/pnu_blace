@@ -225,7 +225,7 @@ export const PrivacyPage: React.FC = () => {
               <div className="prose prose-gray dark:prose-invert max-w-none">
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   PNU Blace는 이용자에게 개별적인 맞춤서비스를 제공하기 위해
-                  이용정보를 저장하고 수시로 불러오는 '쿠키(cookie)'를
+                  이용정보를 저장하고 수시로 불러오는 &apos;쿠키(cookie)&apos;를
                   사용합니다.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">

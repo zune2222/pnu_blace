@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useMemberAttendanceHistory } from "@/entities/study";
-import { AttendanceStatus, AttendanceRecordDetail } from "@pnu-blace/types";
+import { AttendanceStatus } from "@pnu-blace/types";
 
 interface MemberUsageHistoryModalProps {
   groupId: string;

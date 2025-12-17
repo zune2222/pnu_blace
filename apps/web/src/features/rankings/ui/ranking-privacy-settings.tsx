@@ -1,37 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
-
-interface PrivacySettings {
-  isPublicRanking: boolean;
-  publicNickname?: string;
-}
+import { 
+  usePrivacySettings, 
+  useSaveNickname, 
+  useGenerateRandomNickname 
+} from "@/entities/rankings";
 
 export const RankingPrivacySettings: React.FC = () => {
   const [nickname, setNickname] = useState("");
   const [originalNickname, setOriginalNickname] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const { data: settings, isLoading } = usePrivacySettings();
+  const saveNicknameMutation = useSaveNickname();
+  const generateRandomMutation = useGenerateRandomNickname();
 
+  // 설정 로드 시 닉네임 초기화
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await apiClient.get<PrivacySettings>(
-          "/api/v1/stats/privacy-settings"
-        );
-        setNickname(response.publicNickname || "");
-        setOriginalNickname(response.publicNickname || "");
-      } catch (error) {
-        console.error("닉네임 설정 조회 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSettings();
-  }, []);
+    if (settings?.publicNickname) {
+      setNickname(settings.publicNickname);
+      setOriginalNickname(settings.publicNickname);
+    }
+  }, [settings]);
 
   const handleSaveNickname = async () => {
     if (!nickname.trim()) {
@@ -39,39 +29,27 @@ export const RankingPrivacySettings: React.FC = () => {
       return;
     }
 
-    setIsSaving(true);
     try {
-      await apiClient.post("/api/v1/stats/privacy-settings", {
-        publicNickname: nickname.trim(),
-      });
+      await saveNicknameMutation.mutateAsync(nickname);
       setOriginalNickname(nickname.trim());
       toast.success("닉네임이 변경되었습니다.");
-    } catch (error: any) {
-      toast.error(error.message || "닉네임 저장에 실패했습니다.");
-    } finally {
-      setIsSaving(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '닉네임 저장에 실패했습니다.';
+      toast.error(errorMessage);
     }
   };
 
   const handleGenerateRandom = async () => {
-    setIsGenerating(true);
     try {
-      const response = await apiClient.post<{
-        success: boolean;
-        nickname?: string;
-      }>(
-        "/api/v1/stats/privacy-settings",
-        {} // 빈 객체 전송하면 랜덤 닉네임 생성
-      );
-      if (response.nickname) {
-        setNickname(response.nickname);
-        setOriginalNickname(response.nickname);
+      const newNickname = await generateRandomMutation.mutateAsync();
+      if (newNickname) {
+        setNickname(newNickname);
+        setOriginalNickname(newNickname);
         toast.success("새로운 랜덤 닉네임이 생성되었습니다.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "랜덤 닉네임 생성에 실패했습니다.");
-    } finally {
-      setIsGenerating(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '랜덤 닉네임 생성에 실패했습니다.';
+      toast.error(errorMessage);
     }
   };
 
@@ -110,11 +88,11 @@ export const RankingPrivacySettings: React.FC = () => {
             />
             <button
               onClick={handleGenerateRandom}
-              disabled={isGenerating}
+              disabled={generateRandomMutation.isPending}
               className="px-4 py-3 border border-border/40 text-muted-foreground/70 font-light rounded-lg hover:bg-muted/20 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors break-keep sm:min-w-fit"
               title="랜덤 닉네임 생성"
             >
-              {isGenerating ? "생성 중..." : "🎲 랜덤"}
+              {generateRandomMutation.isPending ? "생성 중..." : "🎲 랜덤"}
             </button>
           </div>
 
@@ -127,10 +105,10 @@ export const RankingPrivacySettings: React.FC = () => {
           <div className="pt-4 border-t border-border/20">
             <button
               onClick={handleSaveNickname}
-              disabled={isSaving || !nickname.trim()}
+              disabled={saveNicknameMutation.isPending || !nickname.trim()}
               className="px-8 py-3 bg-foreground text-background font-light rounded-lg hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSaving ? "저장 중..." : "닉네임 저장"}
+              {saveNicknameMutation.isPending ? "저장 중..." : "닉네임 저장"}
             </button>
           </div>
         )}

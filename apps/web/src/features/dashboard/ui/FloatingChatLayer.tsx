@@ -15,7 +15,7 @@ export const FloatingChatLayer: React.FC<FloatingChatLayerProps> = ({ messages }
       {messages.map((msg) => (
         <div
           key={msg.id}
-          className="absolute animate-float-up"
+          className="absolute animate-[float-up_5s_ease-out_forwards]"
           style={{
             left: `${msg.xPosition}%`,
             bottom: '120px',
@@ -30,28 +30,6 @@ export const FloatingChatLayer: React.FC<FloatingChatLayerProps> = ({ messages }
           </div>
         </div>
       ))}
-
-      <style jsx>{`
-        @keyframes float-up {
-          0% {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          10% {
-            opacity: 1;
-          }
-          80% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-100px);
-          }
-        }
-        .animate-float-up {
-          animation: float-up 5s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

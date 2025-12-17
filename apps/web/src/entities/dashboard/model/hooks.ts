@@ -8,6 +8,11 @@ import {
   CurrentSeat,
   ReadingRoomInfo,
   InsightItem,
+  SeatHistoryData,
+  StreakHeatmapData,
+  MyRankData,
+  MyStatsData,
+  SeatHistoryTableData,
 } from "./types";
 
 // 대시보드 전체 데이터 조회
@@ -55,6 +60,68 @@ export const useInsights = () => {
     },
     staleTime: 1000 * 60 * 5, // 5분
     refetchInterval: 1000 * 60 * 10, // 10분
+  });
+};
+
+// 좌석 내역 조회
+export const useSeatHistory = () => {
+  return useQuery({
+    queryKey: dashboardKeys.seatHistory(),
+    queryFn: async (): Promise<SeatHistoryData | null> => {
+      return await dashboardApi.getSeatHistory();
+    },
+    staleTime: 1000 * 60 * 5, // 5분
+    refetchInterval: 1000 * 60 * 10, // 10분
+  });
+};
+
+// 스트릭 히트맵 조회
+export const useStreakHeatmap = () => {
+  return useQuery({
+    queryKey: dashboardKeys.streakHeatmap(),
+    queryFn: async (): Promise<StreakHeatmapData | null> => {
+      return await dashboardApi.getStreakHeatmap();
+    },
+    staleTime: 1000 * 60 * 15, // 15분
+    refetchInterval: 1000 * 60 * 30, // 30분
+  });
+};
+
+// 내 랭킹 조회
+export const useMyRank = () => {
+  return useQuery({
+    queryKey: dashboardKeys.myRank(),
+    queryFn: async (): Promise<MyRankData | null> => {
+      return await dashboardApi.getMyRank();
+    },
+    staleTime: 1000 * 60 * 5, // 5분
+  });
+};
+
+// 개인 통계 조회
+export const usePersonalStats = () => {
+  return useQuery({
+    queryKey: dashboardKeys.myStats(),
+    queryFn: async () => {
+      return await dashboardApi.getPersonalStats();
+    },
+    staleTime: 1000 * 60 * 5, // 5분
+  });
+};
+
+// 좌석 이용 내역 테이블 조회 (페이지네이션)
+export const useSeatHistoryTable = (
+  page: number = 1,
+  startDate?: string,
+  endDate?: string
+) => {
+  return useQuery({
+    queryKey: dashboardKeys.seatHistoryTable(page, startDate, endDate),
+    queryFn: async (): Promise<SeatHistoryTableData | null> => {
+      return await dashboardApi.getSeatHistoryTable(page, 10, startDate, endDate);
+    },
+    staleTime: 1000 * 60 * 5, // 5분
+    placeholderData: (previousData) => previousData, // 페이지 전환 시 이전 데이터 유지 (v5 방식)
   });
 };
 

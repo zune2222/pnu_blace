@@ -14,13 +14,8 @@ import {
   SeatActionResponseDto,
   ExtendSeatResponseDto,
   MyUsageStatsDto,
-  AutoExtensionConfigDto,
-  UpdateAutoExtensionConfigDto,
-  QueueRequestDto,
-  AddToQueueRequestDto,
-  QueueStatusDto,
 } from "@pnu-blace/types";
-import { StreakStats } from "../model/types";
+import { StreakStats, SeatHistoryData, StreakHeatmapData, MyRankData, MyStatsData, SeatHistoryTableData } from "../model/types";
 
 class DashboardApi {
   private favoriteRooms = ["A202", "A301", "A101"]; // 로컬 스토리지로 관리할 수 있음
@@ -151,17 +146,27 @@ class DashboardApi {
       );
 
       return favoriteRoomsData;
-    } catch (error) {
+    } catch {
       throw new Error("즐겨찾기 열람실 정보를 불러올 수 없습니다");
     }
   }
 
   // 개인 통계 조회
-  async getPersonalStats(): Promise<MyUsageStatsDto | null> {
+  async getPersonalStats(): Promise<MyStatsData | null> {
     try {
-      return await apiClient.get<MyUsageStatsDto>("/api/v1/stats/me");
+      return await apiClient.get<MyStatsData>("/api/v1/stats/me");
     } catch (error) {
       console.warn("개인 통계 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 내 랭킹 조회
+  async getMyRank(): Promise<MyRankData | null> {
+    try {
+      return await apiClient.get<MyRankData>("/api/v1/stats/my-rank");
+    } catch (error) {
+      console.warn("내 랭킹 조회 실패:", error);
       return null;
     }
   }
@@ -172,6 +177,51 @@ class DashboardApi {
       return await apiClient.get<StreakStats>("/api/v1/stats/streak");
     } catch (error) {
       console.warn("연속성 통계 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 좌석 내역 조회
+  async getSeatHistory(): Promise<SeatHistoryData | null> {
+    try {
+      return await apiClient.get<SeatHistoryData>("/api/v1/stats/seat-history");
+    } catch (error) {
+      console.warn("좌석 내역 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 스트릭 히트맵 조회
+  async getStreakHeatmap(): Promise<StreakHeatmapData | null> {
+    try {
+      return await apiClient.get<StreakHeatmapData>(
+        "/api/v1/stats/streak/heatmap"
+      );
+    } catch (error) {
+      console.warn("스트릭 히트맵 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 좌석 이용 내역 테이블 조회 (페이지네이션)
+  async getSeatHistoryTable(
+    page: number = 1,
+    limit: number = 10,
+    startDate?: string,
+    endDate?: string
+  ): Promise<SeatHistoryTableData | null> {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate }),
+      });
+      return await apiClient.get<SeatHistoryTableData>(
+        `/api/v1/stats/seat-history/full?${params.toString()}`
+      );
+    } catch (error) {
+      console.warn("좌석 이용 내역 조회 실패:", error);
       return null;
     }
   }
@@ -230,34 +280,6 @@ class DashboardApi {
         console.warn("개인 통계 기반 인사이트 생성 실패:", error);
       }
 
-      // 3. 대기열 상태 확인
-      try {
-        const queueStatus = await this.getQueueStatus();
-        if (
-          queueStatus?.seatReservation &&
-          queueStatus.seatReservation.status === "WAITING"
-        ) {
-          const request = queueStatus.seatReservation;
-          insights.push({
-            id: "queue-waiting",
-            type: "statistic",
-            title: "좌석 예약 대기 중",
-            content: `${request.roomNo} ${request.seatNo}번 좌석을 ${request.queuePosition + 1}번째로 대기하고 있습니다. ${queueStatus.totalWaiting > 1 ? `총 ${queueStatus.totalWaiting}명이 대기 중입니다.` : "곧 발권될 예정입니다."}`,
-            priority: "high",
-            createdAt: new Date().toISOString(),
-            isNew: true,
-          });
-        }
-      } catch (error) {
-        // 404는 대기열 요청이 없는 경우이므로 무시
-        if (
-          error instanceof Error &&
-          !error.message?.includes("찾을 수 없습니다")
-        ) {
-          console.warn("대기열 상태 기반 인사이트 생성 실패:", error);
-        }
-      }
-
       // 4. 일반적인 팁
       const currentHour = new Date().getHours();
       if (currentHour >= 13 && currentHour <= 15) {
@@ -305,7 +327,7 @@ class DashboardApi {
         data,
         timestamp: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch {
       throw new Error("대시보드 데이터를 불러올 수 없습니다");
     }
   }
@@ -381,144 +403,6 @@ class DashboardApi {
     }
   }
 
-  // ================================
-  // 자동 연장 관련 함수
-  // ================================
-
-  // 자동 연장 설정 조회
-  async getAutoExtensionConfig(): Promise<AutoExtensionConfigDto | null> {
-    try {
-      return await apiClient.get<AutoExtensionConfigDto | null>(
-        "/api/v1/seats/auto-extension/config"
-      );
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 404) {
-        return null;
-      }
-      throw new Error("자동 연장 설정을 불러올 수 없습니다");
-    }
-  }
-
-  // 자동 연장 설정 업데이트
-  async updateAutoExtensionConfig(
-    config: UpdateAutoExtensionConfigDto
-  ): Promise<AutoExtensionConfigDto> {
-    try {
-      return await apiClient.post<AutoExtensionConfigDto>(
-        "/api/v1/seats/auto-extension/config",
-        config
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        switch (error.status) {
-          case 400:
-            throw new Error("설정 정보가 올바르지 않습니다");
-          default:
-            throw new Error("자동 연장 설정 업데이트에 실패했습니다");
-        }
-      }
-      throw new Error("네트워크 연결을 확인해주세요");
-    }
-  }
-
-  // 자동 연장 토글 (활성화/비활성화)
-  async toggleAutoExtension(
-    isEnabled: boolean
-  ): Promise<AutoExtensionConfigDto> {
-    try {
-      return await apiClient.post<AutoExtensionConfigDto>(
-        "/api/v1/seats/auto-extension/toggle",
-        { isEnabled }
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        switch (error.status) {
-          case 404:
-            throw new Error("자동 연장 설정을 찾을 수 없습니다");
-          default:
-            throw new Error("자동 연장 설정 변경에 실패했습니다");
-        }
-      }
-      throw new Error("네트워크 연결을 확인해주세요");
-    }
-  }
-
-  // ================================
-  // 빈자리 예약 대기열 관련 함수
-  // ================================
-
-  // 빈자리 예약 대기열에 추가
-  async addToQueue(
-    roomNo: string,
-    seatNo: string,
-    scheduledAt?: Date
-  ): Promise<QueueRequestDto> {
-    try {
-      const queueRequest: AddToQueueRequestDto = {
-        roomNo,
-        seatNo,
-        scheduledAt,
-      };
-      return await apiClient.post<QueueRequestDto>(
-        "/api/v1/seats/queue/reservation",
-        queueRequest
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        switch (error.status) {
-          case 400:
-            // 백엔드에서 제공하는 구체적인 메시지를 우선 사용
-            throw new Error(
-              error.message || "대기열 요청 정보가 올바르지 않습니다"
-            );
-          case 409:
-            throw new Error(
-              error.message || "이미 대기열에 등록된 요청이 있습니다"
-            );
-          default:
-            throw new Error(error.message || "대기열 등록에 실패했습니다");
-        }
-      }
-      throw new Error("네트워크 연결을 확인해주세요");
-    }
-  }
-
-  // 사용자 대기열 상태 조회
-  async getQueueStatus(): Promise<QueueStatusDto> {
-    try {
-      return await apiClient.get<QueueStatusDto>("/api/v1/seats/queue/status");
-    } catch (error) {
-      if (error instanceof ApiError) {
-        switch (error.status) {
-          case 404:
-            throw new Error("대기열 요청을 찾을 수 없습니다");
-          default:
-            throw new Error("대기열 상태 조회에 실패했습니다");
-        }
-      }
-      throw new Error("네트워크 연결을 확인해주세요");
-    }
-  }
-
-  // 대기열 요청 취소
-  async cancelQueueRequest(): Promise<SeatActionResponseDto> {
-    try {
-      return await apiClient.post<SeatActionResponseDto>(
-        "/api/v1/seats/queue/reservation/cancel"
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        switch (error.status) {
-          case 404:
-            throw new Error("취소할 대기열 요청을 찾을 수 없습니다");
-          default:
-            throw new Error("대기열 요청 취소에 실패했습니다");
-        }
-      }
-      throw new Error("네트워크 연결을 확인해주세요");
-    }
-  }
-
   // 즐겨찾기 토글 (로컬 관리)
   async toggleFavorite(roomNo: string, isFavorite: boolean): Promise<void> {
     try {
@@ -540,7 +424,7 @@ class DashboardApi {
           JSON.stringify(this.favoriteRooms)
         );
       }
-    } catch (error) {
+    } catch {
       throw new Error("즐겨찾기 설정에 실패했습니다");
     }
   }

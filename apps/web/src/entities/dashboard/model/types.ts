@@ -3,7 +3,6 @@ import {
   MySeatDto,
   SeatStatusDto,
   MyUsageStatsDto,
-  SeatPredictionDto,
 } from "@pnu-blace/types";
 
 // 좌석 상태 (백엔드와 동일)
@@ -61,6 +60,94 @@ export interface DashboardData {
   streakStats: StreakStats | null;
   insights: InsightItem[];
   lastUpdated: string;
+}
+
+export interface StreakHeatmapData {
+  currentStreak: number;
+  longestStreak: number;
+  lastStudyDate: string | null;
+  streakHistory: Array<{
+    date: string;
+    hasActivity: boolean;
+    usageHours: number;
+    level: number;
+  }>;
+}
+
+export interface MyStatsData {
+  totalUsageHours: number;
+  totalSessions: number;
+  averageSessionHours: number;
+  mostUsedRoom: string;
+  mostUsedRoomName: string;
+  thisWeekHours: number;
+  thisMonthHours: number;
+  favoriteTimeSlots: Array<{
+    hour: number;
+    count: number;
+    totalHours: number;
+  }>;
+  tier: string;
+}
+
+export interface MyRankData {
+  studentId: string;
+  totalUsageHours: number;
+  totalSessions: number;
+  totalDays: number;
+  averageSessionHours: number;
+  favoriteRoomName?: string;
+  favoriteRoomVisits: number;
+  favoriteRoomHours: number;
+  weeklyUsageHours: number;
+  weeklySessions: number;
+  weeklyDays: number;
+  weekStartDate?: string;
+  tier: string;
+  isPublicRanking: boolean;
+  publicNickname?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastDataSyncAt?: string;
+  totalUsers: number;
+  hoursRank: number;
+  sessionsRank: number;
+  daysRank: number;
+  hoursPercentile?: number;
+  sessionsPercentile?: number;
+  daysPercentile?: number;
+}
+
+export interface SeatHistoryData {
+  totalSessions: number;
+  totalUsageHours: number;
+  totalDays: number;
+  averageSessionHours: number;
+  favoriteRoom: {
+    name: string;
+    count: number;
+    totalHours: number;
+  } | null;
+}
+
+export interface SeatActivity {
+  id: string;
+  date: string;
+  roomName: string;
+  seatNo: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+  usageHours: number;
+}
+
+export interface SeatHistoryTableData {
+  activities: SeatActivity[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 // API 응답 래퍼

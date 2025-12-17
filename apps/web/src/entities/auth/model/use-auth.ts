@@ -9,6 +9,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     actions.initialize();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

@@ -41,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
       {
         className: classes,
         ...props,
-      } as any
+      } as React.HTMLAttributes<HTMLElement>
     );
   }
 

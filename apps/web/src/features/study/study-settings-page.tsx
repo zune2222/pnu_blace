@@ -14,7 +14,6 @@ import {
   useTransferOwnership,
   useProcessJoinRequest,
   useDeleteStudyGroup,
-  useUpdateStudyGroup,
   studyApi,
 } from "@/entities/study";
 import { StudyMemberRole } from "@pnu-blace/types";
@@ -57,8 +56,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
           });
           toast.success("스터디장이 위임되었습니다.");
           refetchMembers();
-        } catch (error: any) {
-          toast.error(error.message || "위임에 실패했습니다.");
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+          toast.error(errorMessage);
         }
       }
     } else {
@@ -70,8 +70,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
         });
         toast.success("역할이 변경되었습니다.");
         refetchMembers();
-      } catch (error: any) {
-        toast.error(error.message || "역할 변경에 실패했습니다.");
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "역할 변경에 실패했습니다.";
+        toast.error(errorMessage);
       }
     }
   };
@@ -82,8 +83,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
       await kickMutation.mutateAsync({ groupId, memberId });
       toast.success("멤버가 내보내졌습니다.");
       refetchMembers();
-    } catch (error: any) {
-      toast.error(error.message || "멤버 내보내기에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "멤버 내보내기에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -97,8 +99,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
       toast.success("참가 신청이 승인되었습니다.");
       refetchRequests();
       refetchMembers();
-    } catch (error: any) {
-      toast.error(error.message || "승인에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "승인에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -113,8 +116,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
       });
       toast.success("참가 신청이 거절되었습니다.");
       refetchRequests();
-    } catch (error: any) {
-      toast.error(error.message || "거절에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "거절에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -130,8 +134,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
       await deleteMutation.mutateAsync(groupId);
       toast.success("스터디가 삭제되었습니다.");
       router.push("/study");
-    } catch (error: any) {
-      toast.error(error.message || "삭제에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "삭제에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -139,8 +144,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
     try {
       const result = await studyApi.getInviteCode(groupId);
       setInviteCode(result.inviteCode);
-    } catch (error: any) {
-      toast.error(error.message || "초대 코드 조회에 실패했습니다.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "초대 코드 조회에 실패했습니다.";
+      toast.error(errorMessage);
     }
   };
 
@@ -183,7 +189,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as "members" | "requests" | "settings")}
                 className={`pb-3 px-2 md:px-4 text-xs md:text-sm font-light transition-colors whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
                     ? "text-foreground border-b-2 border-foreground"
@@ -309,7 +315,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                         </p>
                         {request.message && (
                           <p className="text-sm text-muted-foreground/70 font-light mt-2 p-2 bg-muted-foreground/5 rounded break-words">
-                            "{request.message}"
+                            &quot;{request.message}&quot;
                           </p>
                         )}
                       </div>

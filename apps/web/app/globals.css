@@ -126,6 +126,24 @@
   }
 }
 
+/* 채팅 플로팅 메시지 애니메이션 */
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+}
+
 /* 타이포그래피 유틸리티 */
 .text-headline {
   font-size: clamp(3rem, 8vw, 8rem);
