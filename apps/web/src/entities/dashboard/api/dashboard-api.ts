@@ -15,7 +15,7 @@ import {
   ExtendSeatResponseDto,
   MyUsageStatsDto,
 } from "@pnu-blace/types";
-import { StreakStats } from "../model/types";
+import { StreakStats, SeatHistoryData, StreakHeatmapData, MyRankData, MyStatsData, SeatHistoryTableData } from "../model/types";
 
 class DashboardApi {
   private favoriteRooms = ["A202", "A301", "A101"]; // 로컬 스토리지로 관리할 수 있음
@@ -152,11 +152,21 @@ class DashboardApi {
   }
 
   // 개인 통계 조회
-  async getPersonalStats(): Promise<MyUsageStatsDto | null> {
+  async getPersonalStats(): Promise<MyStatsData | null> {
     try {
-      return await apiClient.get<MyUsageStatsDto>("/api/v1/stats/me");
+      return await apiClient.get<MyStatsData>("/api/v1/stats/me");
     } catch (error) {
       console.warn("개인 통계 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 내 랭킹 조회
+  async getMyRank(): Promise<MyRankData | null> {
+    try {
+      return await apiClient.get<MyRankData>("/api/v1/stats/my-rank");
+    } catch (error) {
+      console.warn("내 랭킹 조회 실패:", error);
       return null;
     }
   }
@@ -167,6 +177,51 @@ class DashboardApi {
       return await apiClient.get<StreakStats>("/api/v1/stats/streak");
     } catch (error) {
       console.warn("연속성 통계 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 좌석 내역 조회
+  async getSeatHistory(): Promise<SeatHistoryData | null> {
+    try {
+      return await apiClient.get<SeatHistoryData>("/api/v1/stats/seat-history");
+    } catch (error) {
+      console.warn("좌석 내역 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 스트릭 히트맵 조회
+  async getStreakHeatmap(): Promise<StreakHeatmapData | null> {
+    try {
+      return await apiClient.get<StreakHeatmapData>(
+        "/api/v1/stats/streak/heatmap"
+      );
+    } catch (error) {
+      console.warn("스트릭 히트맵 조회 실패:", error);
+      return null;
+    }
+  }
+
+  // 좌석 이용 내역 테이블 조회 (페이지네이션)
+  async getSeatHistoryTable(
+    page: number = 1,
+    limit: number = 10,
+    startDate?: string,
+    endDate?: string
+  ): Promise<SeatHistoryTableData | null> {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate }),
+      });
+      return await apiClient.get<SeatHistoryTableData>(
+        `/api/v1/stats/seat-history/full?${params.toString()}`
+      );
+    } catch (error) {
+      console.warn("좌석 이용 내역 조회 실패:", error);
       return null;
     }
   }
