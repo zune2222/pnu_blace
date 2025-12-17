@@ -1,36 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
-
-interface MyRankInfo {
-  totalUsers: number;
-  hoursRank?: number;
-  sessionsRank?: number;
-  daysRank?: number;
-  hoursPercentile?: number;
-  sessionsPercentile?: number;
-  daysPercentile?: number;
-  tier: string;
-}
+import React from "react";
+import { useMyRankInfo, MyRankInfo } from "@/entities/rankings";
 
 export const MyRankingCard: React.FC = () => {
-  const [rankInfo, setRankInfo] = useState<MyRankInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchMyRank = async () => {
-      try {
-        const response = await apiClient.get<MyRankInfo>("/api/v1/stats/my-rank");
-        setRankInfo(response);
-      } catch (error) {
-        console.error("내 랭킹 조회 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMyRank();
-  }, []);
+  const { data: rankInfo, isLoading } = useMyRankInfo();
 
   if (isLoading) {
     return (

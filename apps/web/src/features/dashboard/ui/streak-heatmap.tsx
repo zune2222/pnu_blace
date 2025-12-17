@@ -1,25 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
+import React from "react";
+import { useStreakHeatmap, StreakHeatmapData } from "@/entities/dashboard";
 
 interface StreakHeatmapProps {
   className?: string;
 }
 
-interface StreakData {
-  currentStreak: number;
-  longestStreak: number;
-  lastStudyDate: string | null;
-  streakHistory: Array<{
-    date: string;
-    hasActivity: boolean;
-    usageHours: number;
-    level: number; // 0-4 색상 강도 레벨
-  }>;
-}
-
 // 년 단위 히트맵 데이터 생성 (GitHub 스타일)
-const generateYearlyHeatmapData = (streakData?: StreakData) => {
+const generateYearlyHeatmapData = (streakData?: StreakHeatmapData) => {
   const weeks = [];
   const today = new Date();
   const startOfYear = new Date(today.getFullYear(), 0, 1);
@@ -122,24 +110,7 @@ const getLevelBgClass = (level: number) => {
 export const StreakHeatmap: React.FC<StreakHeatmapProps> = ({
   className = "",
 }) => {
-  const [streakData, setStreakData] = useState<StreakData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchStreakData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await apiClient.get<StreakData>('/api/v1/stats/streak/heatmap');
-        setStreakData(response);
-      } catch (error) {
-        console.error('스트릭 데이터 조회 실패:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStreakData();
-  }, []);
+  const { data: streakData, isLoading } = useStreakHeatmap();
 
   const yearlyHeatmapData = generateYearlyHeatmapData(streakData || undefined);
   const monthLabels = getMonthLabels();

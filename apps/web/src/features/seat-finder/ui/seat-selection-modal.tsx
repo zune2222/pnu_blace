@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { X, Clock, Calendar, AlertCircle } from "lucide-react";
-import { SeatDetailDto, SeatPredictionDto } from "@pnu-blace/types";
-import { apiClient } from "@/lib/api";
+import { SeatDetailDto } from "@pnu-blace/types";
+import { useSeatPrediction } from "@/entities/seat-finder";
 import { logger } from "@/shared/lib/logger";
 
 interface SeatSelectionModalProps {
@@ -27,8 +27,6 @@ export const SeatSelectionModal = ({
   onReserveSeat,
 }: SeatSelectionModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [prediction, setPrediction] = useState<SeatPredictionDto | null>(null);
-  const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [autoExtensionEnabled] = useState(false);
 
@@ -38,6 +36,13 @@ export const SeatSelectionModal = ({
     seatData?.unavailableSeats.includes(selectedSeat || "") || false;
   const isSeatAvailable =
     seatData?.availableSeats.includes(selectedSeat || "") || false;
+
+  // 좌석 예측 데이터 (React Query)
+  const { data: prediction, isLoading: isLoadingPrediction } = useSeatPrediction(
+    roomNo,
+    selectedSeat || "",
+    isOpen && !!selectedSeat && !!seatData && isSeatOccupied
+  );
 
   // 모달 애니메이션 제어
   useEffect(() => {
@@ -50,30 +55,6 @@ export const SeatSelectionModal = ({
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
-
-  // 예측 시간 가져오기
-  useEffect(() => {
-    if (isOpen && selectedSeat && seatData && isSeatOccupied) {
-      const fetchPrediction = async () => {
-        try {
-          setIsLoadingPrediction(true);
-          const predictionData = await apiClient.get<SeatPredictionDto>(
-            `/api/v1/seats/${roomNo}/${selectedSeat}/prediction`
-          );
-          setPrediction(predictionData);
-        } catch {
-          // 예측 실패는 무시
-          setPrediction(null);
-        } finally {
-          setIsLoadingPrediction(false);
-        }
-      };
-
-      fetchPrediction();
-    } else {
-      setPrediction(null);
-    }
-  }, [isOpen, selectedSeat, roomNo, isSeatOccupied, seatData]);
 
   // 예측 시간 포맷팅
   const getPredictedTime = () => {

@@ -1,58 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
+import { 
+  useMyRank, 
+  usePersonalStats, 
+  MyRankData, 
+  MyStatsData 
+} from "@/entities/dashboard";
 
 type RankingPeriod = "weekly" | "all-time";
 
-// API response interfaces that match the actual backend structure
-interface MyStatsData {
-  totalUsageHours: number;
-  totalSessions: number;
-  averageSessionHours: number;
-  mostUsedRoom: string;
-  mostUsedRoomName: string;
-  thisWeekHours: number;
-  thisMonthHours: number;
-  favoriteTimeSlots: Array<{
-    hour: number;
-    count: number;
-  }>;
-  tier: string;
-}
-
-interface MyRankData {
-  studentId: string;
-  totalUsageHours: number;
-  totalSessions: number;
-  totalDays: number;
-  averageSessionHours: number;
-  favoriteRoomName?: string;
-  favoriteRoomVisits: number;
-  favoriteRoomHours: number;
-  weeklyUsageHours: number;
-  weeklySessions: number;
-  weeklyDays: number;
-  weekStartDate?: string;
-  tier: string;
-  isPublicRanking: boolean;
-  publicNickname?: string;
-  createdAt: string;
-  updatedAt: string;
-  lastDataSyncAt?: string;
-  totalUsers: number;
-  hoursRank: number;
-  sessionsRank: number;
-  daysRank: number;
-  hoursPercentile?: number;
-  sessionsPercentile?: number;
-  daysPercentile?: number;
-}
-
 export const MyDashboardRankings: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState<RankingPeriod>("weekly");
-  const [myStats, setMyStats] = useState<MyStatsData | null>(null);
-  const [myRankData, setMyRankData] = useState<MyRankData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const { data: myStats, isLoading: isStatsLoading } = usePersonalStats();
+  const { data: myRankData, isLoading: isRankLoading } = useMyRank();
+  
+  const isLoading = isStatsLoading || isRankLoading;
 
   // 데이터 존재 여부를 더 정확하게 체크
   const hasWeeklyData = myRankData && 
@@ -62,29 +25,6 @@ export const MyDashboardRankings: React.FC = () => {
 
   const hasAllTimeData = myRankData && 
     (myRankData.hoursRank || myRankData.sessionsRank || myRankData.daysRank);
-
-  useEffect(() => {
-    const fetchRankings = async () => {
-      try {
-        setIsLoading(true);
-        
-        // 내 통계와 랭킹 정보를 병렬로 가져오기
-        const [myStatsResponse, myRankResponse] = await Promise.all([
-          apiClient.get<MyStatsData>("/api/v1/stats/me"),
-          apiClient.get<MyRankData>("/api/v1/stats/my-rank")
-        ]);
-
-        setMyStats(myStatsResponse);
-        setMyRankData(myRankResponse);
-      } catch (error) {
-        console.error("랭킹 데이터 조회 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRankings();
-  }, []);
 
   // 이번주 데이터가 없고 전체 데이터가 있으면 전체 탭으로 자동 전환
   useEffect(() => {
