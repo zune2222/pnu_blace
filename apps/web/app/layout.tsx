@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Header, Footer } from "@/widgets";
@@ -116,8 +116,13 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/site.webmanifest",
+};
+
+// Next.js 15: viewport 메타데이터 분리
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#ffffff",
-  viewport: "width=device-width, initial-scale=1",
 };
 
 // 다크 모드 초기화 스크립트 (번쩍임 방지)

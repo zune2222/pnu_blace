@@ -6,6 +6,7 @@ import {
   useSaveNickname, 
   useGenerateRandomNickname 
 } from "@/entities/rankings";
+import { SkeletonCard } from "@/shared/ui";
 
 export const RankingPrivacySettings: React.FC = () => {
   const [nickname, setNickname] = useState("");
@@ -57,9 +58,7 @@ export const RankingPrivacySettings: React.FC = () => {
     return (
       <div className="space-y-8">
         <h2 className="text-2xl font-light text-foreground">내 닉네임</h2>
-        <div className="animate-pulse">
-          <div className="h-24 bg-muted-foreground/10 rounded"></div>
-        </div>
+        <SkeletonCard hasHeader={false} />
       </div>
     );
   }
