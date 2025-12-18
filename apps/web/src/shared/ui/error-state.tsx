@@ -25,7 +25,8 @@ export function ErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="text-foreground hover:underline font-medium"
+            aria-label="데이터 다시 불러오기"
+            className="text-foreground hover:underline font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
           >
             다시 시도
           </button>
@@ -50,9 +51,10 @@ export function ErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+            aria-label="데이터 다시 불러오기"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4" aria-hidden="true" />
             다시 시도
           </button>
         )}
@@ -72,9 +74,10 @@ export function ErrorState({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 border border-border/40 rounded-lg text-sm font-light hover:bg-muted-foreground/10 transition-colors"
+          aria-label="데이터 다시 불러오기"
+          className="inline-flex items-center gap-2 px-4 py-2 border border-border/40 rounded-lg text-sm font-light hover:bg-muted-foreground/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" aria-hidden="true" />
           다시 시도
         </button>
       )}
@@ -103,9 +106,10 @@ export function NetworkError({ onRetry, className }: NetworkErrorProps) {
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors"
+          aria-label="다시 연결 시도"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg text-sm font-light hover:bg-foreground/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" aria-hidden="true" />
           다시 시도
         </button>
       )}

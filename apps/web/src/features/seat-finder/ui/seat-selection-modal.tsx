@@ -56,6 +56,18 @@ export const SeatSelectionModal = ({
     }
   }, [isOpen]);
 
+  // ESC 키로 모달 닫기 (WCAG 2.1 AA 키보드 접근성)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   // 예측 시간 포맷팅
   const getPredictedTime = () => {
     if (!prediction) return "예측 중...";
