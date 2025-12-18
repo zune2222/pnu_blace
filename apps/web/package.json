@@ -35,6 +35,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.10",
     "@playwright/test": "^1.57.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",

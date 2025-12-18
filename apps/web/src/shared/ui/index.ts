@@ -19,7 +19,6 @@ export {
   EmptyState,
 } from "./error-state";
 
-// Loading components
 export {
   LoadingSpinner,
   FullPageLoader,
@@ -27,3 +26,6 @@ export {
   ButtonLoader,
   SectionLoader,
 } from "./loading";
+
+// Error Boundary
+export { ErrorBoundary, withErrorBoundary } from "./error-boundary";
