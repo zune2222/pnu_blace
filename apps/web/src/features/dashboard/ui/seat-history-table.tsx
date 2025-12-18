@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSeatHistoryTable, SeatHistoryTableData } from "@/entities/dashboard";
+import { SkeletonTable, ErrorState } from "@/shared/ui";
 
 interface SeatHistoryTableProps {
   className?: string;
@@ -53,21 +54,10 @@ export const SeatHistoryTable: React.FC<SeatHistoryTableProps> = ({
       <section className={`py-16 md:py-20 ${className}`}>
         <div className="space-y-8">
           <div className="space-y-4">
-            <div className="h-10 bg-muted-foreground/10 rounded animate-pulse" />
-            <div className="h-4 bg-muted-foreground/10 rounded animate-pulse w-32" />
+            <h2 className="text-3xl md:text-4xl font-extralight text-foreground">이용 내역</h2>
+            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">Usage History</p>
           </div>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-10 bg-muted-foreground/10 rounded animate-pulse flex-1" />
-              ))}
-            </div>
-            <div className="space-y-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-16 bg-muted-foreground/10 rounded animate-pulse" />
-              ))}
-            </div>
-          </div>
+          <SkeletonTable rows={5} cols={4} />
         </div>
       </section>
     );
@@ -81,9 +71,10 @@ export const SeatHistoryTable: React.FC<SeatHistoryTableProps> = ({
             <h2 className="text-3xl md:text-4xl font-extralight text-foreground">이용 내역</h2>
             <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">Usage History</p>
           </div>
-          <div className="text-center py-12 space-y-4">
-            <p className="text-muted-foreground/60 font-light">이용 내역을 불러올 수 없습니다.</p>
-          </div>
+          <ErrorState
+            message="이용 내역을 불러올 수 없습니다"
+            variant="card"
+          />
         </div>
       </section>
     );

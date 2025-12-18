@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useSeatHistory } from "@/entities/dashboard";
+import { SkeletonStats, ErrorState } from "@/shared/ui";
 
 export const SeatHistoryWidget: React.FC = () => {
   const { data, isLoading, error } = useSeatHistory();
@@ -8,29 +9,17 @@ export const SeatHistoryWidget: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-muted-foreground/10 rounded"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="h-20 bg-muted-foreground/10 rounded"
-              ></div>
-            ))}
-          </div>
-          <div className="h-32 bg-muted-foreground/10 rounded"></div>
-        </div>
+        <SkeletonStats />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="space-y-8">
-        <div className="text-center text-muted-foreground/70">
-          <p>데이터를 불러올 수 없습니다.</p>
-        </div>
-      </div>
+      <ErrorState
+        message="데이터를 불러올 수 없습니다"
+        variant="card"
+      />
     );
   }
 
