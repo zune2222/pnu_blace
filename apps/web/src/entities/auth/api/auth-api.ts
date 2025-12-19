@@ -1,4 +1,4 @@
-import { apiClient, ApiError } from "@/lib/api";
+import { apiClient, ApiError } from "@/shared/lib/api";
 import { LoginCredentials, LoginResponse } from "../model/types";
 
 class AuthApi {

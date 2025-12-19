@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 // 기본 Skeleton 컴포넌트
 interface SkeletonProps {

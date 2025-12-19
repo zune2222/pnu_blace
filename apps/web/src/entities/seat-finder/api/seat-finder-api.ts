@@ -1,5 +1,5 @@
 import { SeatDetailDto, SeatPredictionDto, ReserveSeatRequestDto, SeatActionResponseDto } from "@pnu-blace/types";
-import { apiClient } from "@/lib/api";
+import { apiClient } from "@/shared/lib/api";
 
 class SeatFinderApi {
   // 좌석 상세 정보 조회

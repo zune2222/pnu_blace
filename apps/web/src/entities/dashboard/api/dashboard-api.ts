@@ -1,4 +1,4 @@
-import { apiClient, ApiError } from "@/lib/api";
+import { apiClient, ApiError } from "@/shared/lib/api";
 import {
   DashboardData,
   CurrentSeat,

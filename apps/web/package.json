@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@pnu-blace/types": "*",
-    "@repo/ui": "*",
+
     "@sentry/nextjs": "^10.8.0",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-devtools": "^5.85.5",
@@ -40,8 +40,8 @@
     "@chromatic-com/storybook": "^4.1.3",
     "@next/bundle-analyzer": "^16.0.10",
     "@playwright/test": "^1.57.0",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@pnu-blace/eslint-config": "*",
+    "@pnu-blace/typescript-config": "*",
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/addon-onboarding": "^10.1.10",

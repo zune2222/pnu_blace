@@ -19,8 +19,8 @@
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@repo/eslint-config": "*",
-		"@repo/typescript-config": "*",
+		"@pnu-blace/eslint-config": "*",
+		"@pnu-blace/typescript-config": "*",
 		"eslint": "^9.33.0",
 		"prettier": "^3.2.5",
 		"typescript": "^5.9.2"
@@ -31,7 +31,7 @@
 	},
 	"eslintConfig": {
 		"extends": [
-			"@repo/eslint-config/base"
+			"@pnu-blace/eslint-config/base"
 		]
 	},
 	"prettier": {
