@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded bg-muted-foreground/10",
+        "animate-pulse rounded bg-muted",
         className
       )}
     />
@@ -100,7 +100,7 @@ export function SkeletonTable({ rows = 5, cols = 4, className }: SkeletonTablePr
   return (
     <div className={cn("space-y-2", className)}>
       {/* Header */}
-      <div className="flex gap-4 p-4 bg-muted-foreground/5 rounded-lg">
+      <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
         {Array.from({ length: cols }).map((_, i) => (
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
