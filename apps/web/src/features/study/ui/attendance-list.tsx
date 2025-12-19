@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { TodayAttendancePublic, AttendanceStatus } from "@pnu-blace/types";
+import { TodayAttendancePublic } from "@pnu-blace/types";
 import { MemberStreakStats } from "@/entities/study/api/study-api";
+import { AttendanceStatusBadge } from "@/shared/ui";
 import { MemberUsageHistoryModal } from "./member-usage-history-modal";
 
 interface AttendanceListProps {
@@ -12,56 +13,6 @@ interface AttendanceListProps {
   isLoading?: boolean;
 }
 
-const StatusBadge: React.FC<{ status: AttendanceStatus | "NOT_YET" }> = ({
-  status,
-}) => {
-  const config: Record<
-    AttendanceStatus | "NOT_YET",
-    { icon: string; label: string; className: string }
-  > = {
-    PRESENT: {
-      icon: "✅",
-      label: "출근",
-      className: "text-green-600 dark:text-green-400",
-    },
-    LATE: {
-      icon: "⚠️",
-      label: "지각",
-      className: "text-amber-600 dark:text-amber-400",
-    },
-    EARLY_LEAVE: {
-      icon: "🚪",
-      label: "조퇴",
-      className: "text-orange-600 dark:text-orange-400",
-    },
-    ABSENT: {
-      icon: "❌",
-      label: "결석",
-      className: "text-red-600 dark:text-red-400",
-    },
-    VACATION: {
-      icon: "🏖️",
-      label: "휴가",
-      className: "text-blue-600 dark:text-blue-400",
-    },
-    NOT_YET: {
-      icon: "⏳",
-      label: "미출근",
-      className: "text-muted-foreground/50",
-    },
-  };
-
-  const { icon, label, className } = config[status];
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 text-sm font-light ${className}`}
-    >
-      {icon} {label}
-    </span>
-  );
-};
-
 const formatMinutes = (minutes?: number): string => {
   if (!minutes) return "";
   const hours = Math.floor(minutes / 60);
@@ -70,6 +21,7 @@ const formatMinutes = (minutes?: number): string => {
   if (mins === 0) return `${hours}시간`;
   return `${hours}시간 ${mins}분`;
 };
+
 
 // 연속성 표시 컴포넌트
 const StreakBadge: React.FC<{ currentStreak: number }> = ({ currentStreak }) => {
@@ -189,7 +141,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
               >
                 📊
               </button>
-              <StatusBadge status={member.status} />
+              <AttendanceStatusBadge status={member.status} />
             </div>
           </div>
         );

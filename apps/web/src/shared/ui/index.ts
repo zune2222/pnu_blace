@@ -32,3 +32,4 @@ export { ErrorBoundary, withErrorBoundary } from "./error-boundary";
 
 // Badges
 export { VisibilityBadge } from "./visibility-badge";
+export { AttendanceStatusBadge } from "./attendance-status-badge";

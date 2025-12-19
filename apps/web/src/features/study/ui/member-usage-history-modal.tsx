@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useMemberAttendanceHistory } from "@/entities/study";
-import { AttendanceStatus } from "@pnu-blace/types";
+import { AttendanceStatusBadge } from "@/shared/ui";
 
 interface MemberUsageHistoryModalProps {
   groupId: string;
@@ -12,48 +12,6 @@ interface MemberUsageHistoryModalProps {
   onClose: () => void;
 }
 
-const StatusBadge: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
-  const config: Record<
-    AttendanceStatus,
-    { icon: string; label: string; className: string }
-  > = {
-    PRESENT: {
-      icon: "✅",
-      label: "출근",
-      className: "text-green-600 dark:text-green-400",
-    },
-    LATE: {
-      icon: "⚠️",
-      label: "지각",
-      className: "text-amber-600 dark:text-amber-400",
-    },
-    EARLY_LEAVE: {
-      icon: "🚪",
-      label: "조퇴",
-      className: "text-orange-600 dark:text-orange-400",
-    },
-    ABSENT: {
-      icon: "❌",
-      label: "결석",
-      className: "text-red-600 dark:text-red-400",
-    },
-    VACATION: {
-      icon: "🏖️",
-      label: "휴가",
-      className: "text-blue-600 dark:text-blue-400",
-    },
-  };
-
-  const { icon, label, className } = config[status];
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 text-sm font-light ${className}`}
-    >
-      {icon} {label}
-    </span>
-  );
-};
 
 const formatMinutes = (minutes: number): string => {
   if (minutes === 0) return "0분";
@@ -271,7 +229,7 @@ export const MemberUsageHistoryModal: React.FC<MemberUsageHistoryModalProps> = (
                           <p className="font-light text-foreground">
                             {formatDate(record.date)}
                           </p>
-                          <StatusBadge status={record.status} />
+                          <AttendanceStatusBadge status={record.status} />
                         </div>
                         {record.checkInTime && (
                           <p className="text-sm text-muted-foreground/60 font-light">
