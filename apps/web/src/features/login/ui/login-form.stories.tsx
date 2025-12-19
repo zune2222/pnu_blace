@@ -10,6 +10,11 @@ const meta: Meta<typeof LoginForm> = {
   title: "Features/Login/LoginForm",
   component: LoginForm,
   tags: ["autodocs"],
+  parameters: {
+    nextjs: {
+      appDirectory: true,
+    },
+  },
   decorators: [
     (Story) => (
       <QueryClientProvider client={queryClient}>

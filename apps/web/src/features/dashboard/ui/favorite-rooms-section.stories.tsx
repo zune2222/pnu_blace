@@ -10,6 +10,11 @@ const meta: Meta<typeof FavoriteRoomsSection> = {
   title: "Features/Dashboard/FavoriteRoomsSection",
   component: FavoriteRoomsSection,
   tags: ["autodocs"],
+  parameters: {
+    nextjs: {
+      appDirectory: true,
+    },
+  },
   decorators: [
     (Story) => (
       <QueryClientProvider client={queryClient}>
