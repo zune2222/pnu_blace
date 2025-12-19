@@ -2,48 +2,18 @@
 
 import React from "react";
 import Link from "next/link";
-import { StudyGroupListItem, StudyVisibility } from "@pnu-blace/types";
+import { StudyGroupListItem } from "@pnu-blace/types";
+import { VisibilityBadge } from "@/shared/ui";
 
 interface StudyCardProps {
   study: StudyGroupListItem;
 }
 
-const VisibilityBadge: React.FC<{ visibility: StudyVisibility }> = ({
-  visibility,
-}) => {
-  const config = {
-    PUBLIC: {
-      icon: "🌍",
-      label: "공개",
-      className: "text-green-600 dark:text-green-400 bg-green-500/10",
-    },
-    PASSWORD: {
-      icon: "🔐",
-      label: "비밀번호",
-      className: "text-amber-600 dark:text-amber-400 bg-amber-500/10",
-    },
-    PRIVATE: {
-      icon: "🔒",
-      label: "비공개",
-      className: "text-gray-600 dark:text-gray-400 bg-gray-500/10",
-    },
-  };
-
-  const { icon, label, className } = config[visibility];
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-light ${className}`}
-    >
-      {icon} {label}
-    </span>
-  );
-};
-
 export const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
   const memberRatio = study.maxMembers
     ? `${study.memberCount}/${study.maxMembers}명`
     : `${study.memberCount}명`;
+
 
   return (
     <Link href={`/study/${study.groupId}`}>
