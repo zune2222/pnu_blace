@@ -280,7 +280,7 @@ function App() {
           source={{ uri: WEB_URL }}
           style={styles.webview}
           onMessage={handleMessage}
-          injectedJavaScript={injectedJavaScript}
+          injectedJavaScriptBeforeContentLoaded={injectedJavaScript}
           onNavigationStateChange={(navState) => setCanGoBack(navState.canGoBack)}
           // WebView configuration
           javaScriptEnabled={true}
