@@ -211,6 +211,9 @@ export class PushService implements OnModuleInit {
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
             const errorCode = resp.error?.code;
+            const errorMessage = resp.error?.message;
+            this.logger.error(`FCM send failed for token[${idx}]: ${errorCode} - ${errorMessage}`);
+            
             // 만료되거나 유효하지 않은 토큰 비활성화
             if (
               errorCode === 'messaging/invalid-registration-token' ||
