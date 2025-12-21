@@ -10,8 +10,12 @@ async function bootstrap() {
     debug: process.env.NODE_ENV === 'development',
   });
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'debug', 'verbose'],
+    logger: isProduction 
+      ? ['error', 'warn', 'log'] 
+      : ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
   // CORS 설정
