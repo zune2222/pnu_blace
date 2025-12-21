@@ -52,16 +52,19 @@ export class PushService implements OnModuleInit {
     token: string,
     platform: 'ios' | 'android',
   ): Promise<DeviceToken> {
-    // 기존 토큰이 있으면 업데이트, 없으면 새로 생성
+    // 먼저 토큰으로만 검색 (기존에 다른 studentId로 저장된 경우 대비)
     let deviceToken = await this.deviceTokenRepository.findOne({
-      where: { studentId, token },
+      where: { token },
     });
 
     if (deviceToken) {
+      // 기존 레코드 업데이트 (studentId 변경될 수 있음)
+      deviceToken.studentId = studentId;
       deviceToken.isActive = true;
       deviceToken.platform = platform;
       deviceToken.updatedAt = new Date();
     } else {
+      // 새로 생성
       deviceToken = this.deviceTokenRepository.create({
         studentId,
         token,
