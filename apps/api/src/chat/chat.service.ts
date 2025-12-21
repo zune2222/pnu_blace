@@ -111,6 +111,17 @@ export class ChatService {
   }
 
   /**
+   * 그룹의 모든 멤버 studentId 목록 조회 (푸시 알림용)
+   */
+  async getGroupMemberIds(groupId: string): Promise<string[]> {
+    const members = await this.studyMemberRepository.find({
+      where: { groupId },
+      select: ['studentId'],
+    });
+    return members.map((m) => m.studentId);
+  }
+
+  /**
    * 메시지 삭제 (soft delete)
    */
   async deleteMessage(

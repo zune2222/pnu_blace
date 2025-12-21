@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Header, Footer } from "@/widgets";
+import { Header, Footer, BottomNavigation } from "@/widgets";
 import { AnnouncementProvider } from "@/widgets/announcement";
 import { QueryProvider } from "@/providers";
 import { Toaster } from "sonner";
@@ -176,8 +176,9 @@ export default function RootLayout({
           <AnnouncementProvider>
             <div className="min-h-screen bg-background text-foreground flex flex-col">
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 pb-16 md:pb-0">{children}</main>
               <Footer />
+              <BottomNavigation />
             </div>
             <Toaster 
               richColors 

@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChatMessage, StudyMember } from '@pnu-blace/db';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
+import { PushModule } from '../push/push.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChatService } from './chat.service';
       }),
       inject: [ConfigService],
     }),
+    PushModule,
   ],
   providers: [ChatGateway, ChatService],
   exports: [ChatService],

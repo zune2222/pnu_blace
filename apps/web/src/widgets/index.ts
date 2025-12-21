@@ -1,3 +1,3 @@
-export { Header } from "./header";
-export { Footer } from "./footer";
-export * from "./announcement";
+export * from "./header";
+export * from "./footer";
+export * from "./bottom-nav";
