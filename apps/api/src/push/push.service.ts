@@ -105,6 +105,8 @@ export class PushService implements OnModuleInit {
     studentId: string,
     notification: PushNotificationPayload,
   ): Promise<boolean> {
+    this.logger.log(`sendToUser called for studentId: ${studentId}`);
+    
     if (!this.firebaseApp) {
       this.logger.warn('Firebase not initialized, skipping push notification');
       return false;
@@ -114,12 +116,16 @@ export class PushService implements OnModuleInit {
       where: { studentId, isActive: true },
     });
 
+    this.logger.log(`Found ${tokens.length} active tokens for user ${studentId}`);
+
     if (tokens.length === 0) {
-      this.logger.debug(`No active tokens for user ${studentId}`);
+      this.logger.warn(`No active tokens for user ${studentId}`);
       return false;
     }
 
     const tokenStrings = tokens.map((t) => t.token);
+    this.logger.log(`Sending to tokens: ${tokenStrings.map(t => t.slice(0, 20) + '...').join(', ')}`);
+    
     return this.sendToTokens(tokenStrings, notification);
   }
 
