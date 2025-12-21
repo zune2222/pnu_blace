@@ -112,11 +112,11 @@ export const setupNativeBridgeListener = (
   }
 
   // 이벤트 리스너 등록
-  window.addEventListener('nativeReady', handleNativeReady as EventListener);
+  window.addEventListener('nativeReady', handleNativeReady as unknown as EventListener);
 
   // cleanup 함수 반환
   return () => {
-    window.removeEventListener('nativeReady', handleNativeReady as EventListener);
+    window.removeEventListener('nativeReady', handleNativeReady as unknown as EventListener);
   };
 };
 

@@ -5,7 +5,7 @@
     "build": "turbo run build --filter=!docs",
     "build:api": "turbo run build --filter=@pnu-blace/db --filter=@pnu-blace/types --filter=api",
     "build:web": "turbo run build --filter=web",
-    "dev": "docker-compose up -d && turbo run dev",
+    "dev": "docker-compose up -d && turbo run dev --filter=!docs",
     "dev:no-docker": "turbo run dev",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
