@@ -27,8 +27,17 @@ export class PushController {
     @Request() req: any,
     @Body() dto: RegisterTokenDto,
   ): Promise<{ success: boolean; message: string }> {
-    const studentId = req.user.sub;
+    const studentId = req.user?.sub;
     this.logger.log(`registerToken called: studentId=${studentId}, token=${dto.token?.slice(0, 20)}..., platform=${dto.platform}`);
+    
+    if (!studentId) {
+      this.logger.warn('registerToken failed: studentId is undefined');
+      return {
+        success: false,
+        message: '인증 정보를 찾을 수 없습니다.',
+      };
+    }
+    
     await this.pushService.registerToken(studentId, dto.token, dto.platform);
 
     return {
