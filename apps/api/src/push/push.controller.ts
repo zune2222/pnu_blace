@@ -63,4 +63,36 @@ export class PushController {
       message: '푸시 토큰이 해제되었습니다.',
     };
   }
+
+  /**
+   * 테스트 푸시 알림 발송 (본인에게)
+   * POST /api/v1/push/test
+   */
+  @Post('test')
+  async testPush(
+    @Request() req: any,
+    @Body() dto: { title?: string; body?: string },
+  ): Promise<{ success: boolean; message: string }> {
+    const studentId = req.user?.studentId;
+    
+    if (!studentId) {
+      return {
+        success: false,
+        message: '인증 정보를 찾을 수 없습니다.',
+      };
+    }
+
+    this.logger.log(`Test push to: ${studentId}`);
+
+    const result = await this.pushService.sendToUser(studentId, {
+      title: dto.title || '🔔 테스트 알림',
+      body: dto.body || 'PNU Blace 푸시 알림이 정상적으로 작동합니다!',
+      data: { type: 'test', timestamp: new Date().toISOString() },
+    });
+
+    return {
+      success: result,
+      message: result ? '푸시 알림이 발송되었습니다.' : '활성 토큰이 없거나 발송에 실패했습니다.',
+    };
+  }
 }
