@@ -41,7 +41,7 @@ export const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t border-border/40 pb-safe">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border border-border/40 pb-safe mb-5 rounded-2xl mx-2">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => (
           <Link
