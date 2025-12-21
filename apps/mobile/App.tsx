@@ -30,6 +30,7 @@ const STORAGE_KEYS = {
 type BridgeMessageType = 
   | 'REQUEST_PUSH_TOKEN'
   | 'REGISTER_PUSH_TOKEN'
+  | 'LOGIN_SUCCESS'
   | 'SET_USER_TOKEN'
   | 'LOGOUT'
   | 'OPEN_EXTERNAL_URL'
@@ -74,15 +75,33 @@ function App() {
           await messaging().registerDeviceForRemoteMessages();
         }
 
+        // Wait for APNS token to be ready (iOS only)
+        if (Platform.OS === 'ios') {
+          let apnsToken = await messaging().getAPNSToken();
+          let retry = 0;
+          while (!apnsToken && retry < 10) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            apnsToken = await messaging().getAPNSToken();
+            retry++;
+          }
+          
+          if (!apnsToken && Platform.OS === 'ios') {
+            console.warn('APNS token not available after waiting. FCM token fetch might fail.');
+          }
+        }
+
         // Get FCM token
         const token = await messaging().getToken();
-        console.log('FCM Token:', token);
-        setPushToken(token);
-        await AsyncStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
+        
+        if (token) {
+          console.log('FCM Token:', token);
+          setPushToken(token);
+          await AsyncStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
 
-        // Send token to webview when ready
-        if (webViewRef.current) {
-          injectPushToken(token);
+          // Send token to webview when ready
+          if (webViewRef.current) {
+            injectPushToken(token);
+          }
         }
       } catch (error) {
         console.error('FCM setup error:', error);
@@ -196,6 +215,13 @@ function App() {
       
       switch (message.type) {
         case 'REQUEST_PUSH_TOKEN':
+          if (pushToken) {
+            injectPushToken(pushToken);
+          }
+          break;
+
+        case 'LOGIN_SUCCESS':
+          // Web app notifies that login is successful, trigger token sync
           if (pushToken) {
             injectPushToken(pushToken);
           }
