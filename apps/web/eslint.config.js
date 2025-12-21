@@ -4,8 +4,13 @@ import storybook from "eslint-plugin-storybook";
 import { nextJsConfig } from "@pnu-blace/eslint-config/next-js";
 
 /** @type {import("eslint").Linter.Config} */
-export default [...nextJsConfig, {
-  rules: {
-    "react/prop-types": "off", // TypeScript 사용 시 불필요
+export default [
+  ...nextJsConfig,
+  ...storybook.configs["flat/recommended"],
+  {
+    rules: {
+      "react/prop-types": "off", // TypeScript 사용 시 불필요
+      "storybook/no-renderer-packages": "off", // @storybook/react에서 직접 import 허용
+    },
   },
-}, ...storybook.configs["flat/recommended"]];
+];
