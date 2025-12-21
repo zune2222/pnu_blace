@@ -250,10 +250,13 @@ function App() {
       window.sendToNative('REQUEST_PUSH_TOKEN');
 
       // Disable pinch zoom
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
+      let meta = document.querySelector('meta[name="viewport"]');
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        document.head.appendChild(meta);
+      }
       meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-      document.getElementsByTagName('head')[0].appendChild(meta);
       
       // Override console.log for debugging
       const originalLog = console.log;
@@ -286,6 +289,8 @@ function App() {
           allowsBackForwardNavigationGestures={true}
           allowsInlineMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
+          scalesPageToFit={false} // Disable zooming on iOS
+          bounces={false} // Disable bouncing
           // Handle external links
           onShouldStartLoadWithRequest={(request) => {
             // Check for allowed domains/patterns
