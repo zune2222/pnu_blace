@@ -18,9 +18,9 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Production URL - 배포된 웹 주소
-// const WEB_URL = 'https://pnu-blace.vercel.app';
+const WEB_URL = 'https://pnu-blace.vercel.app';
 
-const WEB_URL = 'http://localhost:3000';
+// const WEB_URL = 'http://localhost:3000';
 // AsyncStorage keys
 const STORAGE_KEYS = {
   PUSH_TOKEN: '@pnublace/pushToken',
