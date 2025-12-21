@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api";
+import { apiClient } from "@/shared/lib/api";
 import { RoomInfo } from "@pnu-blace/types";
 
 export const useRooms = () => {

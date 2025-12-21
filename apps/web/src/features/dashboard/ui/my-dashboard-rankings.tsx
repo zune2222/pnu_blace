@@ -6,6 +6,7 @@ import {
   MyRankData, 
   MyStatsData 
 } from "@/entities/dashboard";
+import { SkeletonStats, EmptyState } from "@/shared/ui";
 
 type RankingPeriod = "weekly" | "all-time";
 
@@ -63,9 +64,7 @@ export const MyDashboardRankings: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-extralight text-foreground">
             내 랭킹
           </h2>
-          <div className="animate-pulse">
-            <div className="h-40 bg-muted-foreground/10 rounded"></div>
-          </div>
+          <SkeletonStats />
         </div>
       </section>
     );
@@ -79,14 +78,10 @@ export const MyDashboardRankings: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-extralight text-foreground">
             내 랭킹
           </h2>
-          <div className="text-center py-12 space-y-4">
-            <p className="text-muted-foreground/60 font-light break-keep">
-              아직 랭킹 데이터가 없습니다.
-            </p>
-            <p className="text-sm text-muted-foreground/50 font-light break-keep">
-              도서관을 이용하면 랭킹이 집계됩니다.
-            </p>
-          </div>
+          <EmptyState
+            title="아직 랭킹 데이터가 없습니다"
+            message="도서관을 이용하면 랭킹이 집계됩니다."
+          />
         </div>
       </section>
     );

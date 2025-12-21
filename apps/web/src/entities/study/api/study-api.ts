@@ -1,6 +1,6 @@
 "use client";
 
-import { apiClient } from "@/lib/api";
+import { apiClient } from "@/shared/lib/api";
 import {
   StudyGroupListResponse,
   StudyGroupDetail,

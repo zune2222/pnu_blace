@@ -43,6 +43,18 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
     }
   }, [isVisible]);
 
+  // ESC 키로 모달 닫기 (WCAG 2.1 AA 키보드 접근성)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isVisible) {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isVisible, onClose]);
+
   const handleDismiss = () => {
     if (onDismiss) {
       onDismiss();

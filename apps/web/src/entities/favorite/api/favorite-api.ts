@@ -1,7 +1,7 @@
 "use client";
 
 import { ReadingRoomInfo } from "@/entities/dashboard";
-import { apiClient } from "@/lib/api";
+import { apiClient } from "@/shared/lib/api";
 import {
   ToggleFavoriteRequestDto,
   ToggleFavoriteResponseDto,

@@ -12,6 +12,7 @@ import {
   useMyStudyGroups,
 } from "@/entities/study";
 import { useAuth } from "@/entities/auth";
+import { VisibilityBadge } from "@/shared/ui";
 import { AttendanceList } from "./ui/attendance-list";
 import { StudyOverallStats } from "./ui/study-overall-stats";
 import { StudyChat } from "./ui/study-chat";
@@ -19,7 +20,6 @@ import { DailyAttendanceViewer } from "./ui/daily-attendance-viewer";
 import { PenaltyStats } from "./ui/penalty-stats";
 import { StudyRules } from "./ui/study-rules";
 import { JoinRequestModal, PasswordJoinModal } from "./ui/study-join-modals";
-import { StudyVisibility } from "@pnu-blace/types";
 import { useStudyChat } from "@/entities/study/model/use-study-chat";
 
 type TabType = "attendance" | "chat";
@@ -28,21 +28,7 @@ interface StudyDetailPageProps {
   groupId: string;
 }
 
-const VisibilityBadge: React.FC<{ visibility: StudyVisibility }> = ({
-  visibility,
-}) => {
-  const config = {
-    PUBLIC: { icon: "🌍", label: "공개" },
-    PASSWORD: { icon: "🔐", label: "비밀번호" },
-    PRIVATE: { icon: "🔒", label: "비공개" },
-  };
-  const { icon, label } = config[visibility];
-  return (
-    <span className="text-sm text-muted-foreground/60 font-light">
-      {icon} {label}
-    </span>
-  );
-};
+
 
 export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   groupId,

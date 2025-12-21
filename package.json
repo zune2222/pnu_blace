@@ -2,7 +2,7 @@
   "name": "pnu_blace",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=!docs",
     "build:api": "turbo run build --filter=@pnu-blace/db --filter=@pnu-blace/types --filter=api",
     "build:web": "turbo run build --filter=web",
     "dev": "docker-compose up -d && turbo run dev",

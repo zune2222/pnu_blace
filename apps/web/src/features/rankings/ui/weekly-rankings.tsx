@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useWeeklyRankings, WeeklyRankingUser, RankingType } from "@/entities/rankings";
+import { SkeletonList, ErrorState } from "@/shared/ui";
 
 interface WeeklyRankingsProps {
   myNickname?: string | null;
@@ -98,22 +99,17 @@ export const WeeklyRankings: React.FC<WeeklyRankingsProps> = ({ myNickname }) =>
   if (isLoading && !rankings) {
     return (
       <div className="space-y-8">
-        <div className="animate-pulse space-y-4">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="h-16 bg-muted-foreground/10 rounded"></div>
-          ))}
-        </div>
+        <SkeletonList count={10} />
       </div>
     );
   }
 
   if (!rankings) {
     return (
-      <div className="text-center py-16">
-        <p className="text-muted-foreground/60 font-light">
-          랭킹 정보를 불러올 수 없습니다.
-        </p>
-      </div>
+      <ErrorState
+        message="랭킹 정보를 불러올 수 없습니다"
+        variant="card"
+      />
     );
   }
 

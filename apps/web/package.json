@@ -8,11 +8,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@pnu-blace/types": "*",
-    "@repo/ui": "*",
+
     "@sentry/nextjs": "^10.8.0",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-devtools": "^5.85.5",
@@ -28,16 +37,44 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@chromatic-com/storybook": "^4.1.3",
+    "@next/bundle-analyzer": "^16.0.10",
+    "@playwright/test": "^1.57.0",
+    "@pnu-blace/eslint-config": "*",
+    "@pnu-blace/typescript-config": "*",
+    "@storybook/addon-a11y": "^10.1.10",
+    "@storybook/addon-docs": "^10.1.10",
+    "@storybook/addon-onboarding": "^10.1.10",
+    "@storybook/addon-vitest": "^10.1.10",
+    "@storybook/nextjs-vite": "^10.1.10",
     "@tailwindcss/postcss": "^4.1.12",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/browser": "^1.6.1",
+    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/ui": "^1.6.1",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.33.0",
+    "eslint-plugin-storybook": "^10.1.10",
+    "jsdom": "^27.0.1",
+    "msw": "^2.12.4",
+    "msw-storybook-addon": "^2.0.6",
+    "playwright": "^1.57.0",
     "postcss": "^8.5.6",
+    "storybook": "^10.1.10",
     "tailwindcss": "^4.1.12",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vite": "^7.3.0",
+    "vitest": "^1.6.1"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

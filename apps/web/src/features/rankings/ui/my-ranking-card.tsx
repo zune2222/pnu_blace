@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
-import { useMyRankInfo, MyRankInfo } from "@/entities/rankings";
+import { useMyRankInfo } from "@/entities/rankings";
+import { SkeletonStats, EmptyState } from "@/shared/ui";
+import Link from "next/link";
 
 export const MyRankingCard: React.FC = () => {
   const { data: rankInfo, isLoading } = useMyRankInfo();
@@ -9,9 +11,7 @@ export const MyRankingCard: React.FC = () => {
     return (
       <div className="space-y-8">
         <h2 className="text-2xl font-light text-foreground">내 랭킹</h2>
-        <div className="animate-pulse">
-          <div className="h-32 bg-muted-foreground/10 rounded"></div>
-        </div>
+        <SkeletonStats />
       </div>
     );
   }
@@ -20,16 +20,18 @@ export const MyRankingCard: React.FC = () => {
     return (
       <div className="space-y-8">
         <h2 className="text-2xl font-light text-foreground">내 랭킹</h2>
-        <div className="text-center py-16 space-y-4">
-          <p className="text-muted-foreground/60 font-light break-keep">
-            아직 통계 데이터가 없습니다.
-          </p>
-          <p className="text-sm text-muted-foreground/50 font-light break-keep">
-            <a href="/stats" className="text-foreground hover:underline">
-              통계 페이지
-            </a>를 먼저 방문해서 데이터를 생성해주세요.
-          </p>
-        </div>
+        <EmptyState
+          title="아직 통계 데이터가 없습니다"
+          message="통계 페이지를 먼저 방문해서 데이터를 생성해주세요"
+          action={
+            <Link
+              href="/stats"
+              className="text-foreground hover:underline font-medium"
+            >
+              통계 페이지로 이동 →
+            </Link>
+          }
+        />
       </div>
     );
   }
