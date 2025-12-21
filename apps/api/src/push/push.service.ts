@@ -201,7 +201,7 @@ export class PushService implements OnModuleInit {
 
       const response = await admin.messaging().sendEachForMulticast(message);
 
-      this.logger.debug(
+      this.logger.log(
         `Push sent: ${response.successCount} success, ${response.failureCount} failed`,
       );
 
@@ -222,7 +222,7 @@ export class PushService implements OnModuleInit {
         });
 
         if (failedTokens.length > 0) {
-          this.logger.debug(`Deactivating ${failedTokens.length} invalid tokens`);
+          this.logger.log(`Deactivating ${failedTokens.length} invalid tokens`);
           await this.deviceTokenRepository.update(
             { token: In(failedTokens) },
             { isActive: false },
