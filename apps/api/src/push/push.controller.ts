@@ -27,7 +27,7 @@ export class PushController {
     @Request() req: any,
     @Body() dto: RegisterTokenDto,
   ): Promise<{ success: boolean; message: string }> {
-    const studentId = req.user?.sub;
+    const studentId = req.user?.studentId;
     this.logger.log(`registerToken called: studentId=${studentId}, token=${dto.token?.slice(0, 20)}..., platform=${dto.platform}`);
     
     if (!studentId) {
@@ -55,7 +55,7 @@ export class PushController {
     @Request() req: any,
     @Body() dto: UnregisterTokenDto,
   ): Promise<{ success: boolean; message: string }> {
-    const studentId = req.user.sub;
+    const studentId = req.user?.studentId;
     await this.pushService.unregisterToken(studentId, dto.token);
 
     return {
