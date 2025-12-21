@@ -44,6 +44,10 @@
       "rlig" 1,
       "calt" 1;
   }
+  /* font-light 가독성 개선: 300 → 400 */
+  .font-light {
+    font-weight: 400 !important;
+  }
 }
 
 /* Korean text line break utilities */
