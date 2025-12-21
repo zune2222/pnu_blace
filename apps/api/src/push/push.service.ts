@@ -129,9 +129,6 @@ export class PushService implements OnModuleInit {
     return this.sendToTokens(tokenStrings, notification);
   }
 
-  /**
-   * 여러 사용자에게 푸시 알림 발송
-   */
   async sendToUsers(
     studentIds: string[],
     notification: PushNotificationPayload,
