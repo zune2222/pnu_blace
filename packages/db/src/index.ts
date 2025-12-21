@@ -34,3 +34,4 @@ export {
 } from "./entities/penalty-record.entity";
 export { ChatMessage } from "./entities/chat-message.entity";
 export { RoomChatMessage } from "./entities/room-chat-message.entity";
+export { DeviceToken } from "./entities/device-token.entity";

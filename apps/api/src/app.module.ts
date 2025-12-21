@@ -20,6 +20,7 @@ import {
   PenaltyRecord,
   ChatMessage,
   RoomChatMessage,
+  DeviceToken,
 } from '@pnu-blace/db';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -34,6 +35,7 @@ import { StudyModule } from './study/study.module';
 import { ChatModule } from './chat/chat.module';
 import { RedisModule } from './redis/redis.module';
 import { RoomChatModule } from './room-chat/room-chat.module';
+import { PushModule } from './push/push.module';
 
 @Module({
   imports: [
@@ -72,6 +74,7 @@ import { RoomChatModule } from './room-chat/room-chat.module';
           PenaltyRecord,
           ChatMessage,
           RoomChatMessage,
+          DeviceToken,
         ], // 모든 엔티티 클래스 추가
         synchronize: true, // 개발 환경에서는 true로 설정하여 테이블 자동 생성
         logging:
@@ -94,6 +97,7 @@ import { RoomChatModule } from './room-chat/room-chat.module';
     StudyModule,
     ChatModule,
     RoomChatModule,
+    PushModule,
   ],
   controllers: [AppController],
   providers: [AppService],
