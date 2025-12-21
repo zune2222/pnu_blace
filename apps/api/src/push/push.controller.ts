@@ -5,6 +5,7 @@ import {
   Body,
   UseGuards,
   Request,
+  Logger,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PushService } from './push.service';
@@ -13,6 +14,8 @@ import { RegisterTokenDto, UnregisterTokenDto } from './push.dto';
 @Controller('api/v1/push')
 @UseGuards(JwtAuthGuard)
 export class PushController {
+  private readonly logger = new Logger(PushController.name);
+
   constructor(private readonly pushService: PushService) {}
 
   /**
@@ -25,6 +28,7 @@ export class PushController {
     @Body() dto: RegisterTokenDto,
   ): Promise<{ success: boolean; message: string }> {
     const studentId = req.user.sub;
+    this.logger.log(`registerToken called: studentId=${studentId}, token=${dto.token?.slice(0, 20)}..., platform=${dto.platform}`);
     await this.pushService.registerToken(studentId, dto.token, dto.platform);
 
     return {

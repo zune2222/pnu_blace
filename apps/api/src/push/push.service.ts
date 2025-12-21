@@ -71,6 +71,7 @@ export class PushService implements OnModuleInit {
     }
 
     await this.deviceTokenRepository.save(deviceToken);
+    this.logger.log(`Token saved to DB: studentId=${studentId}, tokenPrefix=${token?.slice(0, 20)}, platform=${platform}`);
     this.logger.debug(`Token registered for user ${studentId}`);
 
     return deviceToken;

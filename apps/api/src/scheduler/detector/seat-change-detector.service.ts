@@ -41,11 +41,7 @@ export class SeatChangeDetectorService {
     // 현재 스냅샷을 이전 스냅샷으로 저장
     this.previousSnapshots.set(roomKey, currentSnapshot);
 
-    // 감지된 변화를 로그에 기록
-    for (const change of changes) {
-      await this.logSeatEvent(change);
-    }
-
+   
     return changes;
   }
 
