@@ -32,7 +32,8 @@ type BridgeMessageType =
   | 'REGISTER_PUSH_TOKEN'
   | 'SET_USER_TOKEN'
   | 'LOGOUT'
-  | 'OPEN_EXTERNAL_URL';
+  | 'OPEN_EXTERNAL_URL'
+  | 'THEME_CHANGE';
 
 interface BridgeMessage {
   type: BridgeMessageType;
@@ -40,7 +41,15 @@ interface BridgeMessage {
 }
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const systemColorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
+
+  // Sync with system theme initially or when it changes, 
+  // but we mostly rely on web to tell us the active theme if it differs.
+  useEffect(() => {
+    setIsDarkMode(systemColorScheme === 'dark');
+  }, [systemColorScheme]);
+
   const webViewRef = useRef<WebView>(null);
   const [pushToken, setPushToken] = useState<string | null>(null);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -211,6 +220,12 @@ function App() {
           }
           break;
 
+        case 'THEME_CHANGE':
+          if (typeof message.payload?.isDarkMode === 'boolean') {
+            setIsDarkMode(message.payload.isDarkMode);
+          }
+          break;
+
         default:
           console.log('Unknown message type:', message.type);
       }
@@ -256,7 +271,7 @@ function App() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
         backgroundColor={isDarkMode ? '#0a0a0a' : '#ffffff'}
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#0a0a0a' : '#ffffff' }]} edges={['top']}>
         <WebView
           ref={webViewRef}
           source={{ uri: WEB_URL }}

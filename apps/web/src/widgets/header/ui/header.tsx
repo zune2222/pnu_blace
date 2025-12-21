@@ -31,6 +31,14 @@ export const Header: React.FC = () => {
       const currentMode: "system" | "light" | "dark" = saved || "system";
 
       setThemeMode(currentMode);
+
+      // Native App Theme Sync (Initial)
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
+         const isDark = currentMode === 'dark' || (currentMode === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+         // @ts-ignore
+         window.sendToNative('THEME_CHANGE', { isDarkMode: isDark });
+      }
     };
 
     // 초기 상태 동기화
@@ -83,6 +91,13 @@ export const Header: React.FC = () => {
       html.classList.remove("dark");
     }
     html.style.colorScheme = newDarkMode ? "dark" : "light";
+
+    // Native App Theme Sync
+    // @ts-ignore - native interop
+    if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
+      // @ts-ignore
+      window.sendToNative('THEME_CHANGE', { isDarkMode: newDarkMode });
+    }
 
     localStorage.setItem("theme", newMode);
   };
