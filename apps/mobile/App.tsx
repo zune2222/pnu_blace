@@ -18,8 +18,9 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Production URL - 배포된 웹 주소
-const WEB_URL = 'https://pnu-blace.vercel.app';
+// const WEB_URL = 'https://pnu-blace.vercel.app';
 
+const WEB_URL = 'http://localhost:3000';
 // AsyncStorage keys
 const STORAGE_KEYS = {
   PUSH_TOKEN: '@pnublace/pushToken',
@@ -80,12 +81,12 @@ function App() {
           let apnsToken = await messaging().getAPNSToken();
           let retry = 0;
           while (!apnsToken && retry < 10) {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
             apnsToken = await messaging().getAPNSToken();
             retry++;
           }
           
-          if (!apnsToken && Platform.OS === 'ios') {
+          if (!apnsToken) {
             console.warn('APNS token not available after waiting. FCM token fetch might fail.');
           }
         }

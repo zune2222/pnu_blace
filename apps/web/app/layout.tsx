@@ -6,6 +6,7 @@ import { AnnouncementProvider } from "@/widgets/announcement";
 import { QueryProvider } from "@/providers";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
+import { NativeBridgeInitializer } from "@/shared/lib/native-bridge-initializer";
 
 const geistSans = localFont({
   src: "../public/GeistVF.woff",
@@ -189,6 +190,7 @@ export default function RootLayout({
               visibleToasts={5}
             />
           </AnnouncementProvider>
+          <NativeBridgeInitializer />
         </QueryProvider>
         <Analytics />
       </body>
