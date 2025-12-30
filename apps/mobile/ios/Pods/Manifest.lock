@@ -2676,6 +2676,11 @@ PODS:
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
+  - RNNotifee (9.1.8):
+    - React-Core
+    - RNNotifee/NotifeeCore (= 9.1.8)
+  - RNNotifee/NotifeeCore (9.1.8):
+    - React-Core
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
@@ -2765,6 +2770,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - SocketRocket (~> 0.7.1)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -2946,6 +2952,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNNotifee:
+    :path: "../node_modules/@notifee/react-native"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -3041,6 +3049,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNFBApp: 0c4cadae3900893d4631ea9a9effd14f853cd8e0
   RNFBMessaging: 873220424f6f6aa5c787baf5c7099e1e2ba087c9
+  RNNotifee: 5e3b271e8ea7456a36eec994085543c9adca9168
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 5456bb010373068fc92221140921b09d126b116e
 

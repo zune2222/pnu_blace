@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { DeviceToken } from '@pnu-blace/db';
+import { DeviceToken, User } from '@pnu-blace/db';
 import * as admin from 'firebase-admin';
 import { PushNotificationPayload } from './push.dto';
 
@@ -14,6 +14,8 @@ export class PushService implements OnModuleInit {
   constructor(
     @InjectRepository(DeviceToken)
     private deviceTokenRepository: Repository<DeviceToken>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private configService: ConfigService,
   ) {}
 
@@ -247,5 +249,65 @@ export class PushService implements OnModuleInit {
     return this.deviceTokenRepository.count({
       where: { studentId, isActive: true },
     });
+  }
+
+  /**
+   * 스터디 채팅 알림 발송 (설정 체크 포함)
+   */
+  async sendStudyChatNotification(
+    studentId: string,
+    notification: PushNotificationPayload,
+  ): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { studentId } });
+    if (!user?.studyChatNotification) {
+      this.logger.debug(`Study chat notification disabled for user ${studentId}`);
+      return false;
+    }
+    return this.sendToUser(studentId, notification);
+  }
+
+  /**
+   * 열람실 채팅 알림 발송 (설정 체크 포함)
+   */
+  async sendRoomChatNotification(
+    studentId: string,
+    notification: PushNotificationPayload,
+  ): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { studentId } });
+    if (!user?.roomChatNotification) {
+      this.logger.debug(`Room chat notification disabled for user ${studentId}`);
+      return false;
+    }
+    return this.sendToUser(studentId, notification);
+  }
+
+  /**
+   * 스터디 채팅 알림 - 여러 사용자 (설정 체크 포함)
+   */
+  async sendStudyChatNotificationToUsers(
+    studentIds: string[],
+    notification: PushNotificationPayload,
+  ): Promise<boolean> {
+    const users = await this.userRepository.find({
+      where: { studentId: In(studentIds), studyChatNotification: true },
+    });
+    const enabledIds = users.map(u => u.studentId);
+    if (enabledIds.length === 0) return false;
+    return this.sendToUsers(enabledIds, notification);
+  }
+
+  /**
+   * 열람실 채팅 알림 - 여러 사용자 (설정 체크 포함)
+   */
+  async sendRoomChatNotificationToUsers(
+    studentIds: string[],
+    notification: PushNotificationPayload,
+  ): Promise<boolean> {
+    const users = await this.userRepository.find({
+      where: { studentId: In(studentIds), roomChatNotification: true },
+    });
+    const enabledIds = users.map(u => u.studentId);
+    if (enabledIds.length === 0) return false;
+    return this.sendToUsers(enabledIds, notification);
   }
 }

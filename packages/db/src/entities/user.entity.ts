@@ -29,4 +29,11 @@ export class User {
 
 	@OneToMany("FavoriteRoom", "user")
 	favoriteRooms!: Relation<any[]>;
+
+	// 알림 설정
+	@Column({ default: true })
+	studyChatNotification!: boolean;
+
+	@Column({ default: true })
+	roomChatNotification!: boolean;
 }

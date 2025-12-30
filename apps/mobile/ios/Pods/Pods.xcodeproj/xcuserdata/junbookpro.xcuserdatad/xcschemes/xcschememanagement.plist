@@ -159,6 +159,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>RNNotifee.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>React-Core-React-Core_privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>

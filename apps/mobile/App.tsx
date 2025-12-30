@@ -11,11 +11,14 @@ import {
   Alert,
   Linking,
   BackHandler,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import notifee from '@notifee/react-native';
 
 // Production URL - 배포된 웹 주소
 const WEB_URL = 'https://pnu-blace.vercel.app';
@@ -55,6 +58,25 @@ function App() {
   const webViewRef = useRef<WebView>(null);
   const [pushToken, setPushToken] = useState<string | null>(null);
   const [canGoBack, setCanGoBack] = useState(false);
+
+  // Clear badge when app becomes active
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        // Clear badge count when app comes to foreground
+        await notifee.setBadgeCount(0);
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    // Also clear on initial load
+    notifee.setBadgeCount(0);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // Request notification permission and get FCM token
   useEffect(() => {

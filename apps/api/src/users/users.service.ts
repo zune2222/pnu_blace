@@ -116,4 +116,25 @@ export class UsersService {
     }
     return String(error);
   }
+
+  /**
+   * 알림 설정 업데이트
+   */
+  async updateNotificationSettings(
+    studentId: string,
+    settings: { studyChatNotification?: boolean; roomChatNotification?: boolean },
+  ): Promise<void> {
+    await this.userRepository.update(
+      { studentId },
+      {
+        ...(settings.studyChatNotification !== undefined && {
+          studyChatNotification: settings.studyChatNotification,
+        }),
+        ...(settings.roomChatNotification !== undefined && {
+          roomChatNotification: settings.roomChatNotification,
+        }),
+      },
+    );
+    this.logger.debug(`Notification settings updated for user ${studentId}`);
+  }
 }

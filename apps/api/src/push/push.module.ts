@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DeviceToken } from '@pnu-blace/db';
+import { DeviceToken, User } from '@pnu-blace/db';
 import { PushService } from './push.service';
 import { PushController } from './push.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DeviceToken])],
+  imports: [TypeOrmModule.forFeature([DeviceToken, User])],
   controllers: [PushController],
   providers: [PushService],
   exports: [PushService],
