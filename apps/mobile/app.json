@@ -1,4 +1,9 @@
 {
   "name": "PNUBlace",
-  "displayName": "PNUBlace"
+  "displayName": "PNUBlace",
+  "extra": {
+    "eas": {
+      "projectId": "8ed63598-028a-4c30-8c01-0588e54f8704"
+    }
+  }
 }
