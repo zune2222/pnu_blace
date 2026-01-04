@@ -6,11 +6,15 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'react-native';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 import { MainWebView } from './src/features/webview/ui/main-webview';
 import { useWebViewBridge } from './src/features/webview/model/use-webview-bridge';
 import { useFCM } from './src/features/notifications/model/use-fcm';
 import { useAppLifecycle } from './src/app/model/use-app-lifecycle';
+
+// Enable Crashlytics
+crashlytics().setCrashlyticsCollectionEnabled(true);
 
 function App() {
   const systemColorScheme = useColorScheme();

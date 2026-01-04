@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { SeatSelectionModal } from "./ui";
 import { useAuth } from "@/entities/auth";
 import { logger } from "@/shared/lib/logger";
 import { useSeatData, useSeatReservation, useIframeSeatClick } from "./hooks";
+import { seatEvents } from "@/shared/lib/analytics";
 
 interface SeatDetailPageProps {
   roomNo: string;
@@ -25,11 +26,35 @@ export const SeatDetailPage = ({ roomNo }: SeatDetailPageProps) => {
     onSuccess: () => setSelectedSeat(null),
   });
 
+  // 룸 상세 페이지 조회 이벤트
+  useEffect(() => {
+    if (seatData) {
+      const availableSeats = seatData.totalSeats - seatData.occupiedSeats.length;
+      const utilizationRate = Math.round((seatData.occupiedSeats.length / seatData.totalSeats) * 100);
+
+      seatEvents.roomViewed({
+        room_no: roomNo,
+        room_name: seatData.roomName,
+        total_seats: seatData.totalSeats,
+        available_seats: availableSeats,
+        utilization_rate: utilizationRate,
+      });
+    }
+  }, [seatData, roomNo]);
+
   // 좌석 클릭 핸들러
   const handleSeatClick = useCallback((seatNo: string) => {
+    if (seatData) {
+      seatEvents.bookingStarted({
+        room_no: roomNo,
+        room_name: seatData.roomName,
+        seat_no: seatNo,
+        booking_source: "room_detail",
+      });
+    }
     setSelectedSeat(seatNo);
     setIsModalOpen(true);
-  }, []);
+  }, [roomNo, seatData]);
 
   // iframe postMessage 리스너
   useIframeSeatClick(handleSeatClick);

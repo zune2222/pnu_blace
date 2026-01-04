@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Suspense } from "react";
 import { Header, Footer, BottomNavigation } from "@/widgets";
 import { AnnouncementProvider } from "@/widgets/announcement";
-import { QueryProvider } from "@/providers";
+import { QueryProvider, AnalyticsProvider } from "@/providers";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { NativeBridgeInitializer } from "@/shared/lib/native-bridge-initializer";
@@ -176,23 +177,27 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>
-          <AnnouncementProvider>
-            <div className="min-h-screen bg-background text-foreground flex flex-col">
-              <Header />
-              <main className="flex-1 pb-16 md:pb-0">{children}</main>
-              <div className="hidden md:block">
-                <Footer />
-              </div>
-              <BottomNavigation />
-            </div>
-            <Toaster 
-              richColors 
-              position="top-center" 
-              expand={true}
-              visibleToasts={3}
-            />
-          </AnnouncementProvider>
-          <NativeBridgeInitializer />
+          <Suspense fallback={null}>
+            <AnalyticsProvider>
+              <AnnouncementProvider>
+                <div className="min-h-screen bg-background text-foreground flex flex-col">
+                  <Header />
+                  <main className="flex-1 pb-16 md:pb-0">{children}</main>
+                  <div className="hidden md:block">
+                    <Footer />
+                  </div>
+                  <BottomNavigation />
+                </div>
+                <Toaster
+                  richColors
+                  position="top-center"
+                  expand={true}
+                  visibleToasts={3}
+                />
+              </AnnouncementProvider>
+              <NativeBridgeInitializer />
+            </AnalyticsProvider>
+          </Suspense>
         </QueryProvider>
         <Analytics />
       </body>

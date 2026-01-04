@@ -1,8 +1,7 @@
 import { useRef, useCallback, useState } from 'react';
 import { Platform, Linking } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BridgeMessage, STORAGE_KEYS } from '../../../shared';
+import { BridgeMessage, STORAGE_KEYS, SecureStorage } from '../../../shared';
 
 interface UseWebViewBridgeProps {
   pushToken: string | null;
@@ -63,12 +62,12 @@ export const useWebViewBridge = ({
 
         case 'SET_USER_TOKEN':
           if (message.payload?.token) {
-            await AsyncStorage.setItem(STORAGE_KEYS.USER_TOKEN, message.payload.token);
+            await SecureStorage.setItem(STORAGE_KEYS.USER_TOKEN, message.payload.token);
           }
           break;
 
         case 'LOGOUT':
-          await AsyncStorage.multiRemove([STORAGE_KEYS.USER_TOKEN]);
+          await SecureStorage.multiRemove([STORAGE_KEYS.USER_TOKEN]);
           break;
 
         case 'OPEN_EXTERNAL_URL':
@@ -83,8 +82,8 @@ export const useWebViewBridge = ({
           }
           break;
       }
-    } catch (error) {
-      console.error('Failed to parse webview message:', error);
+    } catch {
+      // Failed to parse webview message
     }
   }, [pushToken, injectPushToken, setIsDarkMode]);
 

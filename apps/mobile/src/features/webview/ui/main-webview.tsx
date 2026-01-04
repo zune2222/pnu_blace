@@ -32,9 +32,6 @@ export const MainWebView = forwardRef<WebView, MainWebViewProps>(({
         const allowedPatterns = [
           WEB_URL,
           'about:',
-          'http://localhost',
-          'http://10.0.2.2',
-          'http://192.168.',
           'https://place.pusan.ac.kr',
         ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import { PenaltyStats } from "./ui/penalty-stats";
 import { StudyRules } from "./ui/study-rules";
 import { JoinRequestModal, PasswordJoinModal } from "./ui/study-join-modals";
 import { useStudyChat } from "@/entities/study/model/use-study-chat";
+import { studyEvents } from "@/shared/lib/analytics";
 
 type TabType = "attendance" | "chat";
 
@@ -48,6 +49,19 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
     useTodayAttendance(groupId);
   const { data: myStudies } = useMyStudyGroups(isAuthenticated);
 
+  // 스터디 상세 페이지 조회 이벤트
+  useEffect(() => {
+    if (study) {
+      studyEvents.detailViewed({
+        study_id: groupId,
+        study_name: study.name,
+        visibility: study.visibility,
+        member_count: study.memberCount,
+        is_member: !!myStudies?.items.find((s) => s.groupId === groupId),
+      });
+    }
+  }, [study, groupId, myStudies]);
+
   const {
     messages: chatMessages,
     isConnected: chatConnected,
@@ -63,6 +77,10 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     resetUnread();
+    studyEvents.tabSwitched(groupId, tab);
+    if (tab === "chat") {
+      studyEvents.chat({ study_id: groupId, action: "tab_opened" });
+    }
   };
 
   const myMembership = myStudies?.items.find((s) => s.groupId === groupId);
@@ -77,6 +95,10 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
       router.push("/login");
       return;
     }
+
+    const method = study?.visibility === "PASSWORD" ? "password" : "public_request";
+    studyEvents.joinStarted(groupId, method);
+
     if (study?.visibility === "PASSWORD") {
       setShowPasswordModal(true);
     } else if (study?.visibility === "PUBLIC") {
@@ -98,7 +120,16 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
       setJoinDisplayName("");
       setJoinMessage("");
       toast.success("참가 신청이 완료되었습니다.");
+
+      if (study) {
+        studyEvents.joined({
+          study_id: groupId,
+          study_name: study.name,
+          join_method: "public_request",
+        });
+      }
     } catch (error: unknown) {
+      studyEvents.joinFailed(groupId, error instanceof Error ? error.message : "unknown");
       toast.error(error instanceof Error ? error.message : "참가 신청에 실패했습니다.");
     }
   };
@@ -115,8 +146,18 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
       });
       setShowPasswordModal(false);
       toast.success("스터디에 가입되었습니다!");
+
+      if (study) {
+        studyEvents.joined({
+          study_id: groupId,
+          study_name: study.name,
+          join_method: "password",
+        });
+      }
+
       router.push(`/study/${groupId}`);
     } catch (error: unknown) {
+      studyEvents.joinFailed(groupId, error instanceof Error ? error.message : "unknown");
       toast.error(error instanceof Error ? error.message : "가입에 실패했습니다.");
     }
   };

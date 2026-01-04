@@ -3,9 +3,17 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/auth";
+import { engagementEvents } from "@/shared/lib/analytics";
 
 export const CtaSection: React.FC = () => {
   const { isAuthenticated } = useAuth();
+
+  const handleCtaClick = () => {
+    engagementEvents.ctaClicked(
+      isAuthenticated ? "start_dashboard" : "login",
+      "cta_section"
+    );
+  };
 
   return (
     <section className="py-16 md:py-24 px-6">
@@ -39,6 +47,7 @@ export const CtaSection: React.FC = () => {
           <div className="pt-4">
             <Link
               href={isAuthenticated ? "/dashboard" : "/login"}
+              onClick={handleCtaClick}
               className="group inline-flex items-center justify-center space-x-3 text-xl md:text-2xl font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
             >
               <span>{isAuthenticated ? "시작하기" : "로그인하기"}</span>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Platform, Alert } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS } from '../../../shared';
+import { STORAGE_KEYS, SecureStorage } from '../../../shared';
 
 interface UseFCMProps {
   onNavigate: (route: string) => void;
@@ -23,7 +22,6 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
         if (!enabled) {
-          console.log('FCM permission denied');
           return;
         }
 
@@ -43,7 +41,7 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
           }
           
           if (!apnsToken) {
-            console.warn('APNS token not available after waiting. FCM token fetch might fail.');
+            return;
           }
         }
 
@@ -51,16 +49,15 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
         const token = await messaging().getToken();
         
         if (token) {
-          console.log('FCM Token:', token);
           setPushToken(token);
-          await AsyncStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
-          
+          await SecureStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
+
           if (onTokenRefresh) {
             onTokenRefresh(token);
           }
         }
-      } catch (error) {
-        console.error('FCM setup error:', error);
+      } catch {
+        // FCM setup failed silently
       }
     };
 
@@ -68,10 +65,9 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
 
     // Listen for token refresh
     const unsubscribeTokenRefresh = messaging().onTokenRefresh(async (token) => {
-      console.log('FCM Token refreshed:', token);
       setPushToken(token);
-      await AsyncStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
-      
+      await SecureStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
+
       if (onTokenRefresh) {
         onTokenRefresh(token);
       }
@@ -83,8 +79,6 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
   // Handle foreground notifications
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log('Foreground message:', remoteMessage);
-      
       // Show alert for foreground notifications
       Alert.alert(
         remoteMessage.notification?.title ?? '알림',

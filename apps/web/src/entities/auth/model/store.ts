@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { AuthState } from "./types";
+import { authEvents } from "@/shared/lib/analytics";
 
 interface AuthStore extends AuthState {
   setAuthenticated: (user: AuthState["user"], token: string) => void;
@@ -48,13 +49,17 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        // 로그아웃 이벤트 추적
+        authEvents.logout({ trigger: "manual" });
+        authEvents.identify(null);
+
         set({
           isAuthenticated: false,
           user: null,
           token: null,
           isLoading: false,
         });
-        
+
         // 로컬스토리지에서 토큰 제거
         if (typeof window !== "undefined") {
           localStorage.removeItem("auth_token");

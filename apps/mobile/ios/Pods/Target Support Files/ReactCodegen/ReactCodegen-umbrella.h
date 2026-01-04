@@ -30,6 +30,8 @@
 #import "rnasyncstorageJSI.h"
 #import "RNCWebViewSpec/RNCWebViewSpec.h"
 #import "RNCWebViewSpecJSI.h"
+#import "RNKeychainSpec/RNKeychainSpec.h"
+#import "RNKeychainSpecJSI.h"
 #import "safeareacontext/safeareacontext.h"
 #import "safeareacontextJSI.h"
 
