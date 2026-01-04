@@ -2,7 +2,7 @@ import React from "react";
 
 export const LoadingState: React.FC = () => {
   return (
-    <section className="py-20 md:py-32">
+    <section className="py-12 md:py-20">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="animate-pulse space-y-6">
           {/* 좌석 정보 스켈레톤 */}

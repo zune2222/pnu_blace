@@ -259,59 +259,17 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* 모바일 메뉴 */}
+        {/* 모바일 메뉴 - 테마/설정 전용 (네비게이션은 바텀탭 사용) */}
         <div
           className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-            isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+            isMobileMenuOpen ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="px-4 pt-4 pb-4 space-y-2 bg-background/95 backdrop-blur-sm border-t border-border/40">
-            {/* 모바일 네비게이션 */}
-            <div
-              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "50ms" }}
-            >
-              <Link
-                href="/dashboard"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
-              >
-                대시보드
-              </Link>
-              <Link
-                href="/seats"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
-              >
-                좌석 찾기
-              </Link>
-              <Link
-                href="/stats"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
-              >
-                내 통계
-              </Link>
-              <Link
-                href="/rankings"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
-              >
-                랭킹
-              </Link>
-              <Link
-                href="/study"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
-              >
-                스터디
-              </Link>
-            </div>
-
             {/* 모바일 테마 토글 */}
             <div
               className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "100ms" }}
+              style={{ transitionDelay: "50ms" }}
             >
               <button
                 onClick={toggleDarkMode}
@@ -373,32 +331,37 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* 모바일 액션 버튼 */}
+            {/* 설정 링크 */}
             <div
-              className={`pt-4 space-y-3 transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-              style={{ transitionDelay: "200ms" }}
+              className={`transform transition-all duration-200 ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              style={{ transitionDelay: "100ms" }}
             >
-              {isAuthenticated ? (
-                <Button
-                  variant="outline"
-                  className="w-full min-h-[48px] active:scale-95"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    logout();
-                  }}
+              <Link
+                href="/settings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between w-full px-4 py-4 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors duration-200 min-h-[48px] active:scale-95"
+              >
+                <span>설정</span>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  로그아웃
-                </Button>
-              ) : (
-                <Button variant="outline" className="w-full min-h-[48px] active:scale-95" asChild>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    로그인
-                  </Link>
-                </Button>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </Link>
             </div>
           </div>
         </div>

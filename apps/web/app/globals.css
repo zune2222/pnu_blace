@@ -1,7 +1,44 @@
 @import "tailwindcss";
 
-/* CSS 변수 정의 */
+/* 
+ * Tailwind v4 Theme Configuration
+ * 색상은 :root/.dark CSS 변수를 참조하여 다크모드 지원
+ */
+@theme {
+  /* 색상은 CSS 변수 기반 - 다크모드 자동 지원 */
+  --color-background: var(--tw-color-background);
+  --color-foreground: var(--tw-color-foreground);
+  --color-primary: var(--tw-color-primary);
+  --color-primary-foreground: var(--tw-color-primary-foreground);
+  --color-secondary: var(--tw-color-secondary);
+  --color-secondary-foreground: var(--tw-color-secondary-foreground);
+  --color-muted: var(--tw-color-muted);
+  --color-muted-foreground: var(--tw-color-muted-foreground);
+  --color-accent: var(--tw-color-accent);
+  --color-accent-foreground: var(--tw-color-accent-foreground);
+  --color-border: var(--tw-color-border);
+  --color-input: var(--tw-color-input);
+  --color-ring: var(--tw-color-ring);
+}
+
+/* CSS 변수 정의 - Light Mode */
 :root {
+  /* Tailwind 연동용 색상 변수 */
+  --tw-color-background: hsl(0 0% 100%);
+  --tw-color-foreground: hsl(222.2 84% 4.9%);
+  --tw-color-primary: hsl(222.2 47.4% 11.2%);
+  --tw-color-primary-foreground: hsl(210 40% 98%);
+  --tw-color-secondary: hsl(210 40% 96.1%);
+  --tw-color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --tw-color-muted: hsl(210 40% 96.1%);
+  --tw-color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  --tw-color-accent: hsl(210 40% 96.1%);
+  --tw-color-accent-foreground: hsl(222.2 47.4% 11.2%);
+  --tw-color-border: hsl(214.3 31.8% 91.4%);
+  --tw-color-input: hsl(214.3 31.8% 91.4%);
+  --tw-color-ring: hsl(222.2 84% 4.9%);
+
+  /* 기존 CSS 변수 유지 (호환성) */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --primary: 222.2 47.4% 11.2%;
@@ -15,9 +52,35 @@
   --ring: 222.2 84% 4.9%;
   --accent: 210 40% 96.1%;
   --accent-foreground: 222.2 47.4% 11.2%;
+
+  /* PNU Brand Colors */
+  --pnu-blue: 209 100% 33%;
+  --pnu-blue-light: 209 85% 50%;
+  --pnu-green: 152 100% 33%;
+
+  /* Hero Section Colors */
+  --hero-bg: 222 84% 4.9%;
+  --hero-bg-secondary: 220 60% 8%;
 }
 
+/* Dark Mode */
 .dark {
+  /* Tailwind 연동용 색상 변수 - 다크모드 */
+  --tw-color-background: hsl(222.2 84% 4.9%);
+  --tw-color-foreground: hsl(210 40% 98%);
+  --tw-color-primary: hsl(210 40% 98%);
+  --tw-color-primary-foreground: hsl(222.2 47.4% 11.2%);
+  --tw-color-secondary: hsl(217.2 32.6% 17.5%);
+  --tw-color-secondary-foreground: hsl(210 40% 98%);
+  --tw-color-muted: hsl(217.2 32.6% 17.5%);
+  --tw-color-muted-foreground: hsl(215 20.2% 65.1%);
+  --tw-color-accent: hsl(217.2 32.6% 17.5%);
+  --tw-color-accent-foreground: hsl(210 40% 98%);
+  --tw-color-border: hsl(217.2 32.6% 17.5%);
+  --tw-color-input: hsl(217.2 32.6% 17.5%);
+  --tw-color-ring: hsl(212.7 26.8% 83.9%);
+
+  /* 기존 CSS 변수 유지 (호환성) */
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
   --primary: 210 40% 98%;
@@ -211,3 +274,118 @@
     padding-bottom: 6rem;
   }
 }
+
+/* ============================================
+   HERO SECTION DESIGN SYSTEM
+   ============================================ */
+
+/* Hero Section 배경 그라디언트 */
+.hero-gradient-bg {
+  background: 
+    radial-gradient(
+      ellipse 80% 50% at 50% 50%,
+      hsl(var(--pnu-blue) / 0.15) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      to bottom,
+      hsl(var(--hero-bg)) 0%,
+      hsl(var(--hero-bg-secondary)) 100%
+    );
+}
+
+/* Light Streak 효과 */
+.hero-light-streak {
+  position: absolute;
+  inset: 0;
+  background: 
+    conic-gradient(
+      from 90deg at 50% 50%,
+      transparent 0deg,
+      hsl(var(--pnu-blue) / 0.1) 45deg,
+      transparent 90deg,
+      hsl(var(--pnu-blue) / 0.08) 135deg,
+      transparent 180deg,
+      hsl(var(--pnu-blue) / 0.1) 225deg,
+      transparent 270deg,
+      hsl(var(--pnu-blue) / 0.08) 315deg,
+      transparent 360deg
+    );
+  transform-origin: center;
+}
+
+/* Hero 타이포그래피 */
+.hero-title {
+  font-size: clamp(3rem, 12vw, 8rem);
+  line-height: 0.9;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: white;
+  text-shadow: 0 0 60px hsl(var(--pnu-blue) / 0.3);
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--pnu-blue-light));
+}
+
+.hero-description {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+/* Scroll Indicator */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* Hero CTA Button */
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--pnu-blue)) 0%,
+    hsl(var(--pnu-blue-light)) 100%
+  );
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 20px hsl(var(--pnu-blue) / 0.4),
+    0 0 0 0 hsl(var(--pnu-blue) / 0);
+}
+
+.hero-cta:hover {
+  box-shadow: 
+    0 6px 30px hsl(var(--pnu-blue) / 0.5),
+    0 0 40px hsl(var(--pnu-blue) / 0.2);
+}
+
+.hero-cta:focus-visible {
+  outline: 2px solid hsl(var(--pnu-blue-light));
+  outline-offset: 4px;
+}
+
+@media (min-width: 640px) {
+  .hero-cta {
+    padding: 1.125rem 2.5rem;
+    font-size: 1.125rem;
+  }
+}
+

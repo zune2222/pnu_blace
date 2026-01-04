@@ -28,7 +28,7 @@ export const FavoriteHeart: React.FC<FavoriteHeartProps> = ({
       onClick={onClick}
       aria-label={isFavorite ? "즐겨찾기에서 제거" : "즐겨찾기에 추가"}
       aria-pressed={isFavorite}
-      className={`p-2 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${colorClasses} ${className}`}
+      className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${colorClasses} ${className}`}
       title={isFavorite ? "즐겨찾기에서 제거" : "즐겨찾기에 추가"}
     >
       <svg

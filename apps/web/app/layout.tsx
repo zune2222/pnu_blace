@@ -180,14 +180,16 @@ export default function RootLayout({
             <div className="min-h-screen bg-background text-foreground flex flex-col">
               <Header />
               <main className="flex-1 pb-16 md:pb-0">{children}</main>
-              <Footer />
+              <div className="hidden md:block">
+                <Footer />
+              </div>
               <BottomNavigation />
             </div>
             <Toaster 
               richColors 
-              position="bottom-right" 
+              position="top-center" 
               expand={true}
-              visibleToasts={5}
+              visibleToasts={3}
             />
           </AnnouncementProvider>
           <NativeBridgeInitializer />

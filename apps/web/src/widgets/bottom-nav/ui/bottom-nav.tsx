@@ -2,18 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BarChart2, Armchair, BookOpen, Trophy } from "lucide-react";
+import { BarChart2, Armchair, BookOpen, Trophy, ChartPie } from "lucide-react";
 
 export const BottomNavigation = () => {
   const pathname = usePathname();
 
   const navItems = [
-    {
-      href: "/",
-      label: "홈",
-      icon: Home,
-      isActive: pathname === "/",
-    },
     {
       href: "/dashboard",
       label: "대시보드",
@@ -25,6 +19,12 @@ export const BottomNavigation = () => {
       label: "좌석",
       icon: Armchair,
       isActive: pathname.startsWith("/seats"),
+    },
+    {
+      href: "/stats",
+      label: "통계",
+      icon: ChartPie,
+      isActive: pathname.startsWith("/stats"),
     },
     {
       href: "/study",

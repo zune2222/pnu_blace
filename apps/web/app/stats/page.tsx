@@ -9,7 +9,7 @@ import { useDashboardData } from "@/features/dashboard/model";
 const StatsLoginPrompt: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
-      <section className="py-20 md:py-32">
+      <section className="py-12 md:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center space-y-8">
             <h1 className="text-4xl md:text-5xl font-extralight text-foreground">
@@ -98,7 +98,7 @@ const AuthenticatedStatsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="py-20 md:py-32">
+      <section className="py-12 md:py-20">
         <div className="max-w-4xl mx-auto px-6 space-y-16">
           <SeatHistoryWidget />
           <StudyContinuitySection

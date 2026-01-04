@@ -77,52 +77,52 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
           </p>
         </div>
 
-        {/* 메트릭 그리드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+        {/* 메트릭 그리드 - 모바일에서도 3열 유지하되 컴팩트하게 */}
+        <div className="grid grid-cols-3 gap-4 md:gap-8">
           {/* 현재 스트릭 */}
-          <div className="text-center space-y-4">
-            <div className="text-5xl">🔥</div>
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+          <div className="text-center space-y-2 md:space-y-4">
+            <div className="text-3xl md:text-5xl">🔥</div>
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               현재 스트릭
             </p>
-            <div className="space-y-2">
-              <div className="font-mono text-4xl md:text-5xl font-extralight text-foreground">
+            <div className="space-y-1 md:space-y-2">
+              <div className="font-mono text-2xl md:text-5xl font-extralight text-foreground">
                 {currentStreak}
               </div>
-              <p className="text-sm text-muted-foreground/60 font-light">
-                {currentStreak === 1 ? "일 스트릭" : "일 스트릭"}
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
+                일 스트릭
               </p>
             </div>
           </div>
 
           {/* 최고 스트릭 */}
-          <div className="text-center space-y-4">
-            <div className="text-5xl">🏆</div>
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+          <div className="text-center space-y-2 md:space-y-4">
+            <div className="text-3xl md:text-5xl">🏆</div>
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               최고 스트릭
             </p>
-            <div className="space-y-2">
-              <div className="font-mono text-4xl md:text-5xl font-extralight text-foreground">
+            <div className="space-y-1 md:space-y-2">
+              <div className="font-mono text-2xl md:text-5xl font-extralight text-foreground">
                 {longestStreak}
               </div>
-              <p className="text-sm text-muted-foreground/60 font-light">
-                일 스트릭 달성
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
+                일 달성
               </p>
             </div>
           </div>
 
           {/* 스트릭 진행도 */}
-          <div className="text-center space-y-4">
-            <div className="text-5xl">⭐</div>
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
-              목표 달성도
+          <div className="text-center space-y-2 md:space-y-4">
+            <div className="text-3xl md:text-5xl">⭐</div>
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+              달성도
             </p>
-            <div className="space-y-2">
-              <div className="font-mono text-4xl md:text-5xl font-extralight text-foreground">
+            <div className="space-y-1 md:space-y-2">
+              <div className="font-mono text-2xl md:text-5xl font-extralight text-foreground">
                 {Math.round(progressPercentage)}%
               </div>
-              <p className="text-sm text-muted-foreground/60 font-light">
-                최고 스트릭 대비
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
+                최고 대비
               </p>
             </div>
           </div>
@@ -202,14 +202,14 @@ const LoadingSkeleton: React.FC = () => {
           <div className="h-4 bg-border/20 rounded animate-pulse w-32" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-3 gap-4 md:gap-8">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="text-center space-y-4">
-              <div className="h-16 bg-border/20 rounded animate-pulse" />
-              <div className="h-4 bg-border/20 rounded animate-pulse" />
-              <div className="space-y-2">
-                <div className="h-12 bg-border/20 rounded animate-pulse" />
-                <div className="h-4 bg-border/20 rounded animate-pulse" />
+            <div key={i} className="text-center space-y-2 md:space-y-4">
+              <div className="h-8 md:h-16 bg-border/20 rounded animate-pulse" />
+              <div className="h-3 md:h-4 bg-border/20 rounded animate-pulse" />
+              <div className="space-y-1 md:space-y-2">
+                <div className="h-6 md:h-12 bg-border/20 rounded animate-pulse" />
+                <div className="h-2 md:h-4 bg-border/20 rounded animate-pulse" />
               </div>
             </div>
           ))}

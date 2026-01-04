@@ -21,7 +21,7 @@ export const RankingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="py-20 md:py-32">
+      <section className="py-12 md:py-20">
         <div className="max-w-6xl mx-auto px-6">
           {/* 페이지 헤더 */}
           <div className="space-y-8 mb-16">

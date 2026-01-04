@@ -147,7 +147,6 @@ export const FavoriteRoomsSection: React.FC<FavoriteRoomsSectionProps> = ({
                         );
                       }}
                       size="sm"
-                      className="p-1"
                     />
                   </div>
                 </div>
