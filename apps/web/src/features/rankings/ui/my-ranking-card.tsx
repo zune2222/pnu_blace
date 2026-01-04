@@ -82,18 +82,18 @@ export const MyRankingCard: React.FC = () => {
     <div className="space-y-8">
       <h2 className="text-2xl font-light text-foreground">내 랭킹</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-3 gap-4 md:gap-8">
         {/* 이용시간 랭킹 */}
-        <div className="text-center space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+        <div className="text-center space-y-2 md:space-y-4">
+          <div className="space-y-1 md:space-y-2">
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               Usage Hours
             </p>
-            <div className="font-mono text-3xl font-extralight text-foreground">
+            <div className="font-mono text-2xl md:text-3xl font-extralight text-foreground">
               #{rankInfo.hoursRank || "—"}
             </div>
             {rankInfo.hoursPercentile != null && (
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
                 상위 {Math.max(0, 100 - rankInfo.hoursPercentile)}%
               </p>
             )}
@@ -101,16 +101,16 @@ export const MyRankingCard: React.FC = () => {
         </div>
 
         {/* 방문횟수 랭킹 */}
-        <div className="text-center space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+        <div className="text-center space-y-2 md:space-y-4">
+          <div className="space-y-1 md:space-y-2">
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               Visits
             </p>
-            <div className="font-mono text-3xl font-extralight text-foreground">
+            <div className="font-mono text-2xl md:text-3xl font-extralight text-foreground">
               #{rankInfo.sessionsRank || "—"}
             </div>
             {rankInfo.sessionsPercentile != null && (
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
                 상위 {Math.max(0, 100 - rankInfo.sessionsPercentile)}%
               </p>
             )}
@@ -118,16 +118,16 @@ export const MyRankingCard: React.FC = () => {
         </div>
 
         {/* 이용일수 랭킹 */}
-        <div className="text-center space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+        <div className="text-center space-y-2 md:space-y-4">
+          <div className="space-y-1 md:space-y-2">
+            <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               Days
             </p>
-            <div className="font-mono text-3xl font-extralight text-foreground">
+            <div className="font-mono text-2xl md:text-3xl font-extralight text-foreground">
               #{rankInfo.daysRank || "—"}
             </div>
             {rankInfo.daysPercentile != null && (
-              <p className="text-sm text-muted-foreground/60 font-light">
+              <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light">
                 상위 {Math.max(0, 100 - rankInfo.daysPercentile)}%
               </p>
             )}

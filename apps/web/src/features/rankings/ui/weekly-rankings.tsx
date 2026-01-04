@@ -264,16 +264,16 @@ export const WeeklyRankings: React.FC<WeeklyRankingsProps> = ({ myNickname }) =>
             return (
               <div
                 key={`${user.rank}-${user.publicNickname}`}
-                className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border rounded-lg transition-colors space-y-3 sm:space-y-0 ${
+                className={`flex flex-row items-center justify-between p-4 sm:p-6 border rounded-lg transition-colors ${
                   isMe 
                     ? "border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20" 
                     : "border-border/20 hover:bg-muted-foreground/5"
                 }`}
               >
-                <div className="flex items-center space-x-4 sm:space-x-6">
-                  <div className="text-center min-w-[50px] sm:min-w-[60px]">
+                <div className="flex items-center space-x-3 sm:space-x-6 min-w-0">
+                  <div className="text-center min-w-[30px] sm:min-w-[60px]">
                     <div
-                      className={`text-xl sm:text-2xl font-mono font-extralight ${
+                      className={`text-lg sm:text-2xl font-mono font-extralight ${
                         user.rank === 1
                           ? "text-yellow-500"
                           : user.rank === 2
@@ -287,25 +287,25 @@ export const WeeklyRankings: React.FC<WeeklyRankingsProps> = ({ myNickname }) =>
                     </div>
                   </div>
 
-                  <div className="space-y-1 flex-1 min-w-0">
+                  <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-base sm:text-lg font-light text-foreground truncate">
+                      <span className="text-sm sm:text-lg font-light text-foreground truncate">
                         {user.publicNickname}
                       </span>
                       {isMe && (
-                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-500 text-white rounded-full shrink-0">
+                        <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-medium bg-blue-500 text-white rounded-full shrink-0">
                           나
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground/60 font-light">
+                    <div className="text-xs sm:text-sm text-muted-foreground/60 font-light hidden sm:block">
                       {getTierDisplay(user.tier)}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-left sm:text-right">
-                  <div className="text-lg sm:text-xl font-mono font-extralight text-foreground">
+                <div className="text-right pl-2 shrink-0">
+                  <div className="text-base sm:text-xl font-mono font-extralight text-foreground">
                     {formatValue(activeRanking, getCurrentValue(user))}
                   </div>
                 </div>
