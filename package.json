@@ -14,7 +14,14 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "type-check": "turbo run type-check",
-    "start": "yarn workspace api start:prod"
+    "start": "yarn workspace api start:prod",
+    "mobile:build:ios": "cd apps/mobile && eas build --platform ios --profile production",
+    "mobile:build:android": "cd apps/mobile && eas build --platform android --profile production",
+    "mobile:build:all": "cd apps/mobile && eas build --platform all --profile production",
+    "mobile:submit:ios": "cd apps/mobile && eas submit --platform ios",
+    "mobile:submit:android": "cd apps/mobile && eas submit --platform android",
+    "mobile:deploy:ios": "cd apps/mobile && eas build --platform ios --profile production && eas submit --platform ios",
+    "mobile:deploy:android": "cd apps/mobile && eas build --platform android --profile production && eas submit --platform android"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
