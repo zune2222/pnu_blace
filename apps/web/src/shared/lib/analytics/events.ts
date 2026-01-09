@@ -1,4 +1,4 @@
-import { logAnalyticsEvent, identifyUser, setUserProps } from '../firebase';
+import { logAnalyticsEvent, identifyUser, setUserProps } from './logger';
 import type {
   AuthLoginParams,
   AuthLogoutParams,
