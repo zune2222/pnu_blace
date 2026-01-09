@@ -86,6 +86,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        // LLD linker 강제 사용 (NDK 27+에서 gold linker 제거로 인한 빌드 오류 해결)
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_LD=lld"
+            }
+        }
     }
     signingConfigs {
         debug {

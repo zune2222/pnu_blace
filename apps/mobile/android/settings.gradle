@@ -9,6 +9,7 @@ pluginManagement {
 
 plugins {
     id("com.facebook.react.settings")
+    id("com.facebook.react.rootproject") apply false
 }
 
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
@@ -16,10 +17,11 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://maven.notifee.app' }
     }
 }
 
