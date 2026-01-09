@@ -705,6 +705,7 @@ export class AttendanceService {
    * 스터디 그룹 내 모든 멤버의 연속성 통계 조회
    */
   async getGroupStreakStats(groupId: string): Promise<Array<{
+    memberId: string;
     studentId: string;
     displayName: string;
     currentStreak: number;
@@ -717,6 +718,7 @@ export class AttendanceService {
     });
 
     return members.map(member => ({
+      memberId: member.memberId,
       studentId: member.studentId,
       displayName: member.displayName,
       currentStreak: member.currentStreak,

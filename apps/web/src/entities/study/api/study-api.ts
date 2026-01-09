@@ -21,8 +21,8 @@ import {
 
 // 멤버별 연속성 통계
 export interface MemberStreakStats {
+  memberId: string;
   studentId: string;
-  memberId?: string;
   displayName: string;
   currentStreak: number;
   longestStreak: number;
