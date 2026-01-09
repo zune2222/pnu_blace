@@ -8,11 +8,12 @@ export const LoginHeader: React.FC = () => {
       {/* 로고 영역 */}
       <div className="mb-6">
         <Image
-          src="/pnu_logo_trans.png"
+          src="/pnu_logo_trans.webp"
           alt="PNU Blace 로고"
           width={100}
           height={100}
           className="mx-auto mb-4"
+          priority
         />
         <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
           PNU Blace
