@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
@@ -39,6 +40,9 @@ import { PushModule } from './push/push.module';
 
 @Module({
   imports: [
+    // 0. SentryModule (에러 추적)
+    SentryModule.forRoot(),
+
     // 1. ConfigModule을 가장 먼저 임포트합니다.
     ConfigModule.forRoot({
       isGlobal: true, // 모든 모듈에서 환경 변수를 쓸 수 있게 설정

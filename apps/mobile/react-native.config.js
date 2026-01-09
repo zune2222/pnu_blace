@@ -10,6 +10,6 @@ module.exports = {
     },
   },
   dependencies: {},
-  // Monorepo configuration - point to root node_modules
-  reactNativePath: path.resolve(__dirname, '../../node_modules/react-native'),
+  // Point to local node_modules (EAS build compatibility)
+  reactNativePath: path.resolve(__dirname, './node_modules/react-native'),
 };
