@@ -1,3 +1,8 @@
 // Components
 export { HomePage } from "./home-page";
-export { HeroSection, FeaturesSection, StatsSection, CtaSection } from "./ui";
+export {
+  HeroSection,
+  CtaSection,
+  FeaturesSection,
+  FinalCtaSection,
+} from "./ui";

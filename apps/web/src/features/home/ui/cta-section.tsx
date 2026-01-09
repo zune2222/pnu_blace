@@ -7,16 +7,16 @@ import { engagementEvents } from "@/shared/lib/analytics";
 
 const bridgePoints = [
   {
-    gap: "복잡한 좌석 조회",
-    solution: "한눈에 실시간 현황",
+    gap: "매일 얼마나 했는지 모름",
+    solution: "자동으로 쌓이는 기록",
   },
   {
-    gap: "기록 안 되는 학습 시간",
-    solution: "자동 누적 통계",
+    gap: "혼자라서 지침",
+    solution: "함께라서 지속",
   },
   {
-    gap: "혼자만의 공부",
-    solution: "함께하는 스터디",
+    gap: "의지만으론 부족함",
+    solution: "친구들과 선의의 경쟁",
   },
 ];
 
@@ -38,14 +38,9 @@ export const CtaSection: React.FC = () => {
           <p className="text-xs md:text-sm text-muted-foreground/50 font-mono tracking-widest uppercase mb-4">
             Bridge + Place
           </p>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-foreground leading-tight mb-6 break-keep">
-            도서관과 당신 사이,
-            <br />
-            가장 빠른 다리
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-foreground leading-tight break-keep">
+            기록하고, 함께하고, 성장하다
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground font-light max-w-xl mx-auto leading-relaxed break-keep">
-            기존 시스템의 빈틈을 연결합니다
-          </p>
         </div>
 
         {/* Gap → Solution 카드 */}
@@ -91,22 +86,9 @@ export const CtaSection: React.FC = () => {
           <Link
             href={isAuthenticated ? "/dashboard" : "/login"}
             onClick={handleCtaClick}
-            className="group inline-flex items-center justify-center gap-3 px-6 py-3 text-base md:text-lg font-light text-foreground hover:text-muted-foreground transition-colors duration-300"
+            className="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-background bg-foreground hover:bg-foreground/90 rounded-full transition-colors duration-200"
           >
-            <span>{isAuthenticated ? "대시보드로 이동" : "시작하기"}</span>
-            <svg
-              className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
+            {isAuthenticated ? "대시보드로 이동" : "시작하기"}
           </Link>
         </div>
       </div>

@@ -1,5 +1,4 @@
 export { HeroSection } from "./hero-section";
-export { FeaturesSection } from "./features-section";
-export { StatsSection } from "./stats-section";
 export { CtaSection } from "./cta-section";
+export { FeaturesSection } from "./features-section";
 export { FinalCtaSection } from "./final-cta-section";
