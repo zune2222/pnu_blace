@@ -17,6 +17,11 @@
     "type-check": {
       "dependsOn": ["^type-check"]
     },
+    "test": {
+      "dependsOn": [],
+      "inputs": ["src/**", "test/**", "*.config.*"],
+      "outputs": ["coverage/**"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
