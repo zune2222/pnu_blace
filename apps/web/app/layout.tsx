@@ -20,54 +20,10 @@ const geistMono = localFont({
 });
 
 const pretendard = localFont({
-  src: [
-    {
-      path: "../public/Pretendard-Thin.woff2",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-ExtraLight.woff2",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-Light.woff2",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-Regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-Medium.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-SemiBold.woff2",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-Bold.woff2",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-ExtraBold.woff2",
-      weight: "800",
-      style: "normal",
-    },
-    {
-      path: "../public/Pretendard-Black.woff2",
-      weight: "900",
-      style: "normal",
-    },
-  ],
+  src: "../public/PretendardVariable.woff2",
   variable: "--font-pretendard",
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
