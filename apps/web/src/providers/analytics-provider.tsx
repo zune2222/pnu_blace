@@ -10,11 +10,7 @@ import {
   performanceEvents,
 } from '@/shared/lib/analytics';
 
-interface AnalyticsProviderProps {
-  children: React.ReactNode;
-}
-
-export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
+export function AnalyticsProvider() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const previousPathRef = useRef<string>('');
@@ -147,7 +143,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     });
   }, []);
 
-  return <>{children}</>;
+  return null;
 }
 
 // 클릭 이벤트 추적을 위한 hook

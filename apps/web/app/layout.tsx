@@ -134,27 +134,26 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>
+          <AnnouncementProvider>
+            <div className="min-h-screen bg-background text-foreground flex flex-col">
+              <Header />
+              <main className="flex-1 pb-16 md:pb-0">{children}</main>
+              <div className="hidden md:block">
+                <Footer />
+              </div>
+              <BottomNavigation />
+            </div>
+            <Toaster
+              richColors
+              position="top-center"
+              expand={true}
+              visibleToasts={3}
+            />
+          </AnnouncementProvider>
           <Suspense fallback={null}>
-            <AnalyticsProvider>
-              <AnnouncementProvider>
-                <div className="min-h-screen bg-background text-foreground flex flex-col">
-                  <Header />
-                  <main className="flex-1 pb-16 md:pb-0">{children}</main>
-                  <div className="hidden md:block">
-                    <Footer />
-                  </div>
-                  <BottomNavigation />
-                </div>
-                <Toaster
-                  richColors
-                  position="top-center"
-                  expand={true}
-                  visibleToasts={3}
-                />
-              </AnnouncementProvider>
-              <NativeBridgeInitializer />
-            </AnalyticsProvider>
+            <AnalyticsProvider />
           </Suspense>
+          <NativeBridgeInitializer />
         </QueryProvider>
         <Analytics />
         <SpeedInsights />
