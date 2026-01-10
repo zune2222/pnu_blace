@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useAuth } from "@/entities/auth";
 import { engagementEvents } from "@/shared/lib/analytics";
 
@@ -25,12 +24,7 @@ export const HeroSection: React.FC = () => {
 
   return (
     <section className="min-h-[80vh] md:min-h-[85vh] flex flex-col items-center justify-center px-6 relative">
-      <motion.div
-        className="text-center max-w-7xl mx-auto"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
+      <div className="text-center max-w-7xl mx-auto">
         <h1 className="text-headline dynamic-weight mb-6 md:mb-8 cursor-default">
           PNU Blace
         </h1>
@@ -38,7 +32,7 @@ export const HeroSection: React.FC = () => {
           빈틈없이, 연결되다
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">
           <Link
             href={isAuthenticated ? "/dashboard" : "/login"}
             onClick={handleCtaClick}
@@ -52,7 +46,7 @@ export const HeroSection: React.FC = () => {
             </span>
           )}
         </div>
-      </motion.div>
+      </div>
 
       <button
         onClick={scrollToContent}
