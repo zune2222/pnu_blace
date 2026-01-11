@@ -1,4 +1,5 @@
 import { apiClient, ApiError } from "@/shared/lib/api";
+import { setAuthCookie, removeAuthCookie } from "@/shared/lib/cookie-token";
 import { LoginCredentials, LoginResponse } from "../model/types";
 
 class AuthApi {
@@ -9,9 +10,10 @@ class AuthApi {
         credentials
       );
 
-      // 토큰을 자동으로 저장
+      // 토큰을 자동으로 저장 (localStorage + 쿠키)
       if (response.accessToken) {
         apiClient.setAuthToken(response.accessToken);
+        setAuthCookie(response.accessToken);
       }
 
       return response;
@@ -44,8 +46,9 @@ class AuthApi {
     } catch {
       // 로그아웃 실패해도 로컬 토큰은 제거 (무시)
     } finally {
-      // 로컬 토큰 제거
+      // 로컬 토큰 제거 (localStorage + 쿠키)
       apiClient.removeAuthToken();
+      removeAuthCookie();
     }
   }
 

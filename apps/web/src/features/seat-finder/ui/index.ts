@@ -11,3 +11,4 @@ export { ErrorMessage } from "./error-message";
 export { EmptyState } from "./empty-state";
 export { RoomListContent } from "./room-list-content";
 export { SeatSelectionModal } from "./seat-selection-modal";
+export { SeatsSkeleton } from "./seats-skeleton";
