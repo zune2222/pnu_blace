@@ -156,10 +156,10 @@ export const StoryCardTemplate = forwardRef<HTMLDivElement, StoryCardTemplatePro
         >
           {/* 상단 브랜드 */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "80px" }}>
-            <div style={{ fontSize: "56px", fontWeight: 900, color: "#1a1a1a", letterSpacing: "-0.02em", marginBottom: "16px" }}>
+            <div style={{ fontSize: "56px", fontWeight: 900, color: "#1a1a1a", letterSpacing: "-1px", marginBottom: "16px" }}>
               PNU Blace
             </div>
-            <div style={{ fontSize: "26px", fontWeight: 300, color: "#888888", letterSpacing: "0.15em" }}>
+            <div style={{ fontSize: "26px", fontWeight: 300, color: "#888888", letterSpacing: "4px" }}>
               Bridge + Place
             </div>
           </div>
@@ -174,7 +174,7 @@ export const StoryCardTemplate = forwardRef<HTMLDivElement, StoryCardTemplatePro
             {renderBadge()}
             <div style={{ fontSize: "24px", fontWeight: 300, color: "#aaaaaa" }}>{dateStr}</div>
             <div style={{ width: "160px", height: "1px", background: "#e0e0e0" }} />
-            <div style={{ fontSize: "22px", fontWeight: 600, color: "#cccccc", letterSpacing: "0.1em" }}>PNU Blace</div>
+            <div style={{ fontSize: "22px", fontWeight: 600, color: "#cccccc", letterSpacing: "2px" }}>PNU Blace</div>
           </div>
         </div>
 
@@ -213,12 +213,12 @@ function RankingContent({ rank, totalUsers, formatNumber }: { rank: number; tota
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "22px", fontWeight: 400, color: "#aaaaaa", letterSpacing: "0.4em", textTransform: "uppercase", marginBottom: "24px" }}>
+        <div style={{ fontSize: "22px", fontWeight: 400, color: "#aaaaaa", letterSpacing: "8px", textTransform: "uppercase", marginBottom: "24px" }}>
           RANK
         </div>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "8px" }}>
           <span style={{ fontSize: "60px", fontWeight: 300, color: "#888888" }}>#</span>
-          <span style={{ fontSize: "200px", fontWeight: 200, color: "#1a1a1a", lineHeight: 0.9, letterSpacing: "-0.04em" }}>
+          <span style={{ fontSize: "200px", fontWeight: 200, color: "#1a1a1a", lineHeight: 0.9, letterSpacing: "-2px" }}>
             {rank}
           </span>
         </div>
@@ -233,11 +233,11 @@ function RankingContent({ rank, totalUsers, formatNumber }: { rank: number; tota
 function StatBlock({ label, value, unit, subLabel, large = false }: { label: string; value: string; unit: string; subLabel: string; large?: boolean }) {
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: "22px", fontWeight: 400, color: "#aaaaaa", letterSpacing: "0.4em", textTransform: "uppercase", marginBottom: "24px" }}>
+      <div style={{ fontSize: "22px", fontWeight: 400, color: "#aaaaaa", letterSpacing: "8px", textTransform: "uppercase", marginBottom: "24px" }}>
         {label}
       </div>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "12px" }}>
-        <span style={{ fontSize: large ? "200px" : "120px", fontWeight: large ? 200 : 300, color: "#1a1a1a", lineHeight: 0.9, letterSpacing: "-0.04em" }}>
+        <span style={{ fontSize: large ? "200px" : "120px", fontWeight: large ? 200 : 300, color: "#1a1a1a", lineHeight: 0.9, letterSpacing: "-2px" }}>
           {value}
         </span>
         <span style={{ fontSize: large ? "48px" : "36px", fontWeight: 300, color: "#888888" }}>{unit}</span>
