@@ -93,7 +93,7 @@ export const StoryCardTemplate = forwardRef<HTMLDivElement, StoryCardTemplatePro
                 border: "1px solid #E0E8F0",
               }}
             >
-              <span style={{ fontSize: "32px", fontWeight: 300, color: "#666666" }}>상위</span>
+              <span style={{ fontSize: "32px", fontWeight: 300, color: "#666666", whiteSpace: "nowrap" }}>상위</span>
               <span style={{ fontSize: "40px", fontWeight: 700, color: "#0055A8" }}>
                 {topPercent !== undefined ? `${topPercent}%` : "-"}
               </span>
@@ -113,7 +113,7 @@ export const StoryCardTemplate = forwardRef<HTMLDivElement, StoryCardTemplatePro
               }}
             >
               <span style={{ fontSize: "36px" }}>🔥</span>
-              <span style={{ fontSize: "32px", fontWeight: 600, color: "#0055A8" }}>
+              <span style={{ fontSize: "32px", fontWeight: 600, color: "#0055A8", whiteSpace: "nowrap" }}>
                 {currentStreak}일 연속 출석
               </span>
             </div>
@@ -172,7 +172,7 @@ export const StoryCardTemplate = forwardRef<HTMLDivElement, StoryCardTemplatePro
           {/* 하단 정보 */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "36px" }}>
             {renderBadge()}
-            <div style={{ fontSize: "24px", fontWeight: 300, color: "#aaaaaa" }}>{dateStr}</div>
+            <div style={{ fontSize: "24px", fontWeight: 300, color: "#aaaaaa", whiteSpace: "nowrap" }}>{dateStr}</div>
             <div style={{ width: "160px", height: "1px", background: "#e0e0e0" }} />
             <div style={{ fontSize: "22px", fontWeight: 600, color: "#cccccc", letterSpacing: "2px" }}>PNU Blace</div>
           </div>
