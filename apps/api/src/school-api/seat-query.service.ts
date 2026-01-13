@@ -170,11 +170,6 @@ export class SeatQueryService {
         'libGB=S',
       );
 
-      this.logger.log(`Room status response status: ${response.status}`);
-      this.logger.log(
-        `Room status response data: ${JSON.stringify(response.data)}`,
-      );
-
       if (response.status === 200 && response.data) {
         return this.parseRoomStatusXml(response.data as string);
       }
