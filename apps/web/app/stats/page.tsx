@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/entities/auth";
 import { SeatHistoryWidget, StudyContinuitySection, SeatHistoryTable } from "@/features/dashboard/ui";
 import { useDashboardData } from "@/features/dashboard/model";
+import { ShareStoryButton } from "@/features/share";
 
 // 비로그인 시 로그인 유도 UI
 const StatsLoginPrompt: React.FC = () => {
@@ -100,6 +101,19 @@ const AuthenticatedStatsPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <section className="py-12 md:py-20">
         <div className="max-w-4xl mx-auto px-6 space-y-16">
+          {/* 헤더 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl md:text-4xl font-extralight text-foreground">
+                내 통계
+              </h1>
+              <ShareStoryButton cardVariant="stats" buttonVariant="text" />
+            </div>
+            <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
+              My Statistics
+            </p>
+          </div>
+
           <SeatHistoryWidget />
           <StudyContinuitySection
             streakStats={dashboardState.dashboardData?.streakStats || null}

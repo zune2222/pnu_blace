@@ -7,6 +7,7 @@ import {
   MyStatsData 
 } from "@/entities/dashboard";
 import { SkeletonStats, EmptyState } from "@/shared/ui";
+import { ShareStoryButton } from "@/features/share";
 
 type RankingPeriod = "weekly" | "all-time";
 
@@ -92,9 +93,12 @@ export const MyDashboardRankings: React.FC = () => {
       <div className="space-y-8">
         {/* 섹션 헤더 */}
         <div className="space-y-4">
-          <h2 className="text-3xl md:text-4xl font-extralight text-foreground">
-            내 랭킹
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl md:text-4xl font-extralight text-foreground">
+              내 랭킹
+            </h2>
+            <ShareStoryButton cardVariant="dashboard" buttonVariant="icon" />
+          </div>
           <p className="text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
             My Rankings
           </p>

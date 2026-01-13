@@ -8,6 +8,7 @@ import { AllTimeRankings } from "./ui/all-time-rankings";
 import { WeeklyRankings } from "./ui/weekly-rankings";
 import { MyRankingCard } from "./ui/my-ranking-card";
 import { RankingPrivacySettings } from "./ui/ranking-privacy-settings";
+import { ShareStoryButton } from "@/features/share";
 
 type TabType = "all-time" | "weekly";
 
@@ -26,9 +27,14 @@ export const RankingsPage: React.FC = () => {
           {/* 페이지 헤더 */}
           <div className="space-y-8 mb-16">
             <div>
-              <h1 className="text-4xl md:text-5xl font-extralight text-foreground leading-tight mb-4">
-                도서관 랭킹
-              </h1>
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-4xl md:text-5xl font-extralight text-foreground leading-tight">
+                  도서관 랭킹
+                </h1>
+                {isAuthenticated && (
+                  <ShareStoryButton cardVariant="ranking" buttonVariant="text" />
+                )}
+              </div>
               <p className="text-lg text-muted-foreground/70 font-light">
                 다른 사용자들과 함께하는 도서관 이용 경쟁
               </p>

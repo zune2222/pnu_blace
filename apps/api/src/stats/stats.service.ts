@@ -160,6 +160,24 @@ export class StatsService {
         }
       }
 
+      // 오늘 이용 시간
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const todayLogs = completedLogs.filter(
+        (log) => log.startTime && log.startTime >= todayStart,
+      );
+
+      const todayHours = todayLogs.reduce((total, log) => {
+        if (log.endTime && log.startTime) {
+          return (
+            total +
+            (log.endTime.getTime() - log.startTime.getTime()) / (1000 * 60 * 60)
+          );
+        }
+        return total;
+      }, 0);
+
       // 이번 주 이용 시간
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -233,6 +251,7 @@ export class StatsService {
           Math.round((totalUsageHours / completedLogs.length) * 100) / 100,
         mostUsedRoom,
         mostUsedRoomName: roomNames[mostUsedRoom] || '알 수 없음',
+        todayHours: Math.round(todayHours * 100) / 100,
         thisWeekHours: Math.round(thisWeekHours * 100) / 100,
         thisMonthHours: Math.round(thisMonthHours * 100) / 100,
         favoriteTimeSlots,
@@ -318,6 +337,7 @@ export class StatsService {
       averageSessionHours: 0,
       mostUsedRoom: '',
       mostUsedRoomName: '이용 기록 없음',
+      todayHours: 0,
       thisWeekHours: 0,
       thisMonthHours: 0,
       favoriteTimeSlots: [],

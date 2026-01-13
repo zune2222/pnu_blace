@@ -80,6 +80,7 @@ export interface MyStatsData {
   averageSessionHours: number;
   mostUsedRoom: string;
   mostUsedRoomName: string;
+  todayHours: number;
   thisWeekHours: number;
   thisMonthHours: number;
   favoriteTimeSlots: Array<{

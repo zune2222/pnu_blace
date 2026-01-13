@@ -8,6 +8,7 @@ export class MyUsageStatsDto {
 	averageSessionHours: number;
 	mostUsedRoom: string;
 	mostUsedRoomName: string;
+	todayHours: number; // 오늘 이용 시간
 	thisWeekHours: number;
 	thisMonthHours: number;
 	favoriteTimeSlots: {
