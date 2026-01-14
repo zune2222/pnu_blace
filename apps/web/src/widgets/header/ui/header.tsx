@@ -33,9 +33,9 @@ export const Header: React.FC = () => {
       setThemeMode(currentMode);
 
       // Native App Theme Sync (Initial)
-      if (typeof window !== 'undefined' && (window as any).isNativeApp && (window as any).sendToNative) {
+      if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
          const isDark = currentMode === 'dark' || (currentMode === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
-         (window as any).sendToNative('THEME_CHANGE', { isDarkMode: isDark });
+         window.sendToNative('THEME_CHANGE', { isDarkMode: isDark });
       }
     };
 
@@ -91,8 +91,8 @@ export const Header: React.FC = () => {
     html.style.colorScheme = newDarkMode ? "dark" : "light";
 
     // Native App Theme Sync
-    if (typeof window !== 'undefined' && (window as any).isNativeApp && (window as any).sendToNative) {
-      (window as any).sendToNative('THEME_CHANGE', { isDarkMode: newDarkMode });
+    if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
+      window.sendToNative('THEME_CHANGE', { isDarkMode: newDarkMode });
     }
 
     localStorage.setItem("theme", newMode);
