@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Between } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -45,14 +45,9 @@ export class AttendanceService {
     @InjectRepository(UserStats)
     private userStatsRepository: Repository<UserStats>,
     private schoolApiService: SchoolApiService,
+    @Inject(forwardRef(() => PenaltyService))
+    private penaltyService: PenaltyService,
   ) {}
-
-  // PenaltyService는 지연 주입 (순환 의존성 방지)
-  private penaltyService?: PenaltyService;
-
-  setPenaltyService(penaltyService: PenaltyService) {
-    this.penaltyService = penaltyService;
-  }
 
   /**
    * 30분마다 출퇴근 동기화 실행
@@ -192,14 +187,12 @@ export class AttendanceService {
       await this.updateStreakStats(group.groupId, member.studentId, date, status);
 
       // 벌점 자동 부여
-      if (this.penaltyService) {
-        await this.penaltyService.applyPenaltyForAttendance(
-          group.groupId,
-          member.studentId,
-          status,
-          date,
-        );
-      }
+      await this.penaltyService.applyPenaltyForAttendance(
+        group.groupId,
+        member.studentId,
+        status,
+        date,
+      );
 
       this.logger.debug(
         `Updated attendance for ${member.studentId}: ${status}`,
@@ -365,6 +358,14 @@ export class AttendanceService {
 
           // 연속성 업데이트
           await this.updateStreakStats(group.groupId, member.studentId, yesterday, status);
+
+          // 벌점 자동 부여 (결석인 경우)
+          await this.penaltyService.applyPenaltyForAttendance(
+            group.groupId,
+            member.studentId,
+            status,
+            yesterday,
+          );
         }
       }
     }

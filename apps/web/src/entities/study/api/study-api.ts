@@ -30,6 +30,34 @@ export interface MemberStreakStats {
   lastAttendanceDate?: string;
 }
 
+// 그룹 벌점 현황
+export interface GroupPenaltyStats {
+  memberId: string;
+  studentId: string;
+  displayName: string;
+  currentPenaltyPoints: number;
+  totalPenaltyPoints: number;
+}
+
+// 벌점 기록
+export interface PenaltyRecord {
+  penaltyId: string;
+  type: 'LATE' | 'ABSENT' | 'EARLY_LEAVE' | 'MANUAL';
+  points: number;
+  date: string;
+  reason?: string;
+  isRevoked: boolean;
+  createdAt: string;
+}
+
+// 멤버 벌점 이력
+export interface MemberPenaltyHistory {
+  records: PenaltyRecord[];
+  total: number;
+  currentPoints: number;
+  totalPoints: number;
+}
+
 /**
  * 스터디 API 클라이언트
  */
@@ -313,6 +341,31 @@ class StudyApi {
     }`;
 
     return apiClient.get<MemberAttendanceHistoryResponse>(url);
+  }
+
+  // ==================== 벌점 API ====================
+
+  /**
+   * 그룹 벌점 현황 조회
+   */
+  async getGroupPenalties(groupId: string): Promise<GroupPenaltyStats[]> {
+    return apiClient.get<GroupPenaltyStats[]>(
+      `/api/v1/study-groups/${groupId}/penalties`
+    );
+  }
+
+  /**
+   * 멤버 벌점 이력 조회
+   */
+  async getMemberPenalties(
+    groupId: string,
+    studentId: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<MemberPenaltyHistory> {
+    return apiClient.get<MemberPenaltyHistory>(
+      `/api/v1/study-groups/${groupId}/members/${studentId}/penalties?page=${page}&limit=${limit}`
+    );
   }
 }
 

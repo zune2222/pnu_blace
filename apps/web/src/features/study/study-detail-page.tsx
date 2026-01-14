@@ -299,7 +299,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
             />
             <StudyOverallStats groupId={groupId} />
             <DailyAttendanceViewer groupId={groupId} />
-            <PenaltyStats study={study} />
+            <PenaltyStats groupId={groupId} />
 
             {/* 오늘의 출퇴근 현황 */}
             <div className="py-8">

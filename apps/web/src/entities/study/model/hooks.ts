@@ -30,6 +30,10 @@ export const studyQueryKeys = {
     [...studyQueryKeys.all, "operatingDates", groupId] as const,
   attendanceByDate: (groupId: string, date: string) =>
     [...studyQueryKeys.all, "attendanceByDate", groupId, date] as const,
+  penalties: (groupId: string) =>
+    [...studyQueryKeys.all, "penalties", groupId] as const,
+  memberPenalties: (groupId: string, studentId: string) =>
+    [...studyQueryKeys.all, "memberPenalties", groupId, studentId] as const,
 };
 
 /**
@@ -77,6 +81,34 @@ export const useGroupStreakStats = (groupId: string, enabled: boolean = true) =>
     queryKey: studyQueryKeys.streakStats(groupId),
     queryFn: () => studyApi.getGroupStreakStats(groupId),
     enabled: !!groupId && enabled,
+  });
+};
+
+/**
+ * 그룹 벌점 현황 조회
+ */
+export const useGroupPenalties = (groupId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: studyQueryKeys.penalties(groupId),
+    queryFn: () => studyApi.getGroupPenalties(groupId),
+    enabled: !!groupId && enabled,
+  });
+};
+
+/**
+ * 멤버 벌점 이력 조회
+ */
+export const useMemberPenalties = (
+  groupId: string,
+  studentId: string,
+  page: number = 1,
+  limit: number = 20,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: studyQueryKeys.memberPenalties(groupId, studentId),
+    queryFn: () => studyApi.getMemberPenalties(groupId, studentId, page, limit),
+    enabled: !!groupId && !!studentId && enabled,
   });
 };
 

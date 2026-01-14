@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { StudyService } from './study.service';
 import { AttendanceService } from './attendance.service';
+import { PenaltyService } from './penalty.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   CreateStudyGroupDto,
@@ -133,6 +134,7 @@ export class StudyController {
   constructor(
     private readonly studyService: StudyService,
     private readonly attendanceService: AttendanceService,
+    private readonly penaltyService: PenaltyService,
   ) {}
 
   /**
@@ -306,5 +308,32 @@ export class StudyController {
     };
 
     return this.attendanceService.getMemberAttendanceHistory(groupId, memberId, request);
+  }
+
+
+  /**
+   * 그룹 벌점 현황 조회
+   */
+  @Get(':id/penalties')
+  async getGroupPenalties(@Param('id') groupId: string) {
+    return this.penaltyService.getGroupPenaltyStats(groupId);
+  }
+
+  /**
+   * 멤버별 벌점 이력 조회
+   */
+  @Get(':id/members/:studentId/penalties')
+  async getMemberPenalties(
+    @Param('id') groupId: string,
+    @Param('studentId') studentId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.penaltyService.getMemberPenaltyHistory(
+      groupId,
+      studentId,
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 20,
+    );
   }
 }

@@ -25,6 +25,9 @@ export {
   useTransferOwnership,
   useJoinRequests,
   useProcessJoinRequest,
+  // 벌점 기능
+  useGroupPenalties,
+  useMemberPenalties,
 } from "./model/hooks";
 
 // Re-export types
