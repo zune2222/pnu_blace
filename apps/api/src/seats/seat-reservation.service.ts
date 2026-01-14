@@ -31,7 +31,7 @@ export class SeatReservationService {
   /**
    * 현재 내가 예약한 좌석 정보 조회
    */
-  async getMySeat(studentId: string): Promise<MySeatDto> {
+  async getMySeat(studentId: string): Promise<MySeatDto | null> {
     try {
       const user = await this.userRepository.findOne({
         where: { studentId },
@@ -53,7 +53,7 @@ export class SeatReservationService {
       );
 
       if (!mySeat) {
-        throw new NotFoundException('발권한 좌석이 없습니다.');
+        return null;
       }
 
       // 추가 정보 조회를 위해 room 정보 가져오기

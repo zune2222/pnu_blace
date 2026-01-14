@@ -32,9 +32,19 @@ export class SeatsController {
    */
   @Get('my-seat')
   @UseGuards(JwtAuthGuard)
-  async getMySeat(@Request() req): Promise<MySeatDto> {
+  async getMySeat(
+    @Request() req,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<MySeatDto | void> {
     const user = req.user;
-    return this.seatsService.getMySeat(user.studentId);
+    const seat = await this.seatsService.getMySeat(user.studentId);
+
+    if (!seat) {
+      res.status(HttpStatus.NO_CONTENT);
+      return;
+    }
+
+    return seat;
   }
 
   /**

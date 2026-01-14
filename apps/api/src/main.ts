@@ -2,7 +2,7 @@
 import './instrument';
 import { isProduction } from './instrument';
 
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 
@@ -28,7 +28,8 @@ async function bootstrap() {
   });
 
   // Sentry 전역 에러 필터
-  app.useGlobalFilters(new SentryGlobalFilter());
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new SentryGlobalFilter(httpAdapter));
 
   await app.listen(process.env.PORT ?? 8080);
 }

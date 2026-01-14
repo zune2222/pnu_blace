@@ -68,7 +68,7 @@ export class SeatsService {
   /**
    * 현재 내가 예약한 좌석 정보 조회
    */
-  async getMySeat(studentId: string): Promise<MySeatDto> {
+  async getMySeat(studentId: string): Promise<MySeatDto | null> {
     return this.seatReservationService.getMySeat(studentId);
   }
 
