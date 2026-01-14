@@ -55,7 +55,6 @@ export const InContext: Story = {
       <FavoriteHeart isFavorite={true} onClick={mockFn} />
     </div>
   ),
-  name: 'In Context',
 };
 
 export const AllSizes: Story = {
@@ -66,5 +65,4 @@ export const AllSizes: Story = {
       <FavoriteHeart isFavorite={true} size="lg" onClick={mockFn} />
     </div>
   ),
-  name: 'All Sizes',
 };

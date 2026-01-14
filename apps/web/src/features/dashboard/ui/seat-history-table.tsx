@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useSeatHistoryTable, SeatHistoryTableData } from "@/entities/dashboard";
+import React, { useState } from "react";
+import { useSeatHistoryTable } from "@/entities/dashboard";
 import { SkeletonTable, ErrorState } from "@/shared/ui";
 
 interface SeatHistoryTableProps {

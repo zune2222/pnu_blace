@@ -41,12 +41,11 @@ export const WithError: Story = {
       <ErrorComponent />
     </ErrorBoundary>
   ),
-  name: 'With Error',
 };
 
 export const CustomFallback: Story = {
   render: () => (
-    <ErrorBoundary 
+    <ErrorBoundary
       fallback={
         <div className="p-8 text-center bg-destructive/10 rounded-lg">
           <p className="text-destructive font-medium">커스텀 에러 화면입니다</p>
@@ -56,5 +55,4 @@ export const CustomFallback: Story = {
       <ErrorComponent />
     </ErrorBoundary>
   ),
-  name: 'Custom Fallback',
 };

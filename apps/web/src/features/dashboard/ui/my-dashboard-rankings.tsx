@@ -1,10 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { 
-  useMyRank, 
-  usePersonalStats, 
-  MyRankData, 
-  MyStatsData 
+import {
+  useMyRank,
+  usePersonalStats,
 } from "@/entities/dashboard";
 import { SkeletonStats, EmptyState } from "@/shared/ui";
 import { ShareStoryButton } from "@/features/share";

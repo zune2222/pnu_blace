@@ -23,7 +23,6 @@ import type {
   SearchParams,
   FormParams,
   ErrorParams,
-  PerformanceParams,
   NavigationParams,
   UserProperties,
 } from './types';

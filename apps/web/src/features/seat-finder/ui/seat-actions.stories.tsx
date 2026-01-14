@@ -61,5 +61,4 @@ export const AllActions: Story = {
       <SeatInfoFooter />
     </div>
   ),
-  name: "All Actions",
 };

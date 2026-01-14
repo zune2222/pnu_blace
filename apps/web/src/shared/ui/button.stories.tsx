@@ -80,5 +80,4 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-  name: 'All Variants',
 };

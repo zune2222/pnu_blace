@@ -13,7 +13,6 @@ import {
   ReserveSeatRequestDto,
   SeatActionResponseDto,
   ExtendSeatResponseDto,
-  MyUsageStatsDto,
 } from "@pnu-blace/types";
 import { StreakStats, SeatHistoryData, StreakHeatmapData, MyRankData, MyStatsData, SeatHistoryTableData } from "../model/types";
 

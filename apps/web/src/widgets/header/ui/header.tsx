@@ -33,10 +33,10 @@ export const Header: React.FC = () => {
       setThemeMode(currentMode);
 
       // Native App Theme Sync (Initial)
-      // @ts-ignore
+      // @ts-expect-error - native app interop properties
       if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
          const isDark = currentMode === 'dark' || (currentMode === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
-         // @ts-ignore
+         // @ts-expect-error - native app interop method
          window.sendToNative('THEME_CHANGE', { isDarkMode: isDark });
       }
     };
@@ -93,9 +93,9 @@ export const Header: React.FC = () => {
     html.style.colorScheme = newDarkMode ? "dark" : "light";
 
     // Native App Theme Sync
-    // @ts-ignore - native interop
+    // @ts-expect-error - native app interop properties
     if (typeof window !== 'undefined' && window.isNativeApp && window.sendToNative) {
-      // @ts-ignore
+      // @ts-expect-error - native app interop method
       window.sendToNative('THEME_CHANGE', { isDarkMode: newDarkMode });
     }
 

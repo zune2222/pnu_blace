@@ -11,7 +11,6 @@ import {
   SeatHistoryData,
   StreakHeatmapData,
   MyRankData,
-  MyStatsData,
   SeatHistoryTableData,
 } from "./types";
 

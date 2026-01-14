@@ -37,10 +37,6 @@ export function AnalyticsProvider() {
   useEffect(() => {
     if (!pathname) return;
 
-    const fullPath = searchParams?.toString()
-      ? `${pathname}?${searchParams.toString()}`
-      : pathname;
-
     // 페이지 이동 시 이전 페이지 체류 시간 기록
     if (previousPathRef.current && previousPathRef.current !== pathname) {
       const timeOnPage = Math.round((Date.now() - pageStartTimeRef.current) / 1000);

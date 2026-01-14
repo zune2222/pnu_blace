@@ -33,8 +33,8 @@ export const useAuthActions = () => {
       setAuthenticated(result.user, result.token);
       
       // Notify native app about successful login to trigger token sync
-      if (typeof window !== 'undefined' && (window as any).isNativeApp) {
-        (window as any).sendToNative('LOGIN_SUCCESS');
+      if (typeof window !== 'undefined' && (window as Window & { isNativeApp?: boolean; sendToNative?: (msg: string) => void }).isNativeApp) {
+        (window as Window & { sendToNative?: (msg: string) => void }).sendToNative?.('LOGIN_SUCCESS');
       }
     } catch (error) {
       setLoading(false);
