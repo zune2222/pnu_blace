@@ -101,6 +101,12 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@pnu-blace/db$": "<rootDir>/../../../packages/db/dist/index.js",
+      "^@pnu-blace/db/(.*)$": "<rootDir>/../../../packages/db/dist/$1",
+      "^@pnu-blace/types$": "<rootDir>/../../../packages/types/dist/index.js",
+      "^@pnu-blace/types/(.*)$": "<rootDir>/../../../packages/types/dist/$1"
+    }
   }
 }

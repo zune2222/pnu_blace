@@ -123,16 +123,12 @@ describe('SeatReservationService', () => {
       );
     });
 
-    it('실패: 발권한 좌석이 없으면 NotFoundException 발생', async () => {
+    it('성공: 발권한 좌석이 없으면 null 반환', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockSchoolApiService.getMySeat.mockResolvedValue(null);
 
-      await expect(service.getMySeat('20230001')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.getMySeat('20230001')).rejects.toThrow(
-        '발권한 좌석이 없습니다.',
-      );
+      const result = await service.getMySeat('20230001');
+      expect(result).toBeNull();
     });
   });
 
