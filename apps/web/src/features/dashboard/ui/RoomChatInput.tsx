@@ -36,7 +36,7 @@ export const RoomChatInput: React.FC<RoomChatInputProps> = ({
   }, [handleSubmit]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+    <div className="fixed bottom-24 md:bottom-0 left-0 right-0 z-50 pb-safe">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
         <div className="bg-background/95 dark:bg-background/98 backdrop-blur-lg border border-border/30 rounded-2xl shadow-xl">
           {/* 연결 상태 & 닉네임 표시 (확장 시) */}

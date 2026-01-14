@@ -4,39 +4,75 @@
 
 ## 🎯 개요
 
-PNU Blace는 부산대학교 도서관의 좌석 예약을 더욱 편리하게 만들어주는 웹 애플리케이션입니다. 실시간 좌석 현황 확인, 자동 예약, 빈자리 알림 등의 기능을 제공합니다.
+PNU Blace는 부산대학교 도서관 좌석 예약을 기반으로 한 **학습 동기부여 커뮤니티 플랫폼**입니다.
+
+단순한 좌석 예약 앱을 넘어, **랭킹 시스템**과 **학습 통계 시각화**, **스터디 그룹** 기능을 통해 학생들이 서로 경쟁하고 함께 성장할 수 있는 환경을 제공합니다.
 
 ## ✨ 주요 기능
 
-- **실시간 좌석 현황**: 도서관 각 열람실의 실시간 좌석 상태 확인
-- **자동 좌석 예약**: 원하는 좌석이 비워지면 자동으로 예약
-- **좌석 예약/반납**: 간편한 좌석 예약 및 반납 기능
-- **좌석 연장**: 현재 사용 중인 좌석 이용 시간 연장
-- **빈자리 예측**: AI 기반 좌석 반납 시간 예측
-- **즐겨찾기**: 자주 이용하는 열람실 즐겨찾기 기능
-- **알림 서비스**: 좌석 상태 변경 알림
+### 🏆 랭킹 시스템
+- **전체/주간 랭킹**: 이용시간, 방문횟수, 이용일수 3가지 기준으로 순위 경쟁
+- **티어 시스템**: Explorer → Student → Scholar → Master → Legend → Myth
+- **익명 닉네임**: "꾸준한 거북이", "열정적인 코알라" 같은 자동 생성 닉네임
+- **백분위 표시**: 전체 사용자 중 상위 몇 %인지 실시간 확인
+
+### 📊 학습 통계 대시보드
+- **히트맵**: GitHub 잔디처럼 연간 학습 활동 시각화
+- **스트릭**: 연속 방문일 추적 (현재/최장 기록)
+- **상세 통계**: 총 이용시간, 방문횟수, 평균 세션 시간, 자주 가는 열람실
+- **이용 내역**: 날짜/시간대별 상세 기록 조회
+
+### 👥 스터디 그룹
+- **스터디 생성**: 공개/비밀번호/비공개 3가지 방식
+- **출결 관리**: 체크인/체크아웃 시간 자동 기록
+- **벌점 시스템**: 스터디 규칙 위반 시 페널티
+- **실시간 채팅**: 그룹원 간 실시간 소통
+- **초대 코드**: 링크로 간편하게 멤버 초대
+
+### 💬 실시간 채팅
+- **열람실 채팅**: 현재 같은 열람실 이용자들과 대화
+- **스터디 채팅**: 그룹 멤버들과 상시 소통
+- **푸시 알림**: 새 메시지 알림
+
+### 📤 SNS 공유
+- **카드 이미지 생성**: 랭킹/통계 정보를 예쁜 카드로 자동 생성
+- **인스타그램 스토리 최적화**: 1080x1920 해상도 지원
+
+### 💺 좌석 기능
+- **실시간 좌석 현황**: 각 열람실의 실시간 좌석 상태 확인
+- **좌석 예약/반납/연장**: 간편한 좌석 관리
+- **즐겨찾기 열람실**: 자주 가는 열람실 빠른 접근
+- **혼잡도 표시**: 여유/보통/혼잡 상태 확인
 
 ## 🏗️ 기술 스택
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **State Management**: React Query (TanStack Query)
+- **Framework**: Next.js 15 (App Router)
+- **React**: v19
+- **Styling**: Tailwind CSS v4
+- **State Management**: Zustand, TanStack Query v5
+- **Real-time**: Socket.io Client
+- **Animation**: Framer Motion
 - **Language**: TypeScript
-- **Fonts**: Pretendard, Geist
 
 ### Backend
-- **Framework**: NestJS
-- **Language**: TypeScript
-- **Database**: PostgreSQL (추정)
-- **Authentication**: JWT
-- **Scheduler**: Bull Queue (추정)
+- **Framework**: NestJS 11
+- **ORM**: TypeORM
+- **Database**: PostgreSQL
+- **Cache**: Redis
+- **Real-time**: Socket.io
+- **Authentication**: JWT + Passport
+- **Push Notifications**: Firebase Admin
+
+### Mobile
+- **Framework**: React Native (Expo)
+- **Build**: EAS Build & Submit
 
 ### Development Tools
-- **Monorepo**: Turborepo
-- **Package Manager**: Yarn
+- **Monorepo**: Turborepo + Yarn Workspaces
+- **Package Manager**: Yarn 3.6.4
 - **Linting**: ESLint
-- **Formatting**: Prettier
+- **Testing**: Vitest, Playwright (E2E)
 
 ## 🚀 시작하기
 
@@ -118,9 +154,15 @@ yarn start
 
 - `/` - 홈페이지 (서비스 소개)
 - `/login` - 로그인
-- `/dashboard` - 대시보드 (현재 좌석, 즐겨찾기 등)
+- `/dashboard` - 대시보드 (현재 좌석, 실시간 채팅, 즐겨찾기)
 - `/seats` - 좌석 찾기 (전체 열람실 목록)
-- `/seats/[roomNo]` - 특정 열람실 좌석 현황
+- `/seats/[roomNo]` - 특정 열람실 좌석 현황 및 예약
+- `/rankings` - 랭킹 (전체/주간 랭킹, 티어 시스템)
+- `/stats` - 통계 (히트맵, 스트릭, 이용 내역)
+- `/study` - 스터디 목록 (검색, 필터링)
+- `/study/create` - 스터디 생성
+- `/study/[groupId]` - 스터디 상세 (출결, 채팅)
+- `/settings` - 설정 (알림 설정)
 
 ## 🌐 배포
 
