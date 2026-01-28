@@ -5,6 +5,7 @@ import { useAuth } from "@/entities/auth";
 import { SeatHistoryWidget, StudyContinuitySection, SeatHistoryTable } from "@/features/dashboard/ui";
 import { useDashboardData } from "@/features/dashboard/model";
 import { ShareStoryButton } from "@/features/share";
+import { Emoji } from "@/shared/ui";
 
 // 비로그인 시 로그인 유도 UI
 const StatsLoginPrompt: React.FC = () => {
@@ -23,7 +24,7 @@ const StatsLoginPrompt: React.FC = () => {
             {/* 미리보기 카드들 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">🔥</div>
+                <Emoji className="text-2xl">🔥</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   스터디 스트릭
                 </h3>
@@ -32,7 +33,7 @@ const StatsLoginPrompt: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">📊</div>
+                <Emoji className="text-2xl">📊</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   총 이용 시간
                 </h3>
@@ -41,7 +42,7 @@ const StatsLoginPrompt: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">📅</div>
+                <Emoji className="text-2xl">📅</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   이용 일수
                 </h3>
@@ -50,7 +51,7 @@ const StatsLoginPrompt: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">🏠</div>
+                <Emoji className="text-2xl">🏠</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   자주 가는 열람실
                 </h3>
@@ -59,7 +60,7 @@ const StatsLoginPrompt: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">📈</div>
+                <Emoji className="text-2xl">📈</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   이용 패턴
                 </h3>
@@ -68,7 +69,7 @@ const StatsLoginPrompt: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border border-border/20 rounded-lg text-left space-y-3">
-                <div className="text-2xl">📊</div>
+                <Emoji className="text-2xl">📊</Emoji>
                 <h3 className="text-lg font-light text-foreground">
                   활동 히트맵
                 </h3>

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "@/entities/study/model/use-study-chat";
 import { useAuth } from "@/entities/auth";
+import { Emoji } from "@/shared/ui";
 
 interface StudyChatProps {
   messages: ChatMessage[];
@@ -142,7 +143,7 @@ export const StudyChat: React.FC<StudyChatProps> = ({
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/20 bg-muted-foreground/5 shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-light text-foreground">💬 채팅</span>
+          <span className="text-sm font-light text-foreground"><Emoji>💬</Emoji> 채팅</span>
           <span
             className={`w-2 h-2 rounded-full ${
               isConnected ? "bg-green-500" : "bg-red-500"
@@ -174,7 +175,7 @@ export const StudyChat: React.FC<StudyChatProps> = ({
         {messages.length === 0 && !isLoading && (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground/50 font-light text-sm">
-              아직 메시지가 없습니다. 첫 번째로 인사해보세요! 👋
+              아직 메시지가 없습니다. 첫 번째로 인사해보세요! <Emoji>👋</Emoji>
             </p>
           </div>
         )}

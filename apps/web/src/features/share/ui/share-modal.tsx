@@ -4,6 +4,7 @@ import React, { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Download, Share2, Loader2 } from "lucide-react";
 import { StoryCardTemplate, StoryCardTemplateProps } from "./story-card-template";
+import { Emoji } from "@/shared/ui";
 import { generateStoryImage, shareImage, downloadImage, canShareFiles } from "../lib";
 
 interface ShareModalProps {
@@ -127,7 +128,7 @@ export function ShareModal({ isOpen, onClose, cardData }: ShareModalProps) {
             </div>
             {cardData.currentStreak !== undefined && cardData.currentStreak > 0 && (
               <div className="bg-[#F5F8FC] border border-[#E0E8F0] rounded-full px-4 py-2 text-sm flex items-center gap-2">
-                <span>🔥</span>
+                <Emoji>🔥</Emoji>
                 <span className="font-semibold text-[#0055A8]">{cardData.currentStreak}일 연속</span>
               </div>
             )}

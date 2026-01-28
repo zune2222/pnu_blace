@@ -2,6 +2,7 @@
 import React from "react";
 import { StreakStats } from "@/entities/dashboard/model/types";
 import { StreakHeatmap } from "./streak-heatmap";
+import { Emoji } from "@/shared/ui";
 
 interface StudyContinuitySectionProps {
   streakStats: StreakStats | null;
@@ -81,7 +82,7 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
         <div className="grid grid-cols-3 gap-4 md:gap-8">
           {/* 현재 스트릭 */}
           <div className="text-center space-y-2 md:space-y-4">
-            <div className="text-3xl md:text-5xl">🔥</div>
+            <Emoji className="text-3xl md:text-5xl">🔥</Emoji>
             <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               현재 스트릭
             </p>
@@ -97,7 +98,7 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
 
           {/* 최고 스트릭 */}
           <div className="text-center space-y-2 md:space-y-4">
-            <div className="text-3xl md:text-5xl">🏆</div>
+            <Emoji className="text-3xl md:text-5xl">🏆</Emoji>
             <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               최고 스트릭
             </p>
@@ -113,7 +114,7 @@ export const StudyContinuitySection: React.FC<StudyContinuitySectionProps> = ({
 
           {/* 스트릭 진행도 */}
           <div className="text-center space-y-2 md:space-y-4">
-            <div className="text-3xl md:text-5xl">⭐</div>
+            <Emoji className="text-3xl md:text-5xl">⭐</Emoji>
             <p className="text-[10px] md:text-sm text-muted-foreground/60 font-light tracking-wide uppercase">
               달성도
             </p>

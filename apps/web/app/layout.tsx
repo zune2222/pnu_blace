@@ -130,7 +130,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${pretendard.variable} ${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${pretendard.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <QueryProvider>

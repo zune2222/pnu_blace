@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/auth";
+import { Emoji } from "@/shared/ui";
 import {
   CurrentSeatWidget,
   FavoriteRoomsSection,
@@ -30,14 +31,14 @@ const LoginPrompt: React.FC = () => {
           {/* 미리보기 카드들 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mt-8 sm:mt-12">
             <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3">
-              <div className="text-2xl">🪑</div>
+              <Emoji className="text-2xl">🪑</Emoji>
               <h3 className="text-base sm:text-lg font-light text-foreground">현재 좌석</h3>
               <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
                 예약한 좌석 정보와 남은 시간을 실시간으로 확인
               </p>
             </div>
             <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3">
-              <div className="text-2xl">⭐</div>
+              <Emoji className="text-2xl">⭐</Emoji>
               <h3 className="text-base sm:text-lg font-light text-foreground">
                 즐겨찾기 열람실
               </h3>
@@ -46,7 +47,7 @@ const LoginPrompt: React.FC = () => {
               </p>
             </div>
             <div className="p-4 sm:p-6 border border-border/20 rounded-lg text-left space-y-3 sm:col-span-2 lg:col-span-1">
-              <div className="text-2xl">🏆</div>
+              <Emoji className="text-2xl">🏆</Emoji>
               <h3 className="text-base sm:text-lg font-light text-foreground">내 랭킹</h3>
               <p className="text-sm text-muted-foreground/60 font-light leading-relaxed">
                 이번 주와 전체 이용 랭킹 확인

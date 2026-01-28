@@ -1,6 +1,7 @@
 export { Button } from "./button";
 export { Input } from "./input";
 export { FavoriteHeart } from "./favorite-heart";
+export { Emoji } from "./emoji";
 
 // Skeleton components
 export {

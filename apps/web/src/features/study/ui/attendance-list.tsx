@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { TodayAttendancePublic } from "@pnu-blace/types";
 import { MemberStreakStats } from "@/entities/study/api/study-api";
-import { AttendanceStatusBadge } from "@/shared/ui";
+import { AttendanceStatusBadge, Emoji } from "@/shared/ui";
 import { MemberUsageHistoryModal } from "./member-usage-history-modal";
 
 interface AttendanceListProps {
@@ -29,7 +29,7 @@ const StreakBadge: React.FC<{ currentStreak: number }> = ({ currentStreak }) => 
 
   return (
     <span className="text-xs text-orange-500 font-light ml-2 inline-flex items-center gap-1">
-      🔥 {currentStreak}일 스트릭
+      <Emoji>🔥</Emoji> {currentStreak}일 스트릭
     </span>
   );
 };
@@ -139,7 +139,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                 className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors p-1 rounded"
                 title="출석 이력 보기"
               >
-                📊
+                <Emoji>📊</Emoji>
               </button>
               <AttendanceStatusBadge status={member.status} />
             </div>

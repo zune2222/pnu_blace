@@ -10,6 +10,7 @@ import {
   useUpdateStudyGroup,
   StudyVisibility,
 } from "@/entities/study";
+import { Emoji } from "@/shared/ui";
 
 const DAYS = [
   { value: 1, label: "월" },
@@ -250,7 +251,7 @@ export const StudyEditPage: React.FC<StudyEditPageProps> = ({ groupId }) => {
                           : "border-border/30 hover:border-border/50"
                       }`}
                     >
-                      <div className="text-2xl mb-1">{option.icon}</div>
+                      <Emoji className="text-2xl mb-1">{option.icon}</Emoji>
                       <div className="text-sm font-light">{option.label}</div>
                       {isSelected && (
                         <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-foreground rounded-full flex items-center justify-center">

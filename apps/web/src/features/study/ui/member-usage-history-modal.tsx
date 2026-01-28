@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useMemberAttendanceHistory } from "@/entities/study";
-import { AttendanceStatusBadge } from "@/shared/ui";
+import { AttendanceStatusBadge, Emoji } from "@/shared/ui";
 
 interface MemberUsageHistoryModalProps {
   groupId: string;
@@ -244,7 +244,7 @@ export const MemberUsageHistoryModal: React.FC<MemberUsageHistoryModalProps> = (
                         )}
                         {record.note && (
                           <p className="text-xs text-muted-foreground/50 font-light mt-1">
-                            📝 {record.note}
+                            <Emoji>📝</Emoji> {record.note}
                           </p>
                         )}
                       </div>

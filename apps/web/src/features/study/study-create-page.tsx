@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
 import { useCreateStudyGroup, StudyVisibility } from "@/entities/study";
+import { Emoji } from "@/shared/ui";
 
 const DAYS = [
   { value: 1, label: "월" },
@@ -234,7 +235,7 @@ export const StudyCreatePage: React.FC = () => {
                   },
                   {
                     value: "PRIVATE",
-                    icon: "🔒",
+                    icon: "🔒", // Note: This is used in data, not JSX - will be rendered via Emoji component
                     label: "비공개",
                     desc: "초대 코드만",
                   },
@@ -259,7 +260,7 @@ export const StudyCreatePage: React.FC = () => {
                       <div
                         className={`text-2xl mb-2 transition-transform duration-150 ${isSelected ? "scale-110" : ""}`}
                       >
-                        {option.icon}
+                        <Emoji>{option.icon}</Emoji>
                       </div>
                       <div
                         className={`text-sm transition-all ${isSelected ? "text-foreground font-medium" : "text-muted-foreground/70 font-light"}`}
@@ -431,7 +432,7 @@ export const StudyCreatePage: React.FC = () => {
               {/* 규칙 요약 */}
               <div className="p-4 bg-foreground/[0.02] border border-border/20 rounded-xl">
                 <div className="flex items-start gap-2">
-                  <span className="text-base">💡</span>
+                  <Emoji className="text-base">💡</Emoji>
                   <div className="text-sm text-muted-foreground/60 font-light space-y-1">
                     <p>
                       <span className="text-green-500">정상 출근</span>:{" "}

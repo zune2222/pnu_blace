@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AuthGuard } from "@/features/auth";
+import { Emoji } from "@/shared/ui";
 import {
   useStudyGroupDetail,
   useMemberList,
@@ -242,9 +243,9 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                       </p>
                       <p className="text-xs text-muted-foreground/50 font-light">
                         {member.role === "OWNER"
-                          ? "👑 스터디장"
+                          ? <><Emoji>👑</Emoji> 스터디장</>
                           : member.role === "ADMIN"
-                            ? "🛡️ 부스터디장"
+                            ? <><Emoji>🛡️</Emoji> 부스터디장</>
                             : "멤버"}
                       </p>
                     </div>
@@ -363,7 +364,7 @@ export const StudySettingsPage: React.FC<StudySettingsPageProps> = ({
                         ? "🌍 공개"
                         : study?.visibility === "PASSWORD"
                           ? "🔐 비밀번호"
-                          : "🔒 비공개"}
+                          : <><Emoji>🔒</Emoji> 비공개</>}
                     </p>
                   </div>
                   <Link

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useStudyChat, ChatMessage } from "@/entities/study/model/use-study-chat";
 import { useAuth } from "@/entities/auth";
+import { Emoji } from "@/shared/ui";
 
 interface StudyChatSidebarProps {
   groupId: string;
@@ -105,7 +106,7 @@ export const StudyChatSidebar: React.FC<StudyChatSidebarProps> = ({
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-foreground text-background rounded-full shadow-lg flex items-center justify-center hover:bg-foreground/90 transition-all z-50"
       >
-        <span className="text-xl">💬</span>
+        <Emoji className="text-xl">💬</Emoji>
         {messages.length > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
             {messages.length > 9 ? "9+" : messages.length}
@@ -129,7 +130,7 @@ export const StudyChatSidebar: React.FC<StudyChatSidebarProps> = ({
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/20 bg-muted-foreground/5 shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-light text-foreground">
-              💬 스터디 채팅
+              <Emoji>💬</Emoji> 스터디 채팅
             </span>
             <span
               className={`w-2 h-2 rounded-full ${
@@ -176,7 +177,7 @@ export const StudyChatSidebar: React.FC<StudyChatSidebarProps> = ({
                   <p className="text-muted-foreground/50 font-light text-sm text-center">
                     아직 메시지가 없습니다.
                     <br />
-                    첫 번째로 인사해보세요! 👋
+                    첫 번째로 인사해보세요! <Emoji>👋</Emoji>
                   </p>
                 </div>
               )}

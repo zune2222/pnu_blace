@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useGroupStreakStats } from "@/entities/study";
 import { useAuth } from "@/entities/auth";
 import { MemberUsageHistoryModal } from "./member-usage-history-modal";
+import { Emoji } from "@/shared/ui";
 
 interface StudyOverallStatsProps {
   groupId: string;
@@ -12,7 +13,7 @@ interface StudyOverallStatsProps {
 const StreakRankBadge: React.FC<{ rank: number }> = ({ rank }) => {
   if (rank > 3) return null;
   const medals = ["🥇", "🥈", "🥉"];
-  return <span className="ml-1">{medals[rank - 1]}</span>;
+  return <Emoji className="ml-1">{medals[rank - 1]!}</Emoji>;
 };
 
 const formatDate = (dateString?: string): string => {
@@ -41,7 +42,7 @@ export const StudyOverallStats: React.FC<StudyOverallStatsProps> = ({
     return (
       <div className="py-8 border-b border-border/20">
         <h2 className="text-lg font-light text-foreground mb-4">
-          📊 스터디 전체 통계
+          <Emoji>📊</Emoji> 스터디 전체 통계
         </h2>
         <div className="bg-muted-foreground/5 rounded-lg p-6 text-center">
           <p className="text-muted-foreground/60 font-light">
@@ -56,7 +57,7 @@ export const StudyOverallStats: React.FC<StudyOverallStatsProps> = ({
     return (
       <div className="py-8 border-b border-border/20">
         <h2 className="text-lg font-light text-foreground mb-4">
-          📊 스터디 전체 통계
+          <Emoji>📊</Emoji> 스터디 전체 통계
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -80,7 +81,7 @@ export const StudyOverallStats: React.FC<StudyOverallStatsProps> = ({
     return (
       <div className="py-8 border-b border-border/20">
         <h2 className="text-lg font-light text-foreground mb-4">
-          📊 스터디 전체 통계
+          <Emoji>📊</Emoji> 스터디 전체 통계
         </h2>
         <div className="bg-muted-foreground/5 rounded-lg p-6 text-center">
           <p className="text-muted-foreground/60 font-light">
@@ -110,7 +111,7 @@ export const StudyOverallStats: React.FC<StudyOverallStatsProps> = ({
     <div className="py-8 border-b border-border/20">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h2 className="text-base md:text-lg font-light text-foreground">
-          📊 스터디 전체 통계
+          <Emoji>📊</Emoji> 스터디 전체 통계
         </h2>
         <div className="text-sm text-muted-foreground/60 font-light">
           활성 멤버 {activeMembers}/{totalMembers}명
@@ -152,8 +153,8 @@ export const StudyOverallStats: React.FC<StudyOverallStatsProps> = ({
         <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-muted-foreground/5 text-xs text-muted-foreground/60 font-light border-b border-border/10">
           <div className="col-span-1">#</div>
           <div className="col-span-4">멤버</div>
-          <div className="col-span-2 text-center">🔥 현재</div>
-          <div className="col-span-2 text-center">🏆 최장</div>
+          <div className="col-span-2 text-center"><Emoji>🔥</Emoji> 현재</div>
+          <div className="col-span-2 text-center"><Emoji>🏆</Emoji> 최장</div>
           <div className="col-span-3 text-center hidden sm:block">마지막 출석</div>
         </div>
 

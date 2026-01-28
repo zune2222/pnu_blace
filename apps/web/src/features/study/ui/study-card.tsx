@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { StudyGroupListItem } from "@pnu-blace/types";
-import { VisibilityBadge } from "@/shared/ui";
+import { VisibilityBadge, Emoji } from "@/shared/ui";
 
 interface StudyCardProps {
   study: StudyGroupListItem;
@@ -73,7 +73,7 @@ export const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
 
           {study.todayAttendanceRate !== undefined && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground/60 font-light">
-              <span>📊</span>
+              <Emoji>📊</Emoji>
               <span>오늘 출석률 {study.todayAttendanceRate}%</span>
             </div>
           )}

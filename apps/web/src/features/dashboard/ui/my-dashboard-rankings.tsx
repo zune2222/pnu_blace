@@ -4,7 +4,7 @@ import {
   useMyRank,
   usePersonalStats,
 } from "@/entities/dashboard";
-import { SkeletonStats, EmptyState } from "@/shared/ui";
+import { SkeletonStats, EmptyState, Emoji } from "@/shared/ui";
 import { ShareStoryButton } from "@/features/share";
 
 type RankingPeriod = "weekly" | "all-time";
@@ -50,7 +50,7 @@ export const MyDashboardRankings: React.FC = () => {
 
     return (
       <span className="flex items-center justify-center gap-1 text-sm font-light text-foreground">
-        <span>{tierIcons[tier] || "📚"}</span>
+        <Emoji>{tierIcons[tier] || "📚"}</Emoji>
         <span>{tier}</span>
       </span>
     );

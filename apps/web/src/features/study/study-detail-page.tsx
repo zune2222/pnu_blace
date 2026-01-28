@@ -12,7 +12,7 @@ import {
   useMyStudyGroups,
 } from "@/entities/study";
 import { useAuth } from "@/entities/auth";
-import { VisibilityBadge } from "@/shared/ui";
+import { VisibilityBadge, Emoji } from "@/shared/ui";
 import { AttendanceList } from "./ui/attendance-list";
 import { StudyOverallStats } from "./ui/study-overall-stats";
 import { StudyChat } from "./ui/study-chat";
@@ -278,7 +278,7 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
                 : "border-transparent text-muted-foreground/60 hover:text-foreground"
             }`}
           >
-            💬 채팅
+            <Emoji>💬</Emoji> 채팅
             {unreadCount > 0 && activeTab !== "chat" && (
               <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                 {unreadCount > 99 ? "99+" : unreadCount}
@@ -345,9 +345,9 @@ export const StudyDetailPage: React.FC<StudyDetailPageProps> = ({
                       </p>
                       <p className="text-xs text-muted-foreground/50 font-light">
                         {member.role === "OWNER"
-                          ? "👑 스터디장"
+                          ? <><Emoji>👑</Emoji> 스터디장</>
                           : member.role === "ADMIN"
-                            ? "🛡️ 부스터디장"
+                            ? <><Emoji>🛡️</Emoji> 부스터디장</>
                             : "멤버"}
                       </p>
                     </div>

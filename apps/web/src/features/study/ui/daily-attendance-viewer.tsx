@@ -5,6 +5,7 @@ import {
   useOperatingDates,
   useAttendanceByDate,
 } from "@/entities/study/model/hooks";
+import { Emoji } from "@/shared/ui";
 
 interface DailyAttendanceViewerProps {
   groupId: string;
@@ -134,7 +135,7 @@ export const DailyAttendanceViewer: React.FC<DailyAttendanceViewerProps> = ({
     return (
       <div className="py-8 border-b border-border/20">
         <h2 className="text-lg font-light text-foreground mb-4">
-          📅 날짜별 출결 현황
+          <Emoji>📅</Emoji> 날짜별 출결 현황
         </h2>
         <div className="animate-pulse space-y-3">
           <div className="h-10 bg-muted-foreground/10 rounded" />
@@ -148,7 +149,7 @@ export const DailyAttendanceViewer: React.FC<DailyAttendanceViewerProps> = ({
     return (
       <div className="py-8 border-b border-border/20">
         <h2 className="text-lg font-light text-foreground mb-4">
-          📅 날짜별 출결 현황
+          <Emoji>📅</Emoji> 날짜별 출결 현황
         </h2>
         <div className="bg-muted-foreground/5 rounded-lg p-6 text-center">
           <p className="text-muted-foreground/60 font-light">
@@ -162,7 +163,7 @@ export const DailyAttendanceViewer: React.FC<DailyAttendanceViewerProps> = ({
   return (
     <div className="py-8 border-b border-border/20">
       <h2 className="text-lg font-light text-foreground mb-4">
-        📅 날짜별 출결 현황
+        <Emoji>📅</Emoji> 날짜별 출결 현황
       </h2>
 
       {/* 캘린더 */}

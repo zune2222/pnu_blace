@@ -1,6 +1,41 @@
 @import "tailwindcss";
 
 /* 
+ * Tossface 이모지 폰트
+ * 숫자(U+30-39), #(U+23), *(U+2A) 제외 - 순수 이모지만 적용
+ */
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/TossFaceFontMac-00.woff2") format("woff2");
+  unicode-range: U+261D, U+2620, U+2639-263A, U+270A-270D, U+1F440-1F450, U+1F479-1F480, U+1F48B, U+1F4A8-1F4AB, U+1F590, U+1F595-1F596, U+1F600-1F644, U+1F64C, U+1F64F, U+1F90C, U+1F90F-1F92F, U+1F970-1F97A, U+1F9D0, U+1F9E0;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/TossFaceFontMac-04.woff2") format("woff2");
+  unicode-range: U+2764, U+1F48B, U+1F48F, U+1F491, U+1F525;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/TossFaceFontMac-07.woff2") format("woff2");
+  unicode-range: U+2600-2604, U+2614-2615, U+26A1, U+26C4-26C5, U+2728, U+2744, U+2B50, U+1F300-1F320, U+1F324-1F393, U+1F3A0-1F3F0, U+1F400-1F4A7, U+1F4AE, U+1F54A-1F54D, U+1F5FA-1F5FF, U+1F648-1F64A, U+1F940-1F96F, U+1F980-1F9CB;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/TossFaceFontMac-08.woff2") format("woff2");
+  unicode-range: U+2705, U+2714, U+2716, U+274C, U+274E, U+2753-2757, U+2763, U+27A1, U+1F004, U+1F4AF, U+1F680-1F6A8;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/TossFaceFontMac-09.woff2") format("woff2");
+  unicode-range: U+1F380-1F393, U+1F396-1F3FA, U+1F451-1F4FD, U+1F4FF-1F53D, U+1F56F-1F5DE, U+1F6AA-1F6FC, U+1F947-1F9FF;
+  font-display: swap;
+}
+
+/* 
  * Tailwind v4 Theme Configuration
  * 색상은 :root/.dark CSS 변수를 참조하여 다크모드 지원
  */
@@ -103,6 +138,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: var(--font-pretendard), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
@@ -124,6 +160,11 @@
     word-break: keep-all;
     overflow-wrap: break-word;
     line-height: 1.6;
+  }
+
+  /* Tossface 이모지 전용 클래스 - 필요한 곳에만 사용 */
+  .emoji {
+    font-family: "Tossface", sans-serif;
   }
 }
 

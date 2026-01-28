@@ -2,6 +2,7 @@
 
 import React from "react";
 import { StudyVisibility } from "@pnu-blace/types";
+import { Emoji } from "./emoji";
 
 interface VisibilityBadgeProps {
   visibility: StudyVisibility;
@@ -36,7 +37,7 @@ export const VisibilityBadge: React.FC<VisibilityBadgeProps> = ({
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-light ${config.className} ${className}`}
     >
-      {config.icon} {config.label}
+      <Emoji>{config.icon}</Emoji> {config.label}
     </span>
   );
 };

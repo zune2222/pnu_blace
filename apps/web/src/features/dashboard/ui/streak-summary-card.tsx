@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { StreakStats } from "@/entities/dashboard/model/types";
+import { Emoji } from "@/shared/ui";
 
 interface StreakSummaryCardProps {
   streakStats: StreakStats | null;
@@ -41,7 +42,7 @@ export const StreakSummaryCard: React.FC<StreakSummaryCardProps> = ({
       <div className="flex items-center justify-between">
         {/* 현재 스트릭 */}
         <div className="flex items-center gap-4">
-          <div className="text-4xl">🔥</div>
+          <Emoji className="text-4xl">🔥</Emoji>
           <div>
             <div className="text-2xl font-mono font-extralight text-foreground">
               {currentStreak}
