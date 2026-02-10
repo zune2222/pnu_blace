@@ -2,6 +2,7 @@
 export interface LoginResult {
 	success: boolean;
 	userID?: string;
+	userName?: string;
 	sessionID?: string;
 	errorMessage?: string;
 }

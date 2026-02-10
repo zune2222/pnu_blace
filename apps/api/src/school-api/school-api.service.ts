@@ -94,8 +94,8 @@ export class SchoolApiService {
     return this.seatQueryService.getMySeatHistory(userID, sessionID);
   }
 
-  async getUserInfo(sessionID: string): Promise<UserInfoFromAPI | null> {
-    return this.authService.getUserInfo(sessionID);
+  async getUserInfo(sessionID: string, userID: string): Promise<UserInfoFromAPI | null> {
+    return this.authService.getUserInfo(sessionID, userID);
   }
 
   async loginAsSystem() {

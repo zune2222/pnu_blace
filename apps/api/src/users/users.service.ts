@@ -107,6 +107,14 @@ export class UsersService {
     });
   }
 
+  async findUsersWithBadData(): Promise<User[]> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where('user.name = user.studentId')
+      .orWhere('user.major = :major', { major: '정보 없음' })
+      .getMany();
+  }
+
   /**
    * 에러 메시지 안전하게 추출
    */

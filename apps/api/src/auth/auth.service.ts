@@ -43,6 +43,7 @@ export class AuthService {
       this.logger.debug(`Fetching user info for: ${studentId}`);
       const userInfo = await this.schoolApiService.getUserInfo(
         loginResult.sessionID!,
+        studentId,
       );
 
       let user: User;
@@ -51,21 +52,24 @@ export class AuthService {
         user = await this.usersService.saveUserFromAPI(userInfo);
         this.logger.debug(`User info saved from API: ${userInfo.userName}`);
       } else {
-        // 사용자 정보 조회 실패 시 기본 정보로 저장
+        // 사용자 정보 조회 실패 시 로그인 응답의 정보를 사용
         this.logger.warn(
-          `Failed to fetch user info for ${studentId}, using basic info`,
+          `Failed to fetch user info for ${studentId}, using login response info`,
         );
 
         let existingUser = await this.usersService.findByStudentId(studentId);
         if (!existingUser) {
           existingUser = this.userRepository.create({
             studentId,
-            name: studentId, // 임시로 학번을 이름으로 사용
+            name: loginResult.userName || studentId,
             major: '정보 없음',
             lastLoginAt: new Date(),
           });
           user = await this.userRepository.save(existingUser);
         } else {
+          if (loginResult.userName) {
+            existingUser.name = loginResult.userName;
+          }
           existingUser.lastLoginAt = new Date();
           user = await this.userRepository.save(existingUser);
         }

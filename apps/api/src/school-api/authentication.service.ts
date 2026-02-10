@@ -101,6 +101,7 @@ export class AuthenticationService {
           return {
             success: true,
             userID: studentId,
+            userName: loginResult.userName,
             sessionID: jsessionId,
           };
         } else {
@@ -139,9 +140,9 @@ export class AuthenticationService {
     return this.login(systemUserId, systemPassword);
   }
 
-  async getUserInfo(sessionID: string): Promise<UserInfoFromAPI | null> {
+  async getUserInfo(sessionID: string, userID: string): Promise<UserInfoFromAPI | null> {
     try {
-      const response = await this.httpClient.get('/idCard.do', {
+      const response = await this.httpClient.post('/idCard.do', `userID=${userID}`, {
         headers: {
           Cookie: `JSESSIONID=${sessionID}`,
         },
@@ -204,7 +205,7 @@ export class AuthenticationService {
 
       const extractCDATA = (tagName: string): string => {
         const regex = new RegExp(
-          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]*?)\\]\\]>\\s*</${tagName}>`,
           'i',
         );
         const match = xmlData.match(regex);
@@ -233,6 +234,7 @@ export class AuthenticationService {
 
   private parseLoginXml(xmlData: string): {
     success: boolean;
+    userName?: string;
     errorMessage?: string;
   } {
     try {
@@ -240,7 +242,7 @@ export class AuthenticationService {
 
       const extractCDATA = (tagName: string): string => {
         const regex = new RegExp(
-          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]*?)\\]\\]>\\s*</${tagName}>`,
           'i',
         );
         const match = xmlData.match(regex);
@@ -249,14 +251,16 @@ export class AuthenticationService {
 
       const resultCode = extractCDATA('resultCode');
       const resultMsg = extractCDATA('resultMsg');
+      const userName = extractCDATA('userName');
 
       this.logger.debug(
-        `Login result - code: ${resultCode}, message: ${resultMsg}`,
+        `Login result - code: ${resultCode}, message: ${resultMsg}, userName: ${userName}`,
       );
 
       if (resultCode === '0') {
         return {
           success: true,
+          userName: userName || undefined,
         };
       } else {
         return {
@@ -279,7 +283,7 @@ export class AuthenticationService {
     try {
       const extractCDATA = (tagName: string): string => {
         const regex = new RegExp(
-          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]+)\\]\\]>\\s*</${tagName}>`,
+          `<${tagName}>\\s*<!\\[CDATA\\[([^\\]]*?)\\]\\]>\\s*</${tagName}>`,
           'i',
         );
         const match = xmlData.match(regex);
