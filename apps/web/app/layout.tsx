@@ -29,7 +29,7 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   title: "PNU Blace",
   description: "부산대학교 도서관을 더욱 편리하게",
-  keywords: ["부산대학교", "도서관", "좌석예약", "자동예약", "PNU", "Blace"],
+  keywords: ["부산대학교", "도서관", "좌석예약", "PNU", "Blace"],
   openGraph: {
     title: "PNU Blace",
     description: "부산대학교 도서관을 더욱 편리하게",
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
       {
-        rel: "android-chrome-512x512", 
+        rel: "android-chrome-512x512",
         url: "/android-chrome-512x512.png",
         sizes: "512x512",
         type: "image/png",
