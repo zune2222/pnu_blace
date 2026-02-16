@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, MoreThan, Not, IsNull } from 'typeorm';
+import { Repository, MoreThan, Not, IsNull } from 'typeorm';
 import { MyUsageLog, SeatEventLog, User, UserStats } from '@pnu-blace/db';
 import { CalendarService, PeriodType } from './calendar.service';
 import { SchoolApiService } from '../school-api/school-api.service';
@@ -8,7 +8,6 @@ import {
   MyUsageStatsDto,
   MyRankInfoDto,
   SeatPredictionDto,
-  UsagePattern,
 } from '@pnu-blace/types';
 
 // 랜덤 닉네임 생성용 단어 목록
@@ -274,51 +273,69 @@ export class StatsService {
     seatNo: string,
   ): Promise<SeatPredictionDto> {
     try {
-      // 현재 기간 타입 조회
       const currentPeriod = await this.calendarService.getCurrentPeriodType();
 
-      // 최근 90일간의 해당 좌석 이벤트 로그 조회
+      // 최근 90일간의 이벤트 수 집계
       const ninetyDaysAgo = new Date();
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-      const eventLogs = await this.seatEventLogRepository.find({
+      const totalEvents = await this.seatEventLogRepository.count({
         where: {
           roomNo,
           seatNo,
           timestamp: MoreThan(ninetyDaysAgo),
-          event: 'OCCUPIED', // 점유 이벤트만
-        },
-        order: {
-          timestamp: 'ASC',
         },
       });
 
-      if (eventLogs.length === 0) {
+      if (totalEvents === 0) {
         return this.getEmptyPrediction(roomNo, seatNo, currentPeriod);
       }
 
-      // 현재 기간과 같은 타입의 이벤트들만 필터링
-      const currentPeriodEvents = eventLogs.filter(
-        (log) => log.periodType === currentPeriod,
-      );
+      // 피크 시간 조회 (raw SQL)
+      const peakRows: { hour: string; cnt: string }[] =
+        await this.seatEventLogRepository.query(
+          `SELECT EXTRACT(HOUR FROM (timestamp AT TIME ZONE 'Asia/Seoul'))::text AS hour,
+                  COUNT(*)::text AS cnt
+           FROM seat_event_log
+           WHERE "roomNo" = $1 AND "seatNo" = $2
+             AND event = 'OCCUPIED'
+             AND timestamp > $3
+           GROUP BY hour
+           ORDER BY cnt DESC
+           LIMIT 3`,
+          [roomNo, seatNo, ninetyDaysAgo],
+        );
 
-      // 이용 패턴 분석
-      const usagePatterns = this.analyzeUsagePatterns(currentPeriodEvents);
-      const usageProfile = this.generateUsageProfile(usagePatterns);
-      const summaryMessage = this.generateSummaryMessage(
-        currentPeriod,
-        usageProfile,
-      );
+      const peakHours = peakRows.map((r) => `${r.hour.padStart(2, '0')}:00`);
+      const recommendedHours = peakRows.map((r) => {
+        const h = (parseInt(r.hour) - 1 + 24) % 24;
+        return `${String(h).padStart(2, '0')}:00`;
+      });
+
+      // 평균 이용률 (해당 좌석의 OCCUPIED 비율)
+      const totalPeriodEvents = await this.seatEventLogRepository.count({
+        where: {
+          roomNo,
+          seatNo,
+          timestamp: MoreThan(ninetyDaysAgo),
+          event: 'OCCUPIED',
+          periodType: currentPeriod,
+        },
+      });
+      const averageUtilization =
+        totalEvents > 0
+          ? Math.round((totalPeriodEvents / totalEvents) * 100 * 10) / 10
+          : 0;
 
       return {
         roomNo,
         seatNo,
         analysis: {
           currentPeriod,
-          totalEvents: eventLogs.length,
-          averageUtilization: eventLogs.length > 0 ? 75.5 : 0, // 예시 값
-          peakHours: ['09:00', '14:00', '19:00'], // 예시 값
-          recommendedTimes: ['08:00', '13:00', '18:00'], // 예시 값
+          totalEvents,
+          averageUtilization,
+          peakHours,
+          recommendedTimes: recommendedHours,
         },
       };
     } catch (error: any) {
@@ -364,81 +381,6 @@ export class StatsService {
         recommendedTimes: [],
       },
     };
-  }
-
-  /**
-   * 이용 패턴 분석 (간단한 버전)
-   */
-  private analyzeUsagePatterns(eventLogs: SeatEventLog[]): UsagePattern[] {
-    // 실제로는 더 복잡한 분석이 필요하지만,
-    // 여기서는 간단히 이용 시간대별 빈도만 분석
-    const patterns: { [duration: number]: number } = {};
-
-    // 가상의 이용 시간 생성 (실제로는 VACATED 이벤트와 매칭 필요)
-    for (let i = 0; i < eventLogs.length; i++) {
-      // 임시로 랜덤한 이용 시간 생성 (1-12시간)
-      const duration = Math.floor(Math.random() * 12) + 1;
-      patterns[duration] = (patterns[duration] || 0) + 1;
-    }
-
-    return Object.entries(patterns).map(([duration, count]) => ({
-      durationHours: parseInt(duration),
-      count,
-    }));
-  }
-
-  /**
-   * 이용 프로파일 생성
-   */
-  private generateUsageProfile(
-    patterns: UsagePattern[],
-  ): { durationHours: number; percentage: number }[] {
-    const totalCount = patterns.reduce(
-      (sum, pattern) => sum + pattern.count,
-      0,
-    );
-
-    if (totalCount === 0) {
-      return [];
-    }
-
-    return patterns
-      .map((pattern) => ({
-        durationHours: pattern.durationHours,
-        percentage: Math.round((pattern.count / totalCount) * 100) / 100,
-      }))
-      .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 5); // 상위 5개만
-  }
-
-  /**
-   * 요약 메시지 생성
-   */
-  private generateSummaryMessage(
-    currentPeriod: PeriodType,
-    usageProfile: { durationHours: number; percentage: number }[],
-  ): string {
-    if (usageProfile.length === 0) {
-      return '충분한 데이터가 없어 예측할 수 없습니다.';
-    }
-
-    const topPattern = usageProfile[0];
-    const periodName = this.getPeriodName(currentPeriod);
-
-    return `${periodName}에는 ${Math.round(topPattern.percentage * 100)}%의 확률로 ${topPattern.durationHours}시간 이용하는 패턴을 보여요.`;
-  }
-
-  /**
-   * 기간 타입을 한국어 이름으로 변환
-   */
-  private getPeriodName(periodType: PeriodType): string {
-    const names = {
-      NORMAL: '평상시',
-      EXAM: '시험 기간',
-      VACATION: '방학 기간',
-      FINALS: '기말고사 기간',
-    };
-    return names[periodType] || '평상시';
   }
 
   /**
@@ -678,7 +620,7 @@ export class StatsService {
       message: '도서관 이용 통계입니다.',
       totalTimeMessage: `총 ${Math.round(totalHours * 10) / 10}시간 이용`,
       visitCountMessage: `총 ${totalSessions}회 방문`,
-      favoriteRoomMessage: favoriteRoom 
+      favoriteRoomMessage: favoriteRoom
         ? `가장 자주 이용한 장소: ${favoriteRoom.name} (${favoriteRoom.count}회)`
         : '아직 이용 기록이 충분하지 않습니다.',
     };
@@ -696,7 +638,10 @@ export class StatsService {
       });
 
       // 스트릭 계산
-      const streakStats = await this.calculateStreakStats(studentId, statsData.seatHistory || []);
+      const streakStats = await this.calculateStreakStats(
+        studentId,
+        statsData.seatHistory || [],
+      );
 
       const statsToSave: any = {
         studentId,
@@ -1556,9 +1501,10 @@ export class StatsService {
         for (let i = sortedDates.length - 2; i >= 0; i--) {
           const currentDate = sortedDates[i + 1];
           const prevDate = sortedDates[i];
-          
+
           const dateDiff = Math.floor(
-            (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24),
+            (currentDate.getTime() - prevDate.getTime()) /
+              (1000 * 60 * 60 * 24),
           );
 
           if (dateDiff === 1) {
@@ -1586,9 +1532,10 @@ export class StatsService {
         for (let i = 1; i < sortedDates.length; i++) {
           const currentDate = sortedDates[i];
           const prevDate = sortedDates[i - 1];
-          
+
           const dateDiff = Math.floor(
-            (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24),
+            (currentDate.getTime() - prevDate.getTime()) /
+              (1000 * 60 * 60 * 24),
           );
 
           if (dateDiff === 1) {
@@ -1630,7 +1577,9 @@ export class StatsService {
     endDate?: string,
   ) {
     try {
-      this.logger.debug(`Getting full seat history for user: ${userID}, page: ${page}, limit: ${limit}`);
+      this.logger.debug(
+        `Getting full seat history for user: ${userID}, page: ${page}, limit: ${limit}`,
+      );
 
       // 학교 API에서 모든 이용 내역 가져오기
       const seatHistory = await this.schoolApiService.getMySeatHistory(
@@ -1655,7 +1604,7 @@ export class StatsService {
         filteredHistory = seatHistory.filter((record: any) => {
           const recordDate = record.useDt; // YYYY.MM.DD 형태
           const recordDateFormatted = recordDate.replace(/\./g, '-'); // YYYY-MM-DD로 변환
-          
+
           if (startDate && recordDateFormatted < startDate) {
             return false;
           }
@@ -1686,9 +1635,11 @@ export class StatsService {
         duration: this.formatDuration(
           this.calculateUsageMinutes(record.startTm, record.endTm),
         ),
-        usageHours: Math.round(
-          this.calculateUsageMinutes(record.startTm, record.endTm) / 60 * 10
-        ) / 10,
+        usageHours:
+          Math.round(
+            (this.calculateUsageMinutes(record.startTm, record.endTm) / 60) *
+              10,
+          ) / 10,
       }));
 
       return {
@@ -1708,7 +1659,10 @@ export class StatsService {
   /**
    * 사용자의 연간 도서관 이용 히트맵 데이터 조회
    */
-  async getUserLibraryHeatmap(studentId: string, year?: number): Promise<{
+  async getUserLibraryHeatmap(
+    studentId: string,
+    year?: number,
+  ): Promise<{
     currentStreak: number;
     longestStreak: number;
     lastStudyDate?: Date;
@@ -1721,7 +1675,7 @@ export class StatsService {
   }> {
     try {
       const targetYear = year || new Date().getFullYear();
-      
+
       // 사용자 정보 조회
       const user = await this.userRepository.findOne({
         where: { studentId },
@@ -1748,13 +1702,16 @@ export class StatsService {
 
       // 날짜별 이용 시간 계산
       const dailyUsageMap = new Map<string, number>();
-      
+
       seatHistory.forEach((record: any) => {
         // YYYY.MM.DD를 YYYY-MM-DD 형태로 변환
         const dateStr = record.useDt.replace(/\./g, '-');
-        const usageMinutes = this.calculateUsageMinutes(record.startTm, record.endTm);
+        const usageMinutes = this.calculateUsageMinutes(
+          record.startTm,
+          record.endTm,
+        );
         const usageHours = usageMinutes / 60;
-        
+
         const existingHours = dailyUsageMap.get(dateStr) || 0;
         dailyUsageMap.set(dateStr, existingHours + usageHours);
       });
@@ -1775,14 +1732,14 @@ export class StatsService {
         const usageHours = dailyUsageMap.get(dateStr) || 0;
         const hasActivity = usageHours > 0;
         const level = this.calculateUsageLevel(usageHours);
-        
+
         streakHistory.push({
           date: dateStr,
           hasActivity,
           usageHours: Math.round(usageHours * 10) / 10,
           level,
         });
-        
+
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
@@ -1802,11 +1759,11 @@ export class StatsService {
    * 이용 시간에 따른 색상 강도 레벨 계산 (0-4)
    */
   private calculateUsageLevel(usageHours: number): number {
-    if (usageHours === 0) return 0;      // 흰색 (이용 없음)
-    if (usageHours <= 2) return 1;       // 연한 주황색
-    if (usageHours <= 5) return 2;       // 중간 주황색
-    if (usageHours <= 8) return 3;       // 진한 주황색
-    return 4;                            // 가장 진한 주황색
+    if (usageHours === 0) return 0; // 흰색 (이용 없음)
+    if (usageHours <= 2) return 1; // 연한 주황색
+    if (usageHours <= 5) return 2; // 중간 주황색
+    if (usageHours <= 8) return 3; // 진한 주황색
+    return 4; // 가장 진한 주황색
   }
 
   /**

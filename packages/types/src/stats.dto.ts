@@ -39,7 +39,7 @@ export class MyRankInfoDto {
 	createdAt: Date;
 	updatedAt: Date;
 	lastDataSyncAt?: Date;
-	
+
 	// 계산된 랭킹 정보
 	totalUsers: number;
 	hoursRank: number;
@@ -78,8 +78,46 @@ export class CalendarActionResponseDto {
 	message: string;
 }
 
-// 사용 패턴 분석용 인터페이스
-export interface UsagePattern {
-	durationHours: number;
-	count: number;
+// Survival Analysis Types
+
+/** 생존 곡선의 한 점 */
+export interface SurvivalPoint {
+	/** 세션 시작 이후 경과 시간(분) */
+	minutesFromStart: number;
+	/** 해당 시점에서 아직 사용 중일 확률 (0-1) */
+	survivalProbability: number;
+	/** 이 구간에 기여한 세션 수 */
+	sampleSize: number;
+}
+
+/** "N분 내 비워질 확률" 밴드 */
+export interface VacancyProbabilityBand {
+	/** 기준 시간(분) */
+	withinMinutes: number;
+	/** 해당 시간 내에 비워질 확률 (0-1) */
+	probability: number;
+}
+
+/** 생존분석 예측 결과 */
+export interface SurvivalPredictionResult {
+	/** 남은 사용시간 중앙값(분) */
+	medianRemainingMinutes: number;
+	/** 25% 분위수 — 낙관적 추정(분) */
+	q25RemainingMinutes: number;
+	/** 75% 분위수 — 비관적 추정(분) */
+	q75RemainingMinutes: number;
+	/** 확률 밴드 배열 */
+	probabilityBands: VacancyProbabilityBand[];
+	/** 예측 신뢰도 (0-1), 샘플 수 기반 */
+	confidence: number;
+	/** 생존 곡선 (프론트엔드 차트용, 선택적) */
+	survivalCurve?: SurvivalPoint[];
+}
+
+/** 예측에 사용된 세그먼트 키 */
+export interface PredictionSegment {
+	periodType: PeriodType | "ALL";
+	startHourBucket: string;
+	dayType: "WEEKDAY" | "WEEKEND" | "ALL";
+	roomNo?: string;
 }

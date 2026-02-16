@@ -1,4 +1,16 @@
-import { IsString, IsNotEmpty, IsBoolean, IsNumber, IsOptional, IsEnum } from "class-validator";
+import {
+	IsString,
+	IsNotEmpty,
+	IsBoolean,
+	IsNumber,
+	IsOptional,
+	IsEnum,
+} from "class-validator";
+import type {
+	VacancyProbabilityBand,
+	PredictionSegment,
+	SurvivalPoint,
+} from "./stats.dto";
 
 // GET /seats/:roomNo
 export class SeatStatusDto {
@@ -63,7 +75,29 @@ export class SeatVacancyPredictionDto {
 	predictedEndTime: string;
 	confidence: number; // 0-1 사이의 값
 	message: string;
-	currentStatus?: "AVAILABLE" | "OCCUPIED" | "UNAVAILABLE"; // 현재 좌석 상태
+	currentStatus?: "AVAILABLE" | "OCCUPIED" | "UNAVAILABLE";
+
+	/** 현재 세션 시작 시각 (ISO 8601) */
+	occupiedSince?: string;
+	/** 현재까지 경과 시간(분) */
+	elapsedMinutes?: number;
+	/** 남은 사용시간 중앙값(분) */
+	medianRemainingMinutes?: number;
+	/** 남은 시간 범위 */
+	remainingRange?: {
+		/** 낙관적 추정 — 25% 분위수(분) */
+		optimistic: number;
+		/** 비관적 추정 — 75% 분위수(분) */
+		pessimistic: number;
+	};
+	/** "N분 내 비워질 확률" 밴드 */
+	probabilityBands?: VacancyProbabilityBand[];
+	/** 예측에 사용된 세그먼트 정보 */
+	segment?: PredictionSegment;
+	/** 예측에 사용된 세션 샘플 수 */
+	sampleSize?: number;
+	/** 생존 곡선 (includeCurve=true 시) */
+	survivalCurve?: SurvivalPoint[];
 }
 
 // 자동 연장 관련 DTOs

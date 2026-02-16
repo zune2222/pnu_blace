@@ -102,7 +102,12 @@ export class SeatsService {
   async getSeatPrediction(
     roomNo: string,
     seatNo: string,
+    includeCurve = false,
   ): Promise<SeatVacancyPredictionDto> {
-    return this.seatPredictionService.getSeatPrediction(roomNo, seatNo);
+    return this.seatPredictionService.getSeatPrediction(
+      roomNo,
+      seatNo,
+      includeCurve,
+    );
   }
 }

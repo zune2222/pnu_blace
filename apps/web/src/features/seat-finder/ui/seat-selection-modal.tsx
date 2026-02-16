@@ -22,7 +22,7 @@ interface SeatSelectionModalProps {
   seatData: SeatDetailDto | null;
   onReserveSeat: (
     seatNo: string,
-    autoExtensionEnabled?: boolean
+    autoExtensionEnabled?: boolean,
   ) => Promise<void>;
 }
 
@@ -46,11 +46,12 @@ export const SeatSelectionModal = ({
     seatData?.availableSeats.includes(selectedSeat || "") || false;
 
   // 좌석 예측 데이터 (React Query)
-  const { data: prediction, isLoading: isLoadingPrediction } = useSeatPrediction(
-    roomNo,
-    selectedSeat || "",
-    isOpen && !!selectedSeat && !!seatData && isSeatOccupied
-  );
+  const { data: prediction, isLoading: isLoadingPrediction } =
+    useSeatPrediction(
+      roomNo,
+      selectedSeat || "",
+      isOpen && !!selectedSeat && !!seatData && isSeatOccupied,
+    );
 
   // 모달 애니메이션 제어
   useEffect(() => {
@@ -70,16 +71,6 @@ export const SeatSelectionModal = ({
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
-
-  // 예측 시간 포맷팅
-  const getPredictedTime = () => {
-    if (!prediction) return "예측 중...";
-    const analysis = prediction.analysis;
-    if (analysis) {
-      return `평균 ${analysis.averageUtilization}% 사용률, 추천 시간: ${analysis.recommendedTimes.slice(0, 2).join(", ")}`;
-    }
-    return "분석 중...";
-  };
 
   const handleReserve = async () => {
     if (!selectedSeat) return;
@@ -149,8 +140,7 @@ export const SeatSelectionModal = ({
             <div className="mb-6">
               <PredictionDisplay
                 isLoading={isLoadingPrediction}
-                predictionText={getPredictedTime()}
-                currentPeriod={prediction?.analysis?.currentPeriod}
+                prediction={prediction}
               />
             </div>
           )}

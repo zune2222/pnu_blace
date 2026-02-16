@@ -10,6 +10,7 @@ import {
 import { StatsController, AdminController } from './stats.controller';
 import { StatsService } from './stats.service';
 import { CalendarService } from './calendar.service';
+import { SurvivalAnalysisService } from './survival-analysis.service';
 import { SchoolApiModule } from '../school-api/school-api.module';
 import { StudyModule } from '../study/study.module';
 
@@ -26,7 +27,7 @@ import { StudyModule } from '../study/study.module';
     StudyModule,
   ],
   controllers: [StatsController, AdminController],
-  providers: [StatsService, CalendarService],
-  exports: [StatsService, CalendarService],
+  providers: [StatsService, CalendarService, SurvivalAnalysisService],
+  exports: [StatsService, CalendarService, SurvivalAnalysisService],
 })
 export class StatsModule {}

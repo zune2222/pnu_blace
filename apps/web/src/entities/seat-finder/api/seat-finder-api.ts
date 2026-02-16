@@ -1,11 +1,18 @@
-import { SeatDetailDto, SeatPredictionDto, ReserveSeatRequestDto, SeatActionResponseDto } from "@pnu-blace/types";
+import {
+  SeatDetailDto,
+  SeatVacancyPredictionDto,
+  ReserveSeatRequestDto,
+  SeatActionResponseDto,
+} from "@pnu-blace/types";
 import { apiClient } from "@/shared/lib/api";
 
 class SeatFinderApi {
   // 좌석 상세 정보 조회
   async getSeatDetail(roomNo: string): Promise<SeatDetailDto | null> {
     try {
-      return await apiClient.get<SeatDetailDto>(`/api/v1/seats/${roomNo}/detail`);
+      return await apiClient.get<SeatDetailDto>(
+        `/api/v1/seats/${roomNo}/detail`,
+      );
     } catch (error) {
       console.warn("좌석 상세 조회 실패:", error);
       return null;
@@ -13,14 +20,24 @@ class SeatFinderApi {
   }
 
   // 좌석 예약
-  async reserveSeat(request: ReserveSeatRequestDto): Promise<SeatActionResponseDto> {
-    return await apiClient.post<SeatActionResponseDto>("/api/v1/seats/reserve", request);
+  async reserveSeat(
+    request: ReserveSeatRequestDto,
+  ): Promise<SeatActionResponseDto> {
+    return await apiClient.post<SeatActionResponseDto>(
+      "/api/v1/seats/reserve",
+      request,
+    );
   }
 
-  // 좌석 예측 정보 조회
-  async getSeatPrediction(roomNo: string, seatNo: string): Promise<SeatPredictionDto | null> {
+  // 좌석 비움 예측 조회
+  async getSeatPrediction(
+    roomNo: string,
+    seatNo: string,
+  ): Promise<SeatVacancyPredictionDto | null> {
     try {
-      return await apiClient.get<SeatPredictionDto>(`/api/v1/seats/${roomNo}/${seatNo}/prediction`);
+      return await apiClient.get<SeatVacancyPredictionDto>(
+        `/api/v1/seats/${roomNo}/${seatNo}/prediction`,
+      );
     } catch (error) {
       console.warn("좌석 예측 조회 실패:", error);
       return null;

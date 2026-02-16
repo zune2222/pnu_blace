@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { SeatsService } from './seats.service';
@@ -171,7 +172,12 @@ export class SeatsController {
   async getSeatPrediction(
     @Param('roomNo') roomNo: string,
     @Param('seatNo') seatNo: string,
+    @Query('includeCurve') includeCurve?: string,
   ): Promise<SeatVacancyPredictionDto> {
-    return this.seatsService.getSeatPrediction(roomNo, seatNo);
+    return this.seatsService.getSeatPrediction(
+      roomNo,
+      seatNo,
+      includeCurve === 'true',
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, MyUsageLog } from '@pnu-blace/db';
+import { User, MyUsageLog, SeatEventLog } from '@pnu-blace/db';
 import { SeatsController } from './seats.controller';
 import { SeatsService } from './seats.service';
 import { SeatQueryService } from './seat-query.service';
@@ -12,7 +12,7 @@ import { StatsModule } from '../stats/stats.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, MyUsageLog]),
+    TypeOrmModule.forFeature([User, MyUsageLog, SeatEventLog]),
     SchoolApiModule,
     StatsModule,
   ],
@@ -27,4 +27,3 @@ import { StatsModule } from '../stats/stats.module';
   exports: [SeatsService],
 })
 export class SeatsModule {}
-

@@ -1,12 +1,19 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SeatDetailDto, SeatPredictionDto, ReserveSeatRequestDto } from "@pnu-blace/types";
+import {
+  SeatDetailDto,
+  SeatVacancyPredictionDto,
+  ReserveSeatRequestDto,
+} from "@pnu-blace/types";
 import { seatFinderApi } from "../api";
 import { seatFinderKeys } from "./queries";
 import { useAuth } from "@/entities/auth";
 import { toast } from "sonner";
 import { logger } from "@/shared/lib/logger";
-import { getSeatReservationErrorMessage, isExpectedApiError } from "@/shared/lib/error-utils";
+import {
+  getSeatReservationErrorMessage,
+  isExpectedApiError,
+} from "@/shared/lib/error-utils";
 
 // 좌석 상세 데이터 조회
 export const useSeatDetail = (roomNo: string) => {
@@ -24,10 +31,14 @@ export const useSeatDetail = (roomNo: string) => {
 };
 
 // 좌석 예측 정보 조회
-export const useSeatPrediction = (roomNo: string, seatNo: string, enabled: boolean = false) => {
+export const useSeatPrediction = (
+  roomNo: string,
+  seatNo: string,
+  enabled: boolean = false,
+) => {
   return useQuery({
     queryKey: seatFinderKeys.prediction(roomNo, seatNo),
-    queryFn: async (): Promise<SeatPredictionDto | null> => {
+    queryFn: async (): Promise<SeatVacancyPredictionDto | null> => {
       return await seatFinderApi.getSeatPrediction(roomNo, seatNo);
     },
     enabled: enabled && !!roomNo && !!seatNo,
@@ -36,11 +47,20 @@ export const useSeatPrediction = (roomNo: string, seatNo: string, enabled: boole
 };
 
 // 좌석 예약 뮤테이션
-export const useReserveSeatMutation = (roomNo: string, onSuccess?: () => void) => {
+export const useReserveSeatMutation = (
+  roomNo: string,
+  onSuccess?: () => void,
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ seatNo, autoExtensionEnabled }: { seatNo: string; autoExtensionEnabled?: boolean }) => {
+    mutationFn: async ({
+      seatNo,
+      autoExtensionEnabled,
+    }: {
+      seatNo: string;
+      autoExtensionEnabled?: boolean;
+    }) => {
       const request: ReserveSeatRequestDto = {
         roomNo,
         seatNo,
@@ -50,7 +70,9 @@ export const useReserveSeatMutation = (roomNo: string, onSuccess?: () => void) =
     },
     onSuccess: (response) => {
       // 좌석 데이터 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: seatFinderKeys.detail(roomNo) });
+      queryClient.invalidateQueries({
+        queryKey: seatFinderKeys.detail(roomNo),
+      });
 
       // 성공 메시지 표시
       if (response.requiresGateEntry) {
