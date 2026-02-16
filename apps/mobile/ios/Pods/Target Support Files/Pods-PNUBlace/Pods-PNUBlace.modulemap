@@ -1,6 +1,0 @@
-module Pods_PNUBlace {
-  umbrella header "Pods-PNUBlace-umbrella.h"
-
-  export *
-  module * { export * }
-}
