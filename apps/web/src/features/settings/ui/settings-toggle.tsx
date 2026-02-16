@@ -16,20 +16,23 @@ export function SettingsToggle({
   onToggle,
 }: SettingsToggleProps) {
   return (
-    <div className="p-4 flex items-center justify-between">
-      <div>
+    <div className="p-4 flex items-center justify-between gap-4">
+      <div className="flex-1 min-w-0">
         <h3 className="font-medium">{label}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
         onClick={onToggle}
         disabled={disabled}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+        className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
           checked ? "bg-primary" : "bg-muted"
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
             checked ? "translate-x-6" : "translate-x-1"
           }`}
         />

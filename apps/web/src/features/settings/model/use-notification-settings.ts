@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { apiClient } from "@/shared/lib/api";
 
 interface NotificationSettings {
@@ -27,6 +28,7 @@ export function useNotificationSettings() {
         setSettings(data);
       } catch (error) {
         console.error("Failed to fetch settings:", error);
+        toast.error("알림 설정을 불러오지 못했습니다.");
       } finally {
         setLoading(false);
       }
@@ -45,6 +47,7 @@ export function useNotificationSettings() {
     } catch (error) {
       console.error("Failed to save setting:", error);
       setSettings((prev) => ({ ...prev, [key]: !value }));
+      toast.error("알림 설정 변경에 실패했습니다.");
     } finally {
       setSaving(false);
     }

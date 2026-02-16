@@ -60,6 +60,14 @@ yarn-error.log
 **/Pods/
 /vendor/bundle/
 
+# Firebase config (API keys)
+google-services.json
+GoogleService-Info.plist
+
+# Build logs
+*.log
+build.log
+
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
 

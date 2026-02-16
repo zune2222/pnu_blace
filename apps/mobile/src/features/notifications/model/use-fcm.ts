@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, PermissionsAndroid } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import { STORAGE_KEYS, SecureStorage } from '../../../shared';
 
@@ -15,6 +15,16 @@ export const useFCM = ({ onNavigate, onTokenRefresh }: UseFCMProps) => {
   useEffect(() => {
     const setupFCM = async () => {
       try {
+        // Request permission (Android 13+ runtime permission)
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            return;
+          }
+        }
+
         // Request permission (iOS)
         const authStatus = await messaging().requestPermission();
         const enabled =
